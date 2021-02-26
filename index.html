@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>US Congressional Districting Explorer </title>
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+        integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+        crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+        integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+        crossorigin=""></script>
+    <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+
+    <div id='map'></div>
+
+    <!-- jQuery Import -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- Import State GeoJSON files -->
+    <script type="text/javascript" src="GeoJSON/states/AL_STATE_20.js"></script>
+    <script type="text/javascript" src="GeoJSON/states/AR_STATE_20.js"></script>
+    <script type="text/javascript" src="GeoJSON/states/MI_STATE_20.js"></script>
+    <!-- Import Session 116/113 Real Districting GeoJSON Files-->
+    <script type="text/javascript" src="GeoJSON/districtings/AL_CD_113.js"></script>
+    <script type="text/javascript" src="GeoJSON/districtings/AL_CD_116.js"></script>
+    <script type="text/javascript" src="GeoJSON/districtings/AR_CD_113.js"></script>
+    <script type="text/javascript" src="GeoJSON/districtings/AR_CD_116.js"></script>
+    <script type="text/javascript" src="GeoJSON/districtings/MI_CD_113.js"></script>
+    <script type="text/javascript" src="GeoJSON/districtings/MI_CD_116.js"></script>
+
+    <script type="text/javascript" src="map.js"></script>     
+    <!--NAMELSAD20 = "XXth Congressional District" CD116FP = XX-->
+
+    <!-- MAIN SCRIPT -->
+    <script type="text/javascript">
+
+        var countryBounds = [[20,-127],[53,-65]]; //-127.70507812500001,20.4270128142574,-65.87402343750001,53.4357192066942
+
+        var states = ["AL", "AR", "MI"];
+
+        var map = L.map('map').fitBounds(countryBounds);
+        map.setMinZoom(map.getZoom());
+        
+        L.tileLayer('https://api.mapbox.com/styles/v1/mfoydl/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWZveWRsIiwiYSI6ImNrbGNqdnNocDBpZ2Qyd214bDZ2Y2piMDgifQ.nxwFI-kYDMC7ag_O8PgNhg', {
+            maxZoom: 18,
+            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, ' +
+                'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+            id: 'cklh2icm3065v17qfbaanb9fe',
+            tileSize: 512,
+            zoomOffset: -1
+        }).addTo(map);
+        
+        stateLayer = new L.LayerGroup();
+        currentLayer = new L.LayerGroup();
+
+        var statesObj = {}
+
+        states.forEach(addStates);
+
+        function addStates(stateAbbr, index) {
+                statesObj[stateAbbr] = {}
+                var obj = statesObj[stateAbbr];
+                var stateJSON =  L.geoJson(window["" + stateAbbr + "_STATE_20"],{
+                    style: statesStyle,
+                    onEachFeature: function(feature,layer){addHighlight(layer,statesStyle)}
+                });
+                var CD116JSON = L.geoJson(window["" + stateAbbr + "_CD_116"],{
+                    style: styleDistrict,
+                    onEachFeature: function (feature, layer) { addHighlight(layer, districtStyle) }
+                });
+
+                obj.state = stateJSON;
+                obj.cd116 = CD116JSON;
+                
+                stateLayer.addLayer(obj.state);
+
+                currentLayer.addLayer(obj.state);
+
+                stateJSON.on('click',function(){
+                    this.setStyle(statesStyle);
+                    hideAll(currentLayer);
+
+                    currentLayer.addLayer(obj.cd116);
+
+                    backButton.addTo(map);
+
+                    map.flyToBounds(this.getBounds());
+                })
+
+               
+                
+        }
+        currentLayer.addTo(map);
+
+        //CUSTOM LEAFLET UI CONTROLS
+
+        //Back button control object for exiting state Zoom-in
+        L.Control.BackButton = L.Control.extend({
+            onAdd: function(map) {
+                var button = L.DomUtil.create('div','mapButton');
+                button.innerHTML = '<h4>Back</h4>'
+                
+                L.DomEvent.on(button,'click',function(ev){
+                    map.removeControl(backButton);
+                    hideAll(currentLayer);
+                    addGroup(stateLayer,currentLayer);
+                    map.flyToBounds(countryBounds);
+                });
+                return button;
+            },
+            onRemove: function(map){}
+        });
+
+        L.control.backButton = function(opts){
+            return new L.Control.BackButton(opts);
+        }
+
+        //Unfinished label object for adding distrit number labels to the map
+        L.Marker.Label = L.Marker.extend({
+            initialize: function(latlng,name,options){
+                this.name = name;
+                ParentClass.prototype.initialize.call(this,latlng,options)
+            },
+            onAdd: function(map){
+                var label = L.DomUtil.create('div','label');
+                label.innerHTML = "<p>"+this.name+"</p>"
+                return label;
+            },
+            onRemove: function(map){}
+        });
+
+        L.marker.label = function(name,opts){
+            return new L.Marker.Label(name,opts);
+        }
+
+        backButton = L.control.backButton({ position: 'topright'});
+        
+    </script>
+
+
+</body>
+
+</html>
