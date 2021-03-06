@@ -1,3 +1,7 @@
+:root{
+    --menu-bg: rgba(255,255,255,0.8);
+}
+
 html,
 body {
     height: 100%;
@@ -7,6 +11,13 @@ body {
 #map {
     width: 100%;
     height: 100%;
+}
+.menu {
+    padding: 20px;
+    background: var(--menu-bg);
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    border-radius: 5px;
+    width: 30vw;
 }
 .mapButton {
     padding: 8px;
@@ -27,3 +38,40 @@ body {
 .mapButton:hover h4{
     color: white;
 }
+.text-label{
+    opacity: 0.8;
+    color: white;
+    background: rgba(0,0,0,0.5);
+    position: absolute;
+    width: 25px;
+    height: 25px;
+    box-shadow: 0 0 0;
+    text-align: center;
+    margin: 0;
+    border: 1px solid black;
+}
+.text-label:before{
+    border: 0px;
+}
+
+.range-value{
+    width: 100%;
+    text-align: end;
+    padding-right: 5px;
+    font-style: italic;
+}
+
+.submitBtn{
+    margin-top: 25px;
+}
+.switch{
+    padding-bottom: 20px;
+}
+
+#menuNavContent{
+    padding: 1rem;
+}
+.cust-nav{
+    border-bottom: 2px solid white;
+}
+
