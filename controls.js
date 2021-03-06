@@ -96,7 +96,10 @@ function districtsTab() {
     var list = createListGroup(div);
     list.id = "districtList";
     const emptyText= "Districting Parameters have not been set :("
-    list.appendChild(L.DomUtil.create(''))
+    var text = L.DomUtil.create('p')
+    text.innerHTML = emptyText;
+    list.appendChild(text);
+
     return div;
 }
 
