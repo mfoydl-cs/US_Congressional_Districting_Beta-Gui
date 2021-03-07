@@ -34,6 +34,10 @@
     <script type="text/javascript" src="GeoJSON/districtings/AR_CD_116.js"></script>
     <script type="text/javascript" src="GeoJSON/districtings/MI_CD_113.js"></script>
     <script type="text/javascript" src="GeoJSON/districtings/MI_CD_116.js"></script>
+    <!-- Import County Data-->
+    <script type="text/javascript" src="GeoJSON/counties/AL_COUNTY_20.js"></script>
+    <script type="text/javascript" src="GeoJSON/counties/AR_COUNTY_20.js"></script>
+    <script type="text/javascript" src="GeoJSON/counties/MI_COUNTY_20.js"></script>
     
     <script type="text/javascript" src="map.js"></script>
     <script type="text/javascript" src="requests.js"></script>
@@ -43,82 +47,7 @@
 </head>
 
 <body>
-
     <div id='map'></div>
-
-   
-    <!--NAMELSAD20 = "XXth Congressional District" CD116FP = XX-->
-
-    <!-- MAIN SCRIPT -->
-    <script type="text/javascript">
-
-        const countryBounds = [[20,-127],[53,-65]]; //-127.70507812500001,20.4270128142574,-65.87402343750001,53.4357192066942
-
-        const states = ["AL", "AR", "MI"];
-
-        var map = L.map('map').fitBounds(countryBounds);
-        map.setMinZoom(map.getZoom());
-        
-        L.tileLayer('https://api.mapbox.com/styles/v1/mfoydl/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWZveWRsIiwiYSI6ImNrbGNqdnNocDBpZ2Qyd214bDZ2Y2piMDgifQ.nxwFI-kYDMC7ag_O8PgNhg', {
-            maxZoom: 18,
-            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, ' +
-                'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-            id: 'cklh2icm3065v17qfbaanb9fe',
-            tileSize: 512,
-            zoomOffset: -1
-        }).addTo(map);
-        
-        stateLayer = new L.LayerGroup();
-        currentLayer = new L.LayerGroup();
-
-        var statesObj = {}
-
-        states.forEach(addStates);
-
-        function addStates(stateAbbr, index) {
-                statesObj[stateAbbr] = {}
-                var obj = statesObj[stateAbbr];
-                var stateJSON =  L.geoJson(window["" + stateAbbr + "_STATE_20"],{
-                    style: statesStyle,
-                    onEachFeature: function(feature,layer){addHighlight(layer,statesStyle)}
-                });
-                var CD116JSON = L.geoJson(window["" + stateAbbr + "_CD_116"],{
-                    style: styleDistrict,
-                    onEachFeature: function (feature, layer) { addHighlight(layer, districtStyle) }
-                });
-
-                obj.state = stateJSON;
-                obj.cd116 = CD116JSON;
-                
-                stateLayer.addLayer(obj.state);
-
-                currentLayer.addLayer(obj.state);
-
-                stateJSON.on('click',function(){
-                    this.setStyle(statesStyle);
-                    hideAll(currentLayer);
-
-                    currentLayer.addLayer(obj.cd116);
-
-                    backButton.addTo(map);
-                    menu.addTo(map);
-
-                    map.flyToBounds(this.getBounds());
-                })
-
-               
-                
-        }
-        currentLayer.addTo(map);
-
-
-        backButton = L.control.backButton({ position: 'bottomleft'});
-
-        menu = L.control.menu({position:'topright'})
-        //menu.addTo(map);
-    </script>
-
-
 </body>
 
 </html>

@@ -1,3 +1,14 @@
+const countryBounds = [[20, -127], [53, -65]]; //-127.70507812500001,20.4270128142574,-65.87402343750001,53.4357192066942
+var map;
+const states = ["AL", "AR", "MI"];
+
+var stateLayer = new L.LayerGroup();
+var districtLayer = new L.LayerGroup();
+var countyLayer = new L.LayerGroup();
+var zoomLayer = [districtLayer, countyLayer];
+
+var overlays = { "Counties": countyLayer, "Districts": districtLayer };
+var layersControl = L.control.layers(null, overlays);
 
 //Feature Style variables
 const style = {
@@ -22,9 +33,17 @@ const districtStyle = { //Styling (besides color) for District GeoJSON features
 }
 
 const highLightStyle = { //Style for highlighted features
-        weight: 4,
-        opacity: 1,
-        fillOpacity: 0.7
+    weight: 4,
+    opacity: 1,
+    fillOpacity: 0.7
+}
+
+const countyStyle = {
+    weight: 2,
+    opacity: 1,
+    fillOpacity: 0,
+    color: 'white',
+    dashArray: '3 8'
 }
 
 //Pastel color palette for coloring the districts
@@ -110,6 +129,93 @@ function getRandomColor() {
 function randomPresetColor(palette) {
     return palette[Math.floor(Math.random() * palette.length)];
 }
+
+
+function backToCountry(){
+    map.removeControl(backButton);
+    map.removeControl(menu);
+    map.removeControl(layersControl);
+    stateLayer.addTo(map);
+    zoomLayer.forEach(function (layer) { layer.remove(); layer.clearLayers() });
+    map.flyToBounds(countryBounds);
+}
+
+var bounds = countryBounds;
+
+function zoomToState(state,obj){
+    state.setStyle(statesStyle);
+    stateLayer.remove();
+
+    obj.county.addTo(countyLayer);
+
+    zoomLayer.forEach(function (layer) { layer.addTo(map) })
+
+    layersControl.setPosition("topleft").addTo(map);
+
+    backButton.addTo(map);
+    menu.addTo(map);
+
+    bounds = state.getBounds();
+    map.flyToBounds(bounds);
+}
+
+function recenter(){
+    map.flyToBounds(bounds);
+}
+
+var statesObj = {}
+
+function addStates(stateAbbr, index) {
+    statesObj[stateAbbr] = {}
+    var obj = statesObj[stateAbbr];
+
+    var stateJSON = L.geoJson(window["" + stateAbbr + "_STATE_20"], {
+        style: statesStyle,
+        onEachFeature: function (feature, layer) { addHighlight(layer, statesStyle) }
+    });
+
+    var counties = L.geoJson(window["" + stateAbbr + "_COUNTY_20"], {
+        style: countyStyle
+    })
+
+    obj.state = stateJSON;
+    obj.county = counties;
+
+    stateLayer.addLayer(obj.state);
+
+    stateJSON.on('click', function () {
+        zoomToState(this,obj);
+    })
+
+
+
+}
+var map;
+$(document).ready(function () {
+    map = L.map('map').fitBounds(countryBounds);
+    map.setMinZoom(map.getZoom());
+
+    L.tileLayer('https://api.mapbox.com/styles/v1/mfoydl/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWZveWRsIiwiYSI6ImNrbGNqdnNocDBpZ2Qyd214bDZ2Y2piMDgifQ.nxwFI-kYDMC7ag_O8PgNhg', {
+        maxZoom: 18,
+        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, ' +
+            'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+        id: 'cklh2icm3065v17qfbaanb9fe',
+        tileSize: 512,
+        zoomOffset: -1
+    }).addTo(map);
+
+    states.forEach(addStates);
+
+
+    stateLayer.addTo(map);
+    districtLayer.addTo(map);
+    countyLayer.addTo(map);
+
+
+    backButton = L.control.backButton({ position: 'bottomleft' });
+
+    menu = L.control.menu({ position: 'topright' })
+});
 
 
 

@@ -9,11 +9,7 @@ L.Control.BackButton = L.Control.extend({
         button.innerHTML = '<h4>Back</h4>'
 
         L.DomEvent.on(button, 'click', function (ev) {
-            map.removeControl(backButton);
-            map.removeControl(menu);
-            hideAll(currentLayer);
-            addGroup(stateLayer, currentLayer);
-            map.flyToBounds(countryBounds);
+            backToCountry();
         });
         return button;
     },
@@ -71,7 +67,7 @@ L.control.menu = function (opts) {
  */
 function parametersTab() {
     var div = L.DomUtil.create('div');
-    createTextElement(div, 'p', "Set Districting Parameters", "h1")
+    createTextElement(div, 'p', "Districting Parameters", "h1 center")
     createSlider(div, 'population-equality', 'Population Equality', 0, 1, 0.1);
     createSlider(div, 'avgerage-deviation', 'Deviation from Average Districting', 0, 1, 0.1);
     createSlider(div, 'enacted-deviation', 'Deviation from Enacted Plan', 0, 1, 0.1);
@@ -92,7 +88,7 @@ function parametersTab() {
  */
 function districtsTab() {
     var div = L.DomUtil.create('div');
-    createTextElement(div, 'p', "View Districtings", "h1")
+    createTextElement(div, 'p', "View Districtings", "h1 center")
     var list = createListGroup(div);
     list.id = "districtList";
     const emptyText= "Districting Parameters have not been set :("
@@ -136,6 +132,9 @@ function submitParameters() {
     districts.forEach(function (item) {
         list.append(districtListItem(item));
     });
+    $(".nav-link.active,.tab-pane.active").removeClass('show active');
+    //$(".tab-pane.active").removeClass('show active');
+    $("#districts-tab,#districts").addClass('active show');
 }
 
 

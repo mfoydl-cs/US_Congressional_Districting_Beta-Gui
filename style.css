@@ -17,7 +17,9 @@ body {
     background: var(--menu-bg);
     box-shadow: 0 0 15px rgba(0,0,0,0.2);
     border-radius: 5px;
-    width: 30vw;
+    width: 27vw;
+    height: 95vh;
+    overflow: auto;
 }
 .mapButton {
     padding: 8px;
@@ -75,3 +77,6 @@ body {
     border-bottom: 2px solid white;
 }
 
+.center{
+    text-align: center;
+}
