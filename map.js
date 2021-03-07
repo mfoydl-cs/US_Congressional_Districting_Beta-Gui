@@ -1,6 +1,7 @@
 const countryBounds = [[20, -127], [53, -65]]; //-127.70507812500001,20.4270128142574,-65.87402343750001,53.4357192066942
-var map;
 const states = ["AL", "AR", "MI"];
+
+var map;
 
 var stateLayer = new L.LayerGroup();
 var districtLayer = new L.LayerGroup();
@@ -190,7 +191,7 @@ function addStates(stateAbbr, index) {
 
 
 }
-var map;
+
 $(document).ready(function () {
     map = L.map('map').fitBounds(countryBounds);
     map.setMinZoom(map.getZoom());
@@ -214,7 +215,9 @@ $(document).ready(function () {
 
     backButton = L.control.backButton({ position: 'bottomleft' });
 
-    menu = L.control.menu({ position: 'topright' })
+    menu = L.control.menu({ position: 'topright' });
+
+    center = L.control.center({position:'topleft'}).addTo(map);
 });
 
 

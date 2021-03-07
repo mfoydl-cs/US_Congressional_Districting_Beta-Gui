@@ -1,6 +1,33 @@
 /* ********** CUSTOM LEAFLET UI CONTROL DEFINITIONS ********** */
 
 /**
+ * 
+ */
+L.Control.Center = L.Control.extend({
+    onAdd: function(map){
+        var img = L.DomUtil.create('img','sideBtn');
+        img.src='./center.png';
+
+        L.DomEvent.on(img, 'click',function(ev){
+            recenter();
+        })
+
+        return img;
+
+        
+    },
+    onRemove: function(map){}
+});
+
+/**
+ * 
+ * @param {*} opts 
+ */
+L.control.center = function(opts) {
+    return new L.Control.Center(opts);
+}
+
+/**
  * Creates the Back button control
  */
 L.Control.BackButton = L.Control.extend({
