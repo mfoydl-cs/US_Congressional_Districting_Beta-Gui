@@ -11,42 +11,6 @@ var zoomLayer = [districtLayer, countyLayer];
 var overlays = { "Counties": countyLayer, "Districts": districtLayer };
 var layersControl = L.control.layers(null, overlays);
 
-//Feature Style variables
-const style = {
-    weight: 2,
-    opacity: 0.9,
-    fillOpacity: 0.5
-}
-
-const statesStyle = { //Styling for State GeoJSON features
-    fillColor: '#3388FF',
-    color: '#3388FF',
-    weight: 2,
-    opacity: 0.9,
-    fillOpacity: 0.2
-}
-
-const districtStyle = { //Styling (besides color) for District GeoJSON features
-    weight: 2,
-    opacity: 0.6,
-    color: 'white',
-    fillOpacity: 0.5
-}
-
-const highLightStyle = { //Style for highlighted features
-    weight: 4,
-    opacity: 1,
-    fillOpacity: 0.7
-}
-
-const countyStyle = {
-    weight: 2,
-    opacity: 1,
-    fillOpacity: 0,
-    color: 'white',
-    dashArray: '3 8'
-}
-
 //Pastel color palette for coloring the districts
 const pastelPalette = [
     "#e89af9", "#f18bf4", "#dd74f2", "#f78fd8",
@@ -67,6 +31,42 @@ const darkPalette = [
     "#ba3e09", "#e27216", "#e05804", "#d63f08", "#ff652d", //Oranges
     "#af08d8", "#520d84", "#c10d97", "#680c96", "#7b12cc", //Purples
 ]
+
+//Feature Style variables
+const style = {
+    weight: 2,
+    opacity: 0.9,
+    fillOpacity: 0.5
+}
+
+const statesStyle = { //Styling for State GeoJSON features
+    fillColor: '#3388FF',
+    color: '#3388FF',
+    weight: 2,
+    opacity: 0.9,
+    fillOpacity: 0.2
+}
+
+const districtStyle = { //Styling (besides color) for District GeoJSON features
+    weight: 2,
+    opacity: 0.6,
+    color: 'white',
+    fillOpacity: 0.5,
+}
+
+const highLightStyle = { //Style for highlighted features
+    weight: 4,
+    opacity: 1,
+    fillOpacity: 0.7
+}
+
+const countyStyle = {
+    weight: 2,
+    opacity: 1,
+    fillOpacity: 0,
+    color: 'white',
+    dashArray: '3 8'
+}
 
 //Function to set up highlight on mouseover on geoFeature
 function addHighlight(layer, style) {
@@ -148,6 +148,7 @@ function zoomToState(state,obj){
     stateLayer.remove();
 
     obj.county.addTo(countyLayer);
+    obj.district.addTo(districtLayer);
 
     zoomLayer.forEach(function (layer) { layer.addTo(map) })
 
@@ -179,8 +180,18 @@ function addStates(stateAbbr, index) {
         style: countyStyle
     })
 
+    var districts = L.geoJson(window["" + stateAbbr + "_CD_113"], {
+        style: () => {
+            return{
+                ...districtStyle,
+                fillColor: randomPresetColor(pastelPalette)
+            }
+        }
+    })
+
     obj.state = stateJSON;
     obj.county = counties;
+    obj.district = districts;
 
     stateLayer.addLayer(obj.state);
 
