@@ -103,7 +103,7 @@ function parametersTab() {
     createSwitch(div, 'split-counties', "Allow Split Counties");
     var text = L.DomUtil.create('p');
     text.innerHTML = "THiefasoieufhalsiufh aidsufh kjdsfkjfksjdf";
-    createAccordian(div, "incumbent", "Incumbent Protection", text.innerHTML);
+    createAccordion(div, "incumbent", "Incumbent Protection", text.innerHTML);
     var subDiv = htmlElement(div, 'div', 'd-grid gap-2 col-6 mx-auto submitBtn')
     var subBtn = createButton(subDiv, 'button', 'Submit', 'btn btn-primary', 'submitButton');
     return div;
@@ -284,9 +284,9 @@ function createTabPane(parent, content, active, id) {
  * @param {string} text value to set the header text
  * @param {Element} content the Element to set as the accordiion child/content
  */
-function createAccordian(parent, id, text, content) {
-    var accordian = htmlElement(parent, 'div', 'accordion', id + "Parent");
-    var accordionItem = htmlElement(accordian, 'div', 'accordion-item');
+function createAccordion(parent, id, text, content) {
+    var accordion = htmlElement(parent, 'div', 'accordion', id + "Parent");
+    var accordionItem = htmlElement(accordion, 'div', 'accordion-item');
     var header = createTextElement(accordionItem, 'p', 'Incumbents', 'accordion-header', id + "Header");
     var button = createCollapseButton(id, text);
     header.innerHTML = button;
