@@ -196,13 +196,18 @@ $(document).ready(function () {
     map = L.map('map').fitBounds(countryBounds);
     map.setMinZoom(map.getZoom());
 
+    map.setMaxBounds([
+        [23, -129], //southwest coords
+        [50, -63] //northeast coords
+    ]);
+
     L.tileLayer('https://api.mapbox.com/styles/v1/mfoydl/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWZveWRsIiwiYSI6ImNrbGNqdnNocDBpZ2Qyd214bDZ2Y2piMDgifQ.nxwFI-kYDMC7ag_O8PgNhg', {
         maxZoom: 18,
         attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, ' +
             'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
         id: 'cklh2icm3065v17qfbaanb9fe',
         tileSize: 512,
-        zoomOffset: -1
+        zoomOffset: -1,
     }).addTo(map);
 
     states.forEach(addStates);
