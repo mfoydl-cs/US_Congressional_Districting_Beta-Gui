@@ -7,10 +7,11 @@ L.Control.Center = L.Control.extend({
     onAdd: function(map){
         var img = L.DomUtil.create('img','sideBtn');
         img.src='./center.png';
+        img.innerHTML = "<span class='tooltiptext'>re-center map</span>";
 
         L.DomEvent.on(img, 'click',function(ev){
             recenter();
-        })
+        });
 
         return img;
 
@@ -59,6 +60,7 @@ L.Control.Menu = L.Control.extend({
         var div = L.DomUtil.create('div', 'menu');
 
         L.DomEvent.disableClickPropagation(div);
+        L.DomEvent.disableScrollPropagation(div);
 
         var nav = createTabNav(div, "menuNav");
 
@@ -103,7 +105,7 @@ function parametersTab() {
     createSwitch(div, 'split-counties', "Allow Split Counties");
     var text = L.DomUtil.create('p');
     text.innerHTML = "THiefasoieufhalsiufh aidsufh kjdsfkjfksjdf";
-    createAccordian(div, "incumbent", "Incumbent Protection", text.innerHTML);
+    createAccordian(div, "incumbent", "Incumbent Protection", text);
     var subDiv = htmlElement(div, 'div', 'd-grid gap-2 col-6 mx-auto submitBtn')
     var subBtn = createButton(subDiv, 'button', 'Submit', 'btn btn-primary', 'submitButton');
     return div;
@@ -132,13 +134,69 @@ function districtsTab() {
  * @return {Element} List Item element to add to list
  */
 function districtListItem(geoJSON) {
+    var id = geoJSON.features[0].properties.CDSESSN;
     var div = L.DomUtil.create('div');
-    var headerDiv = htmlElement(div, "div", 'd-fkex w-100 justify-content-between')
-    var header = createTextElement(headerDiv, "h5", "Some Header Text", "mb-1");
+    var headerDiv = htmlElement(div, "div", 'd-flex w-100 justify-content-between');
+    var header = createTextElement(headerDiv, "h5", id, "mb-1");
+    var check = L.DomUtil.create("input", "form-check-input", headerDiv);
+    check.type = "checkbox";
     var content = createTextElement(div, "p", "Some random paragraph filler text", "");
 
-    var listItem = createListItem(div, true, false);
+    
+    var content2 = L.DomUtil.create('div');
+
+    var districtList = createListGroup(content2);
+    districtList.classList.add('list-group-flush');
+
+    /*
+    var district = L.geoJson(geoJSON,{
+        style: styleDistrict,
+        onEachFeature: function (feature, layer) { districtList.appendChild(districtAccordionItem(feature,layer)) }
+    });
+    */
+   var featureGroup = new L.LayerGroup();
+   var district = L.geoJson(geoJSON,{
+       onEachFeature: function (feature,layer) {
+           var featureJson = L.geoJson(feature);
+           featureJson.addTo(featureGroup);
+           districtList.appendChild(districtAccordionItem(feature,featureJson))
+        }
+   })
+    
+
+    var accordion = createAccordian(div,"Dist"+id,"districts",content2);
+
+    var listItem = createListItem(div, false, false);
+
+    
+    
+    L.DomEvent.on(check,'click',function(ev){
+        toggleDistrict(featureGroup,check.checked);
+    });
+    
     return listItem;
+}
+
+function districtAccordionItem(district,feature){
+    var id = "CD" + district.properties.CDSESSN+district.properties["CD" + district.properties.CDSESSN + "FP"]
+    var div = L.DomUtil.create('div', 'd-flex w-100 justify-content-between');
+    div.id=id;
+    //var div = htmlElement(div, "div", 'd-flex w-100 justify-content-between',id);
+    var p =createTextElement(div,'p',"District "+district.properties["CD"+district.properties.CDSESSN+"FP"])
+    var colorPicker = createInput(div,'color');
+    
+    addDistrictHightlight(feature,div);
+    /*
+    $("#" + div.id).click(function () {
+        console.log("x")
+        //highlightDistrict(district);
+    });
+    */
+
+    //L.DomEvent.on(div, 'mouseenter', function (ev) { console.log(ev) });
+
+    var item = createListItem(div,true,false);
+    return item;
 }
 
 
@@ -152,16 +210,27 @@ function districtListItem(geoJSON) {
  * Adds new dsitricts list to the UI
  */
 function submitParameters() {
-    console.log("submit")
+
     clearDistricts();
-    var districts = retrieveDistricts();
     var list = $("#districtList");
+
+    var districts = retrieveDistricts();
+    
     districts.forEach(function (item) {
         list.append(districtListItem(item));
     });
+
     $(".nav-link.active,.tab-pane.active").removeClass('show active');
-    //$(".tab-pane.active").removeClass('show active');
     $("#districts-tab,#districts").addClass('active show');
+}
+
+function addDistrictHightlight(district,div){
+    L.DomEvent.on(div,'mouseover',function(ev){highlightDistrict(district)});
+    L.DomEvent.on(div,'mouseout',function(ev){resetDistrictHighlight(district,districtStyle)})
+    //console.log(div.id)
+    
+    
+    //L.DomEvent.on(div,'mouseover',function(ev){console.log(ev)});
 }
 
 
@@ -287,11 +356,11 @@ function createTabPane(parent, content, active, id) {
 function createAccordian(parent, id, text, content) {
     var accordian = htmlElement(parent, 'div', 'accordion', id + "Parent");
     var accordionItem = htmlElement(accordian, 'div', 'accordion-item');
-    var header = createTextElement(accordionItem, 'p', 'Incumbents', 'accordion-header', id + "Header");
+    var header = createTextElement(accordionItem, 'p', '', 'accordion-header', id + "Header");
     var button = createCollapseButton(id, text);
-    header.innerHTML = button;
+    header.appendChild(button);
     var collapse = createCollapseDiv(id, content);
-    accordionItem.innerHTML += collapse;
+    accordionItem.appendChild(collapse);
 }
 
 /**
@@ -413,9 +482,31 @@ function htmlElement(parent, type, classes='', id) {
 }
 
 function createCollapseButton(id, text) {
-    return `<button class='accordion-button collapsed label' type='button' data-bs-toggle='collapse' data-bs-target='#${id}' aria-exapanded='false' aria-controls'${id}'>${text}</button>`
+    //return `<button class='accordion-button collapsed label' type='button' data-bs-toggle='collapse' data-bs-target='#${id}' aria-exapanded='false' aria-controls'${id}'>${text}</button>`
+    var button = L.DomUtil.create('button','accordion-button collapsed');
+    button.type='button'
+    button.setAttribute('data-bs-toggle','collapse')
+    button.setAttribute('data-bs-target',"#"+id)
+    button.setAttribute('aria-expanded','false')
+    button.setAttribute('aria-controls',id)
+    button.innerHTML = text;
+    return button;
 }
+/*
 function createCollapseDiv(id, text) {
     return `<div id="${id}" class="accordion-collapse collapse" aria-labelledby="${id}Header" data-bs-parent="#${id}Parent"><div class="accordion-body">${text}</div></div>`
+}*/
+
+function createCollapseDiv(id,content){
+    var div = L.DomUtil.create('div','accordion-collapse collapse')
+    div.id=id;
+    div.setAttribute("aria-labelledby",id+"Header");
+    div.setAttribute("data-bs-parent","#"+id+"Parent");
+
+    divChild = htmlElement(div, 'div','accordion-body');
+
+    divChild.appendChild(content);
+
+    return div;
 }
 

@@ -1,4 +1,5 @@
 const countryBounds = [[20, -127], [53, -65]]; //-127.70507812500001,20.4270128142574,-65.87402343750001,53.4357192066942
+var countryZoom;
 const states = ["AL", "AR", "MI"];
 
 var map;
@@ -30,7 +31,8 @@ const districtStyle = { //Styling (besides color) for District GeoJSON features
     weight: 2,
     opacity: 0.6,
     color: 'white',
-    fillOpacity: 0.5
+    fillOpacity: 0.5,
+    fillColor: 'red'
 }
 
 const highLightStyle = { //Style for highlighted features
@@ -83,7 +85,15 @@ function highlightFeature(e) {
 //Unhighlight a feature
 function resetHighlight(e,style) {
     e.target.setStyle(style);
+}
 
+function highlightDistrict(district){
+    console.log("hi")
+    district.setStyle(highLightStyle);
+}
+
+function resetDistrictHighlight(district, style) {
+    district.setStyle(style);
 }
 
 //Adds all layers of a Leaflet LayerGroup into another LayerGroup
@@ -139,12 +149,14 @@ function backToCountry(){
     stateLayer.addTo(map);
     zoomLayer.forEach(function (layer) { layer.remove(); layer.clearLayers() });
     map.flyToBounds(countryBounds);
+    bounds = countryBounds;
+    
 }
 
 var bounds = countryBounds;
 
 function zoomToState(state,obj){
-    state.setStyle(statesStyle);
+
     stateLayer.remove();
 
     obj.county.addTo(countyLayer);
@@ -186,15 +198,23 @@ function addStates(stateAbbr, index) {
 
     stateJSON.on('click', function () {
         zoomToState(this,obj);
-    })
+    });
 
 
 
 }
 
+function toggleDistrict(district,checked){
+    if(checked){
+        district.addTo(districtLayer);
+    }
+    else{
+        districtLayer.removeLayer(district);
+    }
+}
+
 $(document).ready(function () {
-    map = L.map('map').fitBounds(countryBounds);
-    map.setMinZoom(map.getZoom());
+    map = L.map('map');
 
     L.tileLayer('https://api.mapbox.com/styles/v1/mfoydl/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWZveWRsIiwiYSI6ImNrbGNqdnNocDBpZ2Qyd214bDZ2Y2piMDgifQ.nxwFI-kYDMC7ag_O8PgNhg', {
         maxZoom: 18,
@@ -202,8 +222,14 @@ $(document).ready(function () {
             'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
         id: 'cklh2icm3065v17qfbaanb9fe',
         tileSize: 512,
-        zoomOffset: -1
+        zoomOffset: -1,
     }).addTo(map);
+    
+    //map.
+    map.fitBounds(countryBounds);
+    countryZoom = map.getZoom();
+    map.setMinZoom(countryZoom);
+    //map.setMaxBounds(countryBounds);
 
     states.forEach(addStates);
 
@@ -218,6 +244,7 @@ $(document).ready(function () {
     menu = L.control.menu({ position: 'topright' });
 
     center = L.control.center({position:'topleft'}).addTo(map);
+    
 });
 
 
