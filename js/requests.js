@@ -1,6 +1,12 @@
-function retrieveDistricts(){
-    return [AL_CD_116,AL_CD_113]
-    //return [AL_CD_116, AL_CD_113, AR_CD_116, AR_CD_113, AR_CD_116, AR_CD_113]
+function retrieveDistricts(state){
+    switch(state){
+        case "AL":
+            return [AL_CD_116, AL_CD_113]
+        case "AR":
+            return [AR_CD_116, AR_CD_113]
+        case "MI":
+            return [MI_CD_116, MI_CD_113]
+    }
 }
 
 function getJobsSummary(state){

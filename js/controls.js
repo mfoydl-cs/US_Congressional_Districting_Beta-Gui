@@ -67,7 +67,7 @@ L.Control.Menu = L.Control.extend({
         createTab(nav, "Jobs", jobsTab(this.state), 'jobs', true)//Jobs Tab
         createTab(nav, "Constraints", constraintsTab(this.state), "constraints"); //Constraints Tab
         createTab(nav, "Constrain Results", constraintsSummaryTab(), 'constraintsSummary')//Jobs Tab //Measures Tab
-        createTab(nav, "Measures", measuresTab(), "measures"); //Measures Tab
+        createTab(nav, "Measures", measuresTab(this.state), "measures"); //Measures Tab
         createTab(nav, "Top Districtings", districtsTab(this.state), "districts"); //Districtings Tab
 
         $(document).ready(function () {
@@ -202,7 +202,7 @@ function constraintsSummaryTab() {
     return container;
 }
 
-function measuresTab() {
+function measuresTab(state) {
     var div = L.DomUtil.create('div');
     var measures = htmlElement(div, 'div', 'container');
 
@@ -221,7 +221,7 @@ function measuresTab() {
     var subDiv = htmlElement(div, 'div', 'd-grid gap-2 col-6 mx-auto submitBtn')
     var subBtn = createButton(subDiv, 'button', 'Submit', 'btn btn-primary btn-lg', 'submitButton');
 
-    L.DomEvent.on(subBtn, 'click', function (ev) { submitMeasures() })
+    L.DomEvent.on(subBtn, 'click', function (ev) { submitMeasures(state) })
     return div;
 }
 /**
@@ -347,12 +347,12 @@ function incumbentsContent(state) {
  * Clears current districts list
  * Adds new dsitricts list to the UI
  */
-function submitMeasures() {
+function submitMeasures(state) {
 
     clearDistricts();
     var list = $("#districtList");
 
-    var districts = retrieveDistricts();
+    var districts = retrieveDistricts(state);
 
     districts.forEach(function (item) {
         list.append(districtListItem(item));
@@ -388,15 +388,15 @@ function clearDistricts() {
 }
 
 function switchTabs(id) {
-    $(".nav-link.active,.tab-pane.active").attr({ 'aria-selected': 'false' }).removeClass('active');
+    $(".nav-link.active,.tab-pane.active").attr({ 'aria-selected': 'false' }).removeClass('active show');
     $("#" + id + "-tab").addClass('active').attr({ 'aria-selected': 'true' });;
-    $("#" + id).addClass('active').attr({ 'aria-selected': 'true' });
+    $("#" + id).addClass('active show').attr({ 'aria-selected': 'true' });
     //$("#" + id + "-tab").attr({ 'aria-selected': 'true' });
 }
 
 function switchTabContent(tabid, contentid) {
-    $(".tab-pane.active").attr({ 'aria-selected': 'false' }).removeClass('active');
-    $("#" + contentid).addClass('active').attr({ 'aria-selected': 'true' });
+    $(".tab-pane.active").attr({ 'aria-selected': 'false' }).removeClass('active show');
+    $("#" + contentid).addClass('active show').attr({ 'aria-selected': 'true' });
 
     $("#" + tabid).attr({ "data-bs-target": "#" + contentid });
     $("#" + tabid).attr({ "aria-controls": contentid });
