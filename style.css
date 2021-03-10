@@ -94,3 +94,12 @@ body {
 label {
     font-weight: bolder;
 }
+
+.Republican:checked{
+    background-color: red;
+    border-color:red;
+}
+
+.modal-link {
+    cursor: pointer;
+}
