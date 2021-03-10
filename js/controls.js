@@ -110,7 +110,12 @@ function parametersTab(state) {
     var constraintsAccordion = createAccordian(div,'constraintsAccordion','Districting Subset Constraints',constraints)
 
     createSlider(constraints, 'compactness-constraint', 'Compactness', 0, 1, 0.1);
-    createSlider(constraints, 'majmin-constraint', 'Majority-Minority', 0, 1, 0.1);
+    createSlider(constraints, 'majmin-constraint', 'Majority-Minority Districts (>=)', 0, 10, 1);
+    createSlider(constraints, 'population-constraint','Population Difference (<=%)', 0, 3, 0.1);
+    var selectDiv = htmlElement(constraints,'div','container')
+    createLabel(selectDiv,'Population Constraint Type:','popSelect');
+    var select = createSelect(selectDiv,['Total Population','Voting Age Population (TVAP)','Citizen Voting Age Population (CVAP)'],"population type",'popSelect');
+    select.classList.add('form-select-sm')
 
     var incumbentsDiv = htmlElement(constraints, 'div', 'container')
     createLabel(incumbentsDiv, 'Incumbent Protection: &emsp;&emsp;', 'incumbentsLink')
@@ -316,6 +321,18 @@ function modalDialog(id,headerText,bodyContent){
 
     var saveBtn = createButton(footer, 'button','Save','btn btn-primary');
     return fade;
+}
+
+function createSelect(parent,options,label,id){
+    var select = htmlElement(parent,'select','form-select',id);
+    select.setAttribute('aria-label',label);
+    options.forEach(function(opt){
+        var option = createTextElement(select,'option',opt);
+        option.setAttribute('value',opt);
+    });
+
+    select.firstChild.setAttribute('selected','selected');
+    return select;
 }
 
 
