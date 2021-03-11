@@ -98,10 +98,11 @@ label {
 .left {
     text-align: left;
 }
-
+/*
 .small {
     font-size: small;
 }
+*/
 
 .dropdown {
     background-color: white;
@@ -161,4 +162,9 @@ input[type=checkbox]:not(:checked)+label{
 input[type='range']:hover::-webkit-slider-runnable-track{
     opacity: 0.8;
     filter: brightness(120%);
+}
+
+.custom-check{
+    margin-left: 1em;
+    transform: scale(1.5);
 }

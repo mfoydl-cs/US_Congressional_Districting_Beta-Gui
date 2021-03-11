@@ -382,9 +382,17 @@ function districtListItem(geoJSON, weights) {
 
     //Info Page
     var infoContainer = L.DomUtil.create('div');
-    var infoHeader = htmlElement(infoContainer, 'div');
+    var infoHeader = htmlElement(infoContainer, 'div','d-flex w-100 justify-content-between');
     createTextElement(infoHeader, 'h5', id, 'h5');
+
+    var checkDiv = htmlElement(infoHeader, 'div');
+    createLabel(checkDiv, '<i>show</i>&nbsp',id+'InfoCheck','small');
+    var infoCheck = L.DomUtil.create("input", "form-check-input custom-check", checkDiv);
+    infoCheck.id = id+"InfoCheck"
+    infoCheck.type = "checkbox";
+
     var infoBody = htmlElement(infoContainer, 'div');
+    var stats = htmlElement(infoBody,'div','container');
     createAccordian(infoBody, "Dist" + id, "districts", listgroupContainer);
     var infoFooter = htmlElement(infoContainer, 'div', 'd-grid gap-2');
 
@@ -392,6 +400,12 @@ function districtListItem(geoJSON, weights) {
 
     L.DomEvent.on(check, 'click', function (ev) {
         toggleDistrict(featureGroup, check.checked);
+        infoCheck.checked = check.checked;
+    });
+
+    L.DomEvent.on(infoCheck, 'click', function (ev) {
+        toggleDistrict(featureGroup, infoCheck.checked);
+        check.checked = infoCheck.checked
     });
 
     L.DomEvent.on(link, 'click', function (ev) {
@@ -531,11 +545,13 @@ function showDistrictInfo(info, featureGroup) {
     var districtList = $("#districtList");
     districtList.parent().append(info);
     districtList.hide();
+    $("#sortDiv").children().hide();
 }
 
 function showDistrictList(info, featureGroup) {
     info.remove();
     $("#districtList").show();
+    $("#sortDiv").children().show();
 }
 
 

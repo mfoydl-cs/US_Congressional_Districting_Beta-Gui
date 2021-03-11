@@ -16,9 +16,11 @@ class DistrictingsTab {
 		this.sorting = 'overall'
 
 		this.div = L.DomUtil.create('div');
-		createTextElement(this.div, 'p', "View Districtings", "h1 center")
 
-		var sortDiv = htmlElement(this.div, "div", 'd-flex w-100 justify-content-between');
+		var headerDiv = htmlElement(this.div, 'div', 'center tabContentTitle mb-3');
+		createTextElement(headerDiv, 'h5', 'Examine Districtings', 'h5');
+
+		var sortDiv = htmlElement(this.div, "div", 'd-flex w-100 justify-content-between','sortDiv');
 		createTextElement(sortDiv, "p", "Sorted by " + sortings[this.sorting].desc, "");
 	    var sortBtn = createTextElement(sortDiv, 'a', 'Sort', 'modal-link', 'sortLink');
 	    sortBtn.setAttribute('data-bs-toggle', 'modal');
