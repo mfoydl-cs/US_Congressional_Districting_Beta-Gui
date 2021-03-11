@@ -107,7 +107,7 @@ label {
 input[type=checkbox]:not(:checked)+label{
     color: gray;
 }
-
+/*
 .list-group:first-child {
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
@@ -117,14 +117,10 @@ input[type=checkbox]:not(:checked)+label{
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
 }
-
+*/
 .list-group-item{
     color: black !important;
     background: rgba(255,255,255,0.8);
-}
-
-.list-group-item:hover{
-    background: rgba(255,255,255,1);
 }
 
 .data-table .row .col:first-child{
@@ -134,4 +130,21 @@ input[type=checkbox]:not(:checked)+label{
 
 .tabContentTitle{
     border-bottom: 2px solid darkgray;
+}
+
+.list-group-flush .list-group-item{
+    background: rgba(255,255,255,0);
+}
+
+.list-group-item:hover{
+    background: rgba(255,255,255,1);
+}
+
+.list-group-flush .list-group-item:not(:last-child){
+    border-color: black;
+}
+
+input[type='range']:hover::-webkit-slider-runnable-track{
+    opacity: 0.8;
+    filter: brightness(120%);
 }
