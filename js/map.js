@@ -29,11 +29,9 @@ const statesStyle = { //Styling for State GeoJSON features
 }
 
 const districtStyle = { //Styling (besides color) for District GeoJSON features
-    weight: 2,
-    opacity: 0.6,
-    color: 'white',
-    fillOpacity: 0.5,
-    fillColor: 'red'
+    weight: 3,
+    opacity: 1,
+    fillOpacity: 0.2
 }
 
 const highLightStyle = { //Style for highlighted features

@@ -45,10 +45,40 @@ class Districting {
 	    this.infoCheck.type = "checkbox";
 
 	    var infoBody = htmlElement(infoContainer, 'div');
-	    var stats = htmlElement(infoBody,'div','container');
-	    createAccordian(infoBody, "Dist" + id, "districts", listgroupContainer);
-	    var infoFooter = htmlElement(infoContainer, 'div', 'd-grid gap-2');
 
+	    createAccordian(infoBody, "Dist" + id, "Districts", listgroupContainer);
+
+		var stats = htmlElement(infoBody,'div','container');
+		var statsListContainer = L.DomUtil.create('div')
+		this.statsList = createListGroup(statsListContainer)
+		createAccordian(infoBody, "stats" + id, "Objective Function Breakdown", statsListContainer)
+	    div = L.DomUtil.create('div', 'd-flex w-100 justify-content-between');
+		createTextElement(div, 'p', 'Measure', 'stat-col score')
+		createTextElement(div, 'p', 'Value', 'stat-col')
+		createTextElement(div, 'p', 'Weight', 'stat-col')
+		createTextElement(div, 'p', 'Contrib', 'stat-col')
+		let statItem = createListItem(div, true, false)
+		this.statsList.appendChild(statItem)
+		// populate stats list
+		for (let score in this.geoJSON['scores']) {
+	    	var div = L.DomUtil.create('div', 'd-flex w-100 justify-content-between');
+			createTextElement(div, 'p', score, 'stat-col score')
+			let s = this.geoJSON.scores[score]
+			createTextElement(div, 'p', s, 'stat-col')
+			createTextElement(div, 'p', this.dicTab.weights[score], 'stat-col')
+			createTextElement(div, 'p', s*this.dicTab.weights[score], 'stat-col')
+			let statItem = createListItem(div, true, false)
+			this.statsList.appendChild(statItem)
+		}
+	    div = L.DomUtil.create('div', 'd-flex w-100 justify-content-between');
+		createTextElement(div, 'p', 'Total', 'stat-col score')
+		createTextElement(div, 'p', '', 'stat-col')
+		createTextElement(div, 'p', '', 'stat-col')
+		createTextElement(div, 'p', this.getScore().toFixed(2), 'stat-col')
+		statItem = createListItem(div, true, false)
+		this.statsList.appendChild(statItem)
+	    
+		var infoFooter = htmlElement(infoContainer, 'div', 'd-grid gap-2');
 	    var back = createButton(infoFooter, 'button', 'Back', 'btn btn-secondary btn-lg ');
 
 	    L.DomEvent.on(this.check, 'click', this.checkClicked);
@@ -76,7 +106,6 @@ class Districting {
 	}
 
 	checkClicked = (ev) => {
-		console.log(ev)
 		this.toggleDisplay(ev.target.checked)
 	}
 
@@ -96,12 +125,12 @@ class Districting {
 		var featureJson = L.geoJson(feature);
         featureJson.addTo(this.featureGroup);
 
+
         var id = "CD" + feature.properties.CDSESSN + feature.properties["CD" + feature.properties.CDSESSN + "FP"]
 	    var div = L.DomUtil.create('div', 'd-flex w-100 justify-content-between');
 	    div.id = id;
 	    //var div = htmlElement(div, "div", 'd-flex w-100 justify-content-between',id);
 	    var p = createTextElement(div, 'p', "District " + feature.properties["CD" + feature.properties.CDSESSN + "FP"])
-	    var colorPicker = createInput(div, 'color');
 	    addDistrictHightlight(featureJson, div);
 	    var item = createListItem(div, true, false);
 
