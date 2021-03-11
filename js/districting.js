@@ -17,7 +17,7 @@ class Districting {
 	    this.check = L.DomUtil.create("input", "form-check-input", headerDiv);
 	    this.check.type = "checkbox";
 	    var contentDiv = htmlElement(div, "div", 'd-flex w-100 justify-content-between');
-	    createTextElement(contentDiv, "p", "Score: " + getScore(geoJSON, this.dicTab.weights).toFixed(2), "");
+	    createTextElement(contentDiv, "p", "Score: " + this.getScore().toFixed(2), "");
 	    var link = createTextElement(contentDiv,'a','<em>more info</em>','modal-link')
 	    this.listItem = createListItem(div, false, false);
 
