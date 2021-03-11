@@ -74,10 +74,10 @@ L.Control.Menu = L.Control.extend({
         this.constraintsData = constraintsDataFormat;
 
         createTab(nav, "Jobs", jobsTab(this.state), 'jobs', true)//Jobs Tab
-        createTab(nav, "Constraints", constraintsTab(this.state,this), "constraints"); //Constraints Tab
-        createTab(nav, "Constrain Results", constraintsSummaryTab(this.constraintsData), 'constraintsSummary')//Summary Tab
-        createTab(nav, "Measures", measuresTab(this.state), "measures"); //Measures Tab
-        createTab(nav, "Top Districtings", districtsTab(this.state), "districts"); //Districtings Tab
+        createTab(nav, "Constraints", constraintsTab(this.state,this), "constraints",false,true); //Constraints Tab
+        createTab(nav, "Constrain Results", constraintsSummaryTab(this.constraintsData), 'constraintsSummary',false,true)//Summary Tab
+        createTab(nav, "Measures", measuresTab(this.state), "measures",false,true); //Measures Tab
+        createTab(nav, "Top Districtings", districtsTab(this.state), "districts",false,true); //Districtings Tab
 
         $(document).ready(function () {
             $('#constraintsSummary-tab').hide(); //Hide the physical tab, content accesssed through buttons
@@ -231,7 +231,7 @@ function constraintsSummaryTab(data,menu) {
     var back = createButton(left, 'button', 'Back', 'btn btn-secondary btn-lg');
     var next = createButton(right, 'button', 'Next', 'btn btn-primary btn-lg');
 
-    L.DomEvent.on(back, 'click', function (ev) { switchTabContent('constraints-tab', 'constraints') })
+    L.DomEvent.on(back, 'click', function (ev) { switchTabContent('constraints-tab', 'constraints');disableTab('measures');disableTab('districts') })
     L.DomEvent.on(next, 'click', function (ev) { switchTabs('measures') });
 
     return container;
@@ -401,6 +401,8 @@ function addDistrictHightlight(district, div) {
 }
 
 function selectJob(job) {
+    disableTab('measures')
+    disableTab('districts')
     switchTabs('constraints');
 }
 
@@ -423,9 +425,11 @@ function clearDistricts() {
 }
 
 function switchTabs(id) {
+    enableTab(id);
     $(".nav-link.active,.tab-pane.active").attr({ 'aria-selected': 'false' }).removeClass('active show');
     $("#" + id + "-tab").addClass('active').attr({ 'aria-selected': 'true' });;
     $("#" + id).addClass('active show').attr({ 'aria-selected': 'true' });
+    
     //$("#" + id + "-tab").attr({ 'aria-selected': 'true' });
 }
 
@@ -438,6 +442,18 @@ function switchTabContent(tabid, contentid) {
     $("#" + contentid).attr({ "aria-labelledby": tabid + "-tab" });
 
 
+}
+
+function enableTab(id){
+    var tab = $("#" + id + '-tab');
+    tab.attr({ 'aria-disabled': 'false' });
+    tab.removeClass('disabled')
+}
+
+function disableTab(id){
+    var tab = $("#" + id + '-tab');
+    tab.attr({ 'aria-disabled': 'true' });
+    tab.addClass('disabled')
 }
 
 function showDistrictInfo(info,featureGroup){
@@ -569,8 +585,8 @@ function createTabNav(parent, id) {
  * @param {string} id value to set 'id' attribute and link content to tab
  * @param {boolean} active 
  */
-function createTab(nav, text, content, id, active = false) {
-    createTabItem(nav.nav, text, active, id);
+function createTab(nav, text, content, id, active = false, disabled = false) {
+    createTabItem(nav.nav, text, active, id, disabled);
     createTabPane(nav.content, content, active, id);
 }
 
@@ -581,7 +597,7 @@ function createTab(nav, text, content, id, active = false) {
  * @param {boolean} active whether or not to add the 'active' class
  * @param {string} id value used to attatch tab link to 'id' of tab content
  */
-function createTabItem(parent, text, active, id) {
+function createTabItem(parent, text, active, id, disabled) {
     var li = htmlElement(parent, "li", "nav-item");
     li.setAttribute('role', 'presentation')
     var button = createButton(li, "button", text, 'nav-link cust-nav-link', id + "-tab");
@@ -590,6 +606,10 @@ function createTabItem(parent, text, active, id) {
     button.setAttribute("role", "tab");
     button.setAttribute("aria-controls", id);
     button.setAttribute("aria-selected", "" + active);
+    if(disabled){
+        button.setAttribute('aria-disabled', 'true');
+        button.classList.add('disabled')
+    }
 
     if (active) {
         button.classList.add("active");
