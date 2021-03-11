@@ -1,5 +1,12 @@
 /* ********** CUSTOM LEAFLET UI CONTROL DEFINITIONS ********** */
 
+const constraintsDataFormat = {
+    'count': { 'label': 'Districtings Returned: ', 'value': 0},
+    'avg-compactness': { 'label': 'Average Compactness: ', 'type': '', 'value': 0},
+    'avg-maj-min': { 'label': 'Average Majority-Minority Districts: ', 'value': 0},
+    'population-diff': { 'label': 'Average Population Difference: ', 'type': '', 'value': 0},
+}
+
 /**
  * 
  */
@@ -64,21 +71,34 @@ L.Control.Menu = L.Control.extend({
 
         var nav = createTabNav(div, "menuNav");
 
+        this.constraintsData = constraintsDataFormat;
+
         createTab(nav, "Jobs", jobsTab(this.state), 'jobs', true)//Jobs Tab
-        createTab(nav, "Constraints", constraintsTab(this.state), "constraints"); //Constraints Tab
-        createTab(nav, "Constrain Results", constraintsSummaryTab(), 'constraintsSummary')//Jobs Tab //Measures Tab
+        createTab(nav, "Constraints", constraintsTab(this.state,this), "constraints"); //Constraints Tab
+        createTab(nav, "Constrain Results", constraintsSummaryTab(this.constraintsData), 'constraintsSummary')//Summary Tab
         createTab(nav, "Measures", measuresTab(this.state), "measures"); //Measures Tab
         createTab(nav, "Top Districtings", districtsTab(this.state), "districts"); //Districtings Tab
 
         $(document).ready(function () {
-            $('#constraintsSummary-tab').hide();
+            $('#constraintsSummary-tab').hide(); //Hide the physical tab, content accesssed through buttons
         });
 
         return div;
     },
     onRemove: function (map) { },
     setState: function (state) {
-        this.state = state
+        this.state = state //Keep track of the current state selected
+    },
+    setConstraintsData: function(data){
+        this.constraintsData = data;
+        Object.keys(data).forEach(function (key) {
+            $("#" + key + "ConSummaryLabel").html(data[key].label)
+            var value = $("#" + key + "ConSummaryValue")
+            value.html(data[key].value)
+            if (data[key].type) {
+                value.append(" <i>[" + data[key].type + "]</i>");
+            }
+        });
     }
 });
 
@@ -97,8 +117,8 @@ function jobsTab(state) {
 
     var container = L.DomUtil.create('div');
 
-    var headerDiv = htmlElement(container, 'div', 'center');
-    createTextElement(headerDiv, 'h3', 'Select A Job', 'h3');
+    var headerDiv = htmlElement(container, 'div', 'center tabContentTitle mb-3');
+    createTextElement(headerDiv, 'h5', 'Select a Job', 'h5');
 
 
     var bodyDiv = htmlElement(container, 'div');
@@ -135,11 +155,12 @@ function jobListItem(job) {
  * Creates the content for the 'params' tab
  * @return {Element} div container of the content
  */
-function constraintsTab(state) {
+function constraintsTab(state,menu) {
 
     var div = L.DomUtil.create('div');  //Main Container
 
-    createTextElement(div, 'p', "Job Subset Constraints", "h1 center"); //Tab Title
+    var headerDiv = htmlElement(div, 'div', 'center tabContentTitle mb-3');
+    createTextElement(headerDiv, 'h5', 'Job Subset Constraints', 'h5');
 
     var constraints = htmlElement(div, 'div', 'container');
 
@@ -178,23 +199,37 @@ function constraintsTab(state) {
 
     //Submit Buttons
     var subDiv = htmlElement(div, 'div', 'd-grid gap-2 col-6 mx-auto submitBtn')
-    var subBtn = createButton(subDiv, 'button', 'Submit', 'btn btn-primary', 'submitButton');
+    var subBtn = createButton(subDiv, 'button', 'Submit', 'btn btn-primary btn-lg', 'submitButton');
 
     //Event Handler
-    L.DomEvent.on(subBtn, 'click', function (ev) { submitConstraints() })
+    L.DomEvent.on(subBtn, 'click', function (ev) { submitConstraints('',menu) })
 
     return div;
 }
 
-function constraintsSummaryTab() {
-    var container = L.DomUtil.create('div');
-    var header = htmlElement(container, 'div', 'center');
-    var body = htmlElement(container, 'div', 'container');
+function constraintsSummaryTab(data,menu) {
+    var container = L.DomUtil.create('div'); //Contianer div
 
+    //Header Elements
+    var headerDiv = htmlElement(container, 'div', 'center tabContentTitle mb-3');;
+    createTextElement(headerDiv,'h5','Constraints Results','h5');// Page title
 
-    var footer = htmlElement(container, 'div', 'd-flex w-100 justify-content-around');
-    var back = createButton(footer, 'button', 'Back', 'btn btn-secondary btn-lg');
-    var next = createButton(footer, 'button', 'Next', 'btn btn-primary btn-lg');
+    var body = htmlElement(container, 'div', 'data-table',); //Content container
+    Object.keys(data).forEach(function(key){
+        var row = htmlElement(body,'div','row');
+        createTextElement(row,'p',data[key].label+data[key].value,'col',key+"ConSummaryLabel");
+        var value = createTextElement(row, 'p', data[key].value, 'col', key + "ConSummaryValue");
+        if (data[key].type){
+            value.innerHTML+= "("+data[key].type+")";
+        }
+    });
+
+    //Footer elements
+    var footer = htmlElement(container, 'div', 'row');
+    var left = htmlElement(footer,'div','col d-grid gap-2');
+    var right = htmlElement(footer, 'div', 'col d-grid gap-2');
+    var back = createButton(left, 'button', 'Back', 'btn btn-secondary btn-lg');
+    var next = createButton(right, 'button', 'Next', 'btn btn-primary btn-lg');
 
     L.DomEvent.on(back, 'click', function (ev) { switchTabContent('constraints-tab', 'constraints') })
     L.DomEvent.on(next, 'click', function (ev) { switchTabs('measures') });
@@ -204,12 +239,11 @@ function constraintsSummaryTab() {
 
 function measuresTab(state) {
     var div = L.DomUtil.create('div');
+    var headerDiv = htmlElement(div, 'div', 'center tabContentTitle mb-3');
+    createTextElement(headerDiv,'h5','Objective Function Weights','h5');
+
     var measures = htmlElement(div, 'div', 'container');
 
-    //var measuresAccordion = createAccordian(div, 'measuresAccordion', 'Objective Function Weights', measures)
-
-
-    //createTextElement(measures, 'p', "Objective Function Weights", "h5");
     createSlider(measures, 'population-equality', 'Population Equality', 0, 1, 0.1);
     createSlider(measures, 'avgerage-deviation', 'Deviation from Average Districting', 0, 1, 0.1);
     createSlider(measures, 'enacted-deviation', 'Deviation from Enacted Plan', 0, 1, 0.1);
@@ -335,7 +369,7 @@ function incumbentsContent(state) {
 
     return div;
 }
-// Add Analysis Tab
+// Add Analysis Tab?
 
 
 /* *************************************** */
@@ -370,7 +404,8 @@ function selectJob(job) {
     switchTabs('constraints');
 }
 
-function submitConstraints() {
+function submitConstraints(constraints,menu) {
+    menu.setConstraintsData(constrainJob(constraints));
     switchTabContent('constraints-tab', 'constraintsSummary');
 }
 

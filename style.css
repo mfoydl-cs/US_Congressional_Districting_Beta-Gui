@@ -126,3 +126,12 @@ input[type=checkbox]:not(:checked)+label{
 .list-group-item:hover{
     background: rgba(255,255,255,1);
 }
+
+.data-table .row .col:first-child{
+    font-weight: bolder;
+    text-align: end;
+}
+
+.tabContentTitle{
+    border-bottom: 2px solid darkgray;
+}
