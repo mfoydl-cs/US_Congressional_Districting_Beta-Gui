@@ -382,7 +382,12 @@ function submitMeasures(state, weights) {
 
 function addDistrictHightlight(district, div) {
     L.DomEvent.on(div, 'mouseover', function (ev) { highlightDistrict(district) });
-    L.DomEvent.on(div, 'mouseout', function (ev) { resetDistrictHighlight(district, districtStyle) })
+    L.DomEvent.on(div, 'mouseout', function (ev) { resetDistrictHighlight(district, districtStyle) });
+    addHighlight(district, districtStyle);
+    district.on({
+        mouseover: function () { div.parentNode.classList.add('highlighted') },
+        mouseout: function(){div.parentNode.classList.remove('highlighted')}
+    });
 }
 
 function selectJob(job) {
