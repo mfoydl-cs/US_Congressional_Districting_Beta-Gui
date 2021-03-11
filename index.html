@@ -7,15 +7,15 @@
 
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- Import leaflet and bootstrap css/js -->
+    <!-- Import Leaflet.js and css -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
         integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
         crossorigin="" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
         integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
         crossorigin=""></script>
-    
+
+    <!-- Import Bootstrap js and css-->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"
@@ -24,26 +24,27 @@
 
     <!-- jQuery Import -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <!-- Import State GeoJSON files -->
-    <script type="text/javascript" src="GeoJSON/states/AL_STATE_20.js"></script>
-    <script type="text/javascript" src="GeoJSON/states/AR_STATE_20.js"></script>
-    <script type="text/javascript" src="GeoJSON/states/MI_STATE_20.js"></script>
-    <!-- Import Session 116/113 Real Districting GeoJSON Files-->
-    <script type="text/javascript" src="GeoJSON/districtings/AL_CD_113.js"></script>
-    <script type="text/javascript" src="GeoJSON/districtings/AL_CD_116.js"></script>
-    <script type="text/javascript" src="GeoJSON/districtings/AR_CD_113.js"></script>
-    <script type="text/javascript" src="GeoJSON/districtings/AR_CD_116.js"></script>
-    <script type="text/javascript" src="GeoJSON/districtings/MI_CD_113.js"></script>
-    <script type="text/javascript" src="GeoJSON/districtings/MI_CD_116.js"></script>
-    <!-- Import County Data-->
-    <script type="text/javascript" src="GeoJSON/counties/AL_COUNTY_20.js"></script>
-    <script type="text/javascript" src="GeoJSON/counties/AR_COUNTY_20.js"></script>
-    <script type="text/javascript" src="GeoJSON/counties/MI_COUNTY_20.js"></script>
-    <!-- Import external local css/js -->
-    <script type="text/javascript" src="map.js"></script>
-    <script type="text/javascript" src="requests.js"></script>
-    <script type="text/javascript" src="controls.js"></script>
 
+    <!-- Import State GeoJSON files -->
+    <!-- <script type="text/javascript" src="GeoJSON/geography.js"></script> -->
+    <script type="text/javascript" src="GeoJSON/states.js"></script>
+    <script type="text/javascript" src="GeoJSON/counties.js"></script>
+
+    <script type="text/javascript" src="GeoJSON/precincts/AL_VTD_20.js"></script>
+    <script type="text/javascript" src="GeoJSON/precincts/AR_VTD_20.js"></script>
+    <script type="text/javascript" src="GeoJSON/precincts/MI_VTD_20.js"></script>
+
+    <!-- Import Session 116/113 Real Districting GeoJSON Files-->
+    <script type="text/javascript" src="GeoJSON/113_116_districtings.js"></script>
+    
+    
+    <!-- Import application JS files-->
+    <script type="text/javascript" src="incumbents/incumbents.js"></script>
+    <script type="text/javascript" src="js/map.js"></script>
+    <script type="text/javascript" src="js/requests.js"></script>
+    <script type="text/javascript" src="js/controls.js"></script>
+
+    <!-- Import application css file-->
     <link rel="stylesheet" href="./style.css">
 </head>
 

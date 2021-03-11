@@ -1,0 +1,20 @@
+function retrieveDistricts(state){
+    switch(state){
+        case "AL":
+            return [AL_CD_116, AL_CD_113]
+        case "AR":
+            return [AR_CD_116, AR_CD_113]
+        case "MI":
+            return [MI_CD_116, MI_CD_113]
+    }
+}
+
+function getJobsSummary(state){
+    return { 
+        "jobs-summary": [
+            { "name": "Job 01", "rounds": "200", "cooling-period": "50" }, 
+            { "name": "Job 02", "rounds": "100,000", "cooling-period": "50" }, 
+            { "name": "Job 03", "rounds": "100,000", "cooling-period": "100" }
+        ]
+    }
+}
