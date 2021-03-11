@@ -158,6 +158,7 @@ function backToCountry(){
     map.removeControl(backButton);
     map.removeControl(menu);
     map.removeControl(layersControl);
+    dropdown.addTo(map);
     stateLayer.addTo(map);
     zoomLayer.forEach(function (layer) { layer.clearLayers() });
     map.flyToBounds(countryBounds);
@@ -168,6 +169,7 @@ function backToCountry(){
 var bounds = countryBounds;
 
 function zoomToState(state,obj){
+    map.removeControl(dropdown);
 
     stateLayer.remove();
 
@@ -191,10 +193,7 @@ function recenter(){
 
 var statesObj = {}
 
-function addStates(stateAbbr, index) {
-    statesObj[stateAbbr] = {}
-    var obj = statesObj[stateAbbr];
-
+function getGeoJSON(stateAbbr) {
     var stateJSON = L.geoJson(window["" + stateAbbr + "_STATE_20"], {
         style: statesStyle,
         onEachFeature: function (feature, layer) { addHighlight(layer, statesStyle) }
@@ -207,18 +206,41 @@ function addStates(stateAbbr, index) {
     var precincts = L.geoJson(window[""+stateAbbr+"_VTD_20"],{
         style: precinctStyle
     });
+    return {
+        stateJSON: stateJSON,
+        counties: counties,
+        precincts: precincts,
+    }
+}
 
+function addStates(stateAbbr, index) {
+    statesObj[stateAbbr] = {}
+    var obj = statesObj[stateAbbr];
+
+    // var stateJSON = L.geoJson(window["" + stateAbbr + "_STATE_20"], {
+    //     style: statesStyle,
+    //     onEachFeature: function (feature, layer) { addHighlight(layer, statesStyle) }
+    // });
+
+    // var counties = L.geoJson(window["" + stateAbbr + "_COUNTY_20"], {
+    //     style: countyStyle
+    // });
+
+    // var precincts = L.geoJson(window[""+stateAbbr+"_VTD_20"],{
+    //     style: precinctStyle
+    // });
+    var geo = getGeoJSON(stateAbbr);
 
     obj.abbr = stateAbbr;
-    obj.state = stateJSON;
-    obj.county = counties;
-    obj.precinct = precincts;
+    obj.state = geo.stateJSON;
+    obj.county = geo.counties;
+    obj.precinct = geo.precincts;
     obj.senators = incumbentsJson[stateAbbr]["senators"];
     obj.reps = incumbentsJson[stateAbbr]['representatives'];
 
     stateLayer.addLayer(obj.state);
 
-    stateJSON.on('click', function () {
+    geo.stateJSON.on('click', function () {
         zoomToState(this,obj);
     });
 
@@ -264,6 +286,9 @@ $(document).ready(function () {
     backButton = L.control.backButton({ position: 'bottomleft' });
 
     menu = L.control.menu({ position: 'topright' });
+
+    
+    dropdown = L.control.states({ position: 'topright' }).addTo(map);
 
     center = L.control.center({position:'topleft'}).addTo(map);
     
