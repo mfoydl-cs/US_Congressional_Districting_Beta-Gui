@@ -119,7 +119,7 @@ label {
     cursor: pointer;
 }
 
-input[type=checkbox]:not(:checked)+label{
+.grayed:not(:checked)+label{
     color: gray;
 }
 /*
