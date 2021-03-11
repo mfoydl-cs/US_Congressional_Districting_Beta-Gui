@@ -1,9 +1,6 @@
-const countryBounds = [[20, -127], [53, -65]]; //-127.70507812500001,20.4270128142574,-65.87402343750001,53.4357192066942
+const countryBounds = [[20, -127], [53, -65]];
 var countryZoom;
 const states = ["AL", "AR", "MI"];
-
-//import incumbentsList from './incumbents.json'
-//var incumbentsJson = JSON.stringify(incumbentsList);
 
 var map;
 
@@ -86,7 +83,7 @@ const darkPalette = [
 function addHighlight(layer, style) {
     layer.on({
         mouseover: highlightFeature,
-        mouseout: function(e) {resetHighlight(e,style)}
+        mouseout: function (e) { resetHighlight(e, style) }
     });
 }
 
@@ -95,11 +92,11 @@ function highlightFeature(e) {
     e.target.setStyle(highLightStyle);
 }
 //Unhighlight a feature
-function resetHighlight(e,style) {
+function resetHighlight(e, style) {
     e.target.setStyle(style);
 }
 
-function highlightDistrict(district){
+function highlightDistrict(district) {
     console.log("hi")
     district.setStyle(highLightStyle);
 }
@@ -154,20 +151,23 @@ function randomPresetColor(palette) {
 }
 
 
-function backToCountry(){
+function backToCountry() {
     map.removeControl(backButton);
     map.removeControl(menu);
     map.removeControl(layersControl);
+    dropdown.addTo(map);
     stateLayer.addTo(map);
     zoomLayer.forEach(function (layer) { layer.clearLayers() });
+    stateLayer.eachLayer(function (layer) { layer.setStyle(statesStyle) })
     map.flyToBounds(countryBounds);
     bounds = countryBounds;
-    
+
 }
 
 var bounds = countryBounds;
 
-function zoomToState(state,obj){
+function zoomToState(state, obj) {
+    map.removeControl(dropdown);
 
     stateLayer.remove();
 
@@ -179,22 +179,19 @@ function zoomToState(state,obj){
     backButton.addTo(map);
     menu.setState(obj.abbr)
     menu.addTo(map);
-    
+
 
     bounds = state.getBounds();
     map.flyToBounds(bounds);
 }
 
-function recenter(){
+function recenter() {
     map.flyToBounds(bounds);
 }
 
 var statesObj = {}
 
-function addStates(stateAbbr, index) {
-    statesObj[stateAbbr] = {}
-    var obj = statesObj[stateAbbr];
-
+function getGeoJSON(stateAbbr) {
     var stateJSON = L.geoJson(window["" + stateAbbr + "_STATE_20"], {
         style: statesStyle,
         onEachFeature: function (feature, layer) { addHighlight(layer, statesStyle) }
@@ -204,33 +201,41 @@ function addStates(stateAbbr, index) {
         style: countyStyle
     });
 
-    var precincts = L.geoJson(window[""+stateAbbr+"_VTD_20"],{
+    var precincts = L.geoJson(window["" + stateAbbr + "_VTD_20"], {
         style: precinctStyle
     });
+    return {
+        stateJSON: stateJSON,
+        counties: counties,
+        precincts: precincts,
+    }
+}
 
+function addStates(stateAbbr, index) {
+    statesObj[stateAbbr] = {}
+    var obj = statesObj[stateAbbr];
+
+    var geo = getGeoJSON(stateAbbr);
 
     obj.abbr = stateAbbr;
-    obj.state = stateJSON;
-    obj.county = counties;
-    obj.precinct = precincts;
+    obj.state = geo.stateJSON;
+    obj.county = geo.counties;
+    obj.precinct = geo.precincts;
     obj.senators = incumbentsJson[stateAbbr]["senators"];
     obj.reps = incumbentsJson[stateAbbr]['representatives'];
 
     stateLayer.addLayer(obj.state);
 
-    stateJSON.on('click', function () {
-        zoomToState(this,obj);
+    geo.stateJSON.on('click', function () {
+        zoomToState(this, obj);
     });
-
-
-
 }
 
-function toggleDistrict(district,checked){
-    if(checked){
+function toggleDistrict(district, checked) {
+    if (checked) {
         district.addTo(districtLayer);
     }
-    else{
+    else {
         districtLayer.removeLayer(district);
     }
 }
@@ -246,12 +251,10 @@ $(document).ready(function () {
         tileSize: 512,
         zoomOffset: -1,
     }).addTo(map);
-    
-    //map.
+
     map.fitBounds(countryBounds);
     countryZoom = map.getZoom();
     map.setMinZoom(countryZoom);
-    //map.setMaxBounds(countryBounds);
 
     states.forEach(addStates);
 
@@ -265,9 +268,15 @@ $(document).ready(function () {
 
     menu = L.control.menu({ position: 'topright' });
 
-    center = L.control.center({position:'topleft'}).addTo(map);
-    
+
+    dropdown = L.control.states({ position: 'topright' }).addTo(map);
+
+    center = L.control.center({ position: 'topleft' }).addTo(map);
+
 });
 
+function test(obj) {
+    return obj.state.eachLayer(function (layer) { layer.setStyle(highLightStyle); console.log(layer) });
+}
 
 

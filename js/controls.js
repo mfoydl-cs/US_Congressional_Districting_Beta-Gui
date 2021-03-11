@@ -1,6 +1,13 @@
 // import { DistrictingsTab } from './districtings-tab.js'
 /* ********** CUSTOM LEAFLET UI CONTROL DEFINITIONS ********** */
 
+const constraintsDataFormat = {
+    'count': { 'label': 'Districtings Returned: ', 'value': 0 },
+    'avg-compactness': { 'label': 'Average Compactness: ', 'type': '', 'value': 0 },
+    'avg-maj-min': { 'label': 'Average Majority-Minority Districts: ', 'value': 0 },
+    'population-diff': { 'label': 'Average Population Difference: ', 'type': '', 'value': 0 },
+}
+
 /**
  * 
  */
@@ -67,21 +74,34 @@ L.Control.Menu = L.Control.extend({
 
         var nav = createTabNav(div, "menuNav");
 
+        this.constraintsData = constraintsDataFormat;
+
         createTab(nav, "Jobs", jobsTab(this.state), 'jobs', true)//Jobs Tab
-        createTab(nav, "Constraints", constraintsTab(this.state), "constraints"); //Constraints Tab
-        createTab(nav, "Constrain Results", constraintsSummaryTab(), 'constraintsSummary')//Jobs Tab //Measures Tab
-        createTab(nav, "Measures", measuresTab(this.state), "measures"); //Measures Tab
-        createTab(nav, "Top Districtings", window.dicTab.div, "districts"); //Districtings Tab
+        createTab(nav, "Constraints", constraintsTab(this.state, this), "constraints", false, true); //Constraints Tab
+        createTab(nav, "Constrain Results", constraintsSummaryTab(this.constraintsData), 'constraintsSummary', false, true)//Summary Tab
+        createTab(nav, "Measures", measuresTab(this.state), "measures", false, true); //Measures Tab
+        createTab(nav, "Top Districtings", window.dicTab.div, "districts", false, true); //Districtings Tab
 
         $(document).ready(function () {
-            $('#constraintsSummary-tab').hide();
+            $('#constraintsSummary-tab').hide(); //Hide the physical tab, content accesssed through buttons
         });
 
         return div;
     },
     onRemove: function (map) { },
     setState: function (state) {
-        this.state = state
+        this.state = state //Keep track of the current state selected
+    },
+    setConstraintsData: function (data) {
+        this.constraintsData = data;
+        Object.keys(data).forEach(function (key) {
+            $("#" + key + "ConSummaryLabel").html(data[key].label)
+            var value = $("#" + key + "ConSummaryValue")
+            value.html(data[key].value)
+            if (data[key].type) {
+                value.append(" <i>[" + data[key].type + "]</i>");
+            }
+        });
     }
 });
 
@@ -93,6 +113,61 @@ L.control.menu = function (opts) {
     return new L.Control.Menu(opts);
 }
 
+/**
+ * Creates the States control
+ */
+L.Control.States = L.Control.extend({
+    onAdd: function (map) {
+
+        var div = L.DomUtil.create('div', 'dropdown');
+        L.DomEvent.disableClickPropagation(div);
+        L.DomEvent.disableScrollPropagation(div);
+
+        var constraints = htmlElement(div, 'div', 'd-grid gap-1');
+
+        var constraintsAccordion = createAccordian(div, 'statesAccordion', 'Select a state to display', constraints)
+        var buttons = {};
+        buttons['AL'] = createButton(constraints, 'button', 'Alabama', 'btn btn-primary');
+        buttons['AR'] = createButton(constraints, 'button', 'Arizona', 'btn btn-primary submitBtn');
+        buttons['MI'] = createButton(constraints, 'button', 'Michigan', 'btn btn-primary submitBtn');
+
+        console.dir(buttons['AL']);
+        Object.keys(buttons).forEach(function (key) {
+            /*
+            var geo = getGeoJSON(key);
+            var obj = {};
+            obj.abbr = key;
+            obj.state = geo.stateJSON;
+            obj.county = geo.counties;
+            obj.precinct = geo.precincts;
+            obj.senators = incumbentsJson[key]["senators"];
+            obj.reps = incumbentsJson[key]['representatives'];
+            */
+            var obj = statesObj[key];
+
+            buttons[key]['onclick'] = () => { zoomToState(obj.state, obj) }
+            buttons[key]['onmouseover'] = () => { obj.state.setStyle(highLightStyle) }
+            buttons[key]['onmouseout'] = () => { obj.state.setStyle(statesStyle) }
+
+            //L.DomEvent.on(buttons[key],'mouseover',function(ev){test(obj)})
+        })
+
+        return div;
+    },
+    onRemove: function (map) { },
+    setState: function (state) {
+        this.state = state
+    }
+});
+
+/**
+ * Factory function for the states control
+ * @param {Object} opts Leaflet options object
+ */
+L.control.states = function (opts) {
+    return new L.Control.States(opts);
+}
+
 /* **********   SPECIFIC BUILDER FUNCTIONS W/ LEAFLET  ********** */
 
 function jobsTab(state) {
@@ -100,8 +175,8 @@ function jobsTab(state) {
 
     var container = L.DomUtil.create('div');
 
-    var headerDiv = htmlElement(container, 'div', 'center');
-    createTextElement(headerDiv, 'h3', 'Select A Job', 'h3');
+    var headerDiv = htmlElement(container, 'div', 'center tabContentTitle mb-3');
+    createTextElement(headerDiv, 'h5', 'Select a Job', 'h5');
 
 
     var bodyDiv = htmlElement(container, 'div');
@@ -138,11 +213,12 @@ function jobListItem(job) {
  * Creates the content for the 'params' tab
  * @return {Element} div container of the content
  */
-function constraintsTab(state) {
+function constraintsTab(state, menu) {
 
     var div = L.DomUtil.create('div');  //Main Container
 
-    createTextElement(div, 'p', "Job Subset Constraints", "h1 center"); //Tab Title
+    var headerDiv = htmlElement(div, 'div', 'center tabContentTitle mb-3');
+    createTextElement(headerDiv, 'h5', 'Job Subset Constraints', 'h5');
 
     var constraints = htmlElement(div, 'div', 'container');
 
@@ -181,25 +257,39 @@ function constraintsTab(state) {
 
     //Submit Buttons
     var subDiv = htmlElement(div, 'div', 'd-grid gap-2 col-6 mx-auto submitBtn')
-    var subBtn = createButton(subDiv, 'button', 'Submit', 'btn btn-primary', 'submitButton');
+    var subBtn = createButton(subDiv, 'button', 'Submit', 'btn btn-primary btn-lg', 'submitButton');
 
     //Event Handler
-    L.DomEvent.on(subBtn, 'click', function (ev) { submitConstraints() })
+    L.DomEvent.on(subBtn, 'click', function (ev) { submitConstraints('', menu) })
 
     return div;
 }
 
-function constraintsSummaryTab() {
-    var container = L.DomUtil.create('div');
-    var header = htmlElement(container, 'div', 'center');
-    var body = htmlElement(container, 'div', 'container');
+function constraintsSummaryTab(data, menu) {
+    var container = L.DomUtil.create('div'); //Contianer div
 
+    //Header Elements
+    var headerDiv = htmlElement(container, 'div', 'center tabContentTitle mb-3');;
+    createTextElement(headerDiv, 'h5', 'Constraints Results', 'h5');// Page title
 
-    var footer = htmlElement(container, 'div', 'd-flex w-100 justify-content-around');
-    var back = createButton(footer, 'button', 'Back', 'btn btn-secondary btn-lg');
-    var next = createButton(footer, 'button', 'Next', 'btn btn-primary btn-lg');
+    var body = htmlElement(container, 'div', 'data-table',); //Content container
+    Object.keys(data).forEach(function (key) {
+        var row = htmlElement(body, 'div', 'row');
+        createTextElement(row, 'p', data[key].label + data[key].value, 'col', key + "ConSummaryLabel");
+        var value = createTextElement(row, 'p', data[key].value, 'col', key + "ConSummaryValue");
+        if (data[key].type) {
+            value.innerHTML += "(" + data[key].type + ")";
+        }
+    });
 
-    L.DomEvent.on(back, 'click', function (ev) { switchTabContent('constraints-tab', 'constraints') })
+    //Footer elements
+    var footer = htmlElement(container, 'div', 'row');
+    var left = htmlElement(footer, 'div', 'col d-grid gap-2');
+    var right = htmlElement(footer, 'div', 'col d-grid gap-2');
+    var back = createButton(left, 'button', 'Back', 'btn btn-secondary btn-lg');
+    var next = createButton(right, 'button', 'Next', 'btn btn-primary btn-lg');
+
+    L.DomEvent.on(back, 'click', function (ev) { switchTabContent('constraints-tab', 'constraints'); disableTab('measures'); disableTab('districts') })
     L.DomEvent.on(next, 'click', function (ev) { switchTabs('measures') });
 
     return container;
@@ -207,12 +297,11 @@ function constraintsSummaryTab() {
 
 function measuresTab(state) {
     var div = L.DomUtil.create('div');
+    var headerDiv = htmlElement(div, 'div', 'center tabContentTitle mb-3');
+    createTextElement(headerDiv, 'h5', 'Objective Function Weights', 'h5');
+
     var measures = htmlElement(div, 'div', 'container');
 
-    //var measuresAccordion = createAccordian(div, 'measuresAccordion', 'Objective Function Weights', measures)
-
-
-    //createTextElement(measures, 'p', "Objective Function Weights", "h5");
     createSlider(measures, 'population-equality', 'Population Equality', 0, 1, 0.1);
     createSlider(measures, 'avgerage-deviation', 'Deviation from Average Districting', 0, 1, 0.1);
     createSlider(measures, 'enacted-deviation', 'Deviation from Enacted Plan', 0, 1, 0.1);
@@ -279,37 +368,38 @@ function districtListItem(geoJSON, weights) {
     var districtList = createListGroup(listgroupContainer);
     districtList.classList.add('list-group-flush');
     var featureGroup = new L.LayerGroup();
-    
+
     var district = L.geoJson(geoJSON, {
         onEachFeature: function (feature, layer) {
             var featureJson = L.geoJson(feature);
             featureJson.addTo(featureGroup);
             districtList.appendChild(districtAccordionItem(feature, featureJson))
-        }}
+        }
+    }
     );
     var listItem = createListItem(div, false, false);
 
 
     //Info Page
     var infoContainer = L.DomUtil.create('div');
-    var infoHeader = htmlElement(infoContainer,'div');
-    createTextElement(infoHeader,'h5',id,'h5');
-    var infoBody = htmlElement(infoContainer,'div');
+    var infoHeader = htmlElement(infoContainer, 'div');
+    createTextElement(infoHeader, 'h5', id, 'h5');
+    var infoBody = htmlElement(infoContainer, 'div');
     createAccordian(infoBody, "Dist" + id, "districts", listgroupContainer);
-    var infoFooter = htmlElement(infoContainer, 'div','d-grid gap-2');
+    var infoFooter = htmlElement(infoContainer, 'div', 'd-grid gap-2');
 
     var back = createButton(infoFooter, 'button', 'Back', 'btn btn-secondary btn-lg ');
- 
+
     L.DomEvent.on(check, 'click', function (ev) {
         toggleDistrict(featureGroup, check.checked);
     });
 
-    L.DomEvent.on(link,'click',function(ev){
-        showDistrictInfo(infoContainer,featureGroup);
+    L.DomEvent.on(link, 'click', function (ev) {
+        showDistrictInfo(infoContainer, featureGroup);
     });
 
-    L.DomEvent.on(back, 'click', function (ev) { 
-        showDistrictList(infoContainer,featureGroup);
+    L.DomEvent.on(back, 'click', function (ev) {
+        showDistrictList(infoContainer, featureGroup);
     });
 
     return listItem;
@@ -348,7 +438,7 @@ function incumbentsContent(state) {
 
     return div;
 }
-// Add Analysis Tab
+// Add Analysis Tab?
 
 
 /* *************************************** */
@@ -382,10 +472,13 @@ function addDistrictHightlight(district, div) {
 }
 
 function selectJob(job) {
+    disableTab('measures')
+    disableTab('districts')
     switchTabs('constraints');
 }
 
-function submitConstraints() {
+function submitConstraints(constraints, menu) {
+    menu.setConstraintsData(constrainJob(constraints));
     switchTabContent('constraints-tab', 'constraintsSummary');
 }
 
@@ -403,9 +496,11 @@ function submitConstraints() {
 // }
 
 function switchTabs(id) {
+    enableTab(id);
     $(".nav-link.active,.tab-pane.active").attr({ 'aria-selected': 'false' }).removeClass('active show');
     $("#" + id + "-tab").addClass('active').attr({ 'aria-selected': 'true' });;
     $("#" + id).addClass('active show').attr({ 'aria-selected': 'true' });
+
     //$("#" + id + "-tab").attr({ 'aria-selected': 'true' });
 }
 
@@ -420,13 +515,25 @@ function switchTabContent(tabid, contentid) {
 
 }
 
-function showDistrictInfo(info,featureGroup){
+function enableTab(id) {
+    var tab = $("#" + id + '-tab');
+    tab.attr({ 'aria-disabled': 'false' });
+    tab.removeClass('disabled')
+}
+
+function disableTab(id) {
+    var tab = $("#" + id + '-tab');
+    tab.attr({ 'aria-disabled': 'true' });
+    tab.addClass('disabled')
+}
+
+function showDistrictInfo(info, featureGroup) {
     var districtList = $("#districtList");
     districtList.parent().append(info);
     districtList.hide();
 }
 
-function showDistrictList(info,featureGroup){
+function showDistrictList(info, featureGroup) {
     info.remove();
     $("#districtList").show();
 }
@@ -553,8 +660,8 @@ function createTabNav(parent, id) {
  * @param {string} id value to set 'id' attribute and link content to tab
  * @param {boolean} active 
  */
-function createTab(nav, text, content, id, active = false) {
-    createTabItem(nav.nav, text, active, id);
+function createTab(nav, text, content, id, active = false, disabled = false) {
+    createTabItem(nav.nav, text, active, id, disabled);
     createTabPane(nav.content, content, active, id);
 }
 
@@ -565,7 +672,7 @@ function createTab(nav, text, content, id, active = false) {
  * @param {boolean} active whether or not to add the 'active' class
  * @param {string} id value used to attatch tab link to 'id' of tab content
  */
-function createTabItem(parent, text, active, id) {
+function createTabItem(parent, text, active, id, disabled) {
     var li = htmlElement(parent, "li", "nav-item");
     li.setAttribute('role', 'presentation')
     var button = createButton(li, "button", text, 'nav-link cust-nav-link', id + "-tab");
@@ -574,6 +681,10 @@ function createTabItem(parent, text, active, id) {
     button.setAttribute("role", "tab");
     button.setAttribute("aria-controls", id);
     button.setAttribute("aria-selected", "" + active);
+    if (disabled) {
+        button.setAttribute('aria-disabled', 'true');
+        button.classList.add('disabled')
+    }
 
     if (active) {
         button.classList.add("active");
