@@ -338,12 +338,14 @@ function incumbentsContent(state) {
     statesObj[state]['senators'].forEach(function (senator) {
         var elem = createSwitch(div, senator.name, senator.name + " <em>[" + senator.party + "]</em>");
         elem.classList.add(senator.party);
+        elem.classList.add('grayed');
         elem.setAttribute('checked', 'true')
     });
-    createTextElement(div, 'p', "Representatives", "h5");
+    createTextElement(div, 'p', "Representative", "h5");
     statesObj[state]['reps'].forEach(function (rep) {
         var elem = createSwitch(div, rep.name, rep.name + " -<em> " + rep.district + ' District ' + " [" + rep.party + "]</em>");
         elem.classList.add(rep.party);
+        elem.classList.add('grayed');
         elem.setAttribute('checked', 'true');
     });
 
@@ -374,7 +376,8 @@ function submitMeasures(state, weights) {
     //     list.append(districtListItem(item));
     // });
 
-    switchTabs('districts')
+    switchTabs('districts');
+    hideAll(districtLayer)
 }
 
 function addDistrictHightlight(district, div) {
@@ -386,11 +389,13 @@ function selectJob(job) {
     disableTab('measures')
     disableTab('districts')
     switchTabs('constraints');
+    hideAll(districtLayer);
 }
 
 function submitConstraints(constraints, menu) {
     menu.setConstraintsData(constrainJob(constraints));
     switchTabContent('constraints-tab', 'constraintsSummary');
+    hideAll(districtLayer);
 }
 
 
@@ -663,7 +668,7 @@ function createSlider(parent, id, text, min, max, step) {
     slider.min = min;
     slider.max = max;
     slider.step = step;
-    var value = createLabel(range, 1, id, "range-value smalls", id + "Value");
+    var value = createLabel(range, slider.value, id, "range-value smalls", id + "Value");
     slider.oninput = function () {
         value.innerHTML = this.value;
     }
