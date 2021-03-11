@@ -1,8 +1,32 @@
 let sortings = {
 	overall: {
-		desc:'overall objective function score',
+		desc:'overall best objective function score',
 		cmp: function(d1, d2) {
-			return getScore(d1, this.weights) - getScore(d2, this.weights)
+			return d1.getScore() - d2.getScore()
+		}
+	},
+	overallworst: {
+		desc:'overall worst objective function score',
+		cmp: function(d1, d2) {
+			return d2.getScore() - d1.getScore()
+		}
+	},
+	enacted: {
+		desc:'closest to enacted',
+		cmp: function(d1, d2) {
+			return d2.getScore() - d1.getScore()
+		}
+	},
+	majmin: {
+		desc:'highest scoring majority minority',
+		cmp: function(d1, d2) {
+			return d2.getScore() - d1.getScore()
+		}
+	},
+	different: {
+		desc:'most different area pair-deviations',
+		cmp: function(d1, d2) {
+			return d2.getScore() - d1.getScore()
 		}
 	}
 }
@@ -20,9 +44,9 @@ class DistrictingsTab {
 		var headerDiv = htmlElement(this.div, 'div', 'center tabContentTitle mb-3');
 		createTextElement(headerDiv, 'h5', 'Examine Districtings', 'h5');
 
-		var sortDiv = htmlElement(this.div, "div", 'd-flex w-100 justify-content-between','sortDiv');
-		createTextElement(sortDiv, "p", "Sorted by " + sortings[this.sorting].desc, "");
-	    var sortBtn = createTextElement(sortDiv, 'a', 'Sort', 'modal-link', 'sortLink');
+		this.sortDiv = htmlElement(this.div, "div", 'd-flex w-100 justify-content-between','sortDiv');
+		createTextElement(this.sortDiv, "p", "Sorted by " + sortings[this.sorting].desc, "");
+	    var sortBtn = createTextElement(this.sortDiv, 'a', 'Sort', 'modal-link', 'sortLink');
 	    sortBtn.setAttribute('data-bs-toggle', 'modal');
 	    sortBtn.setAttribute('data-bs-target', '#sortModal');
 	    
@@ -39,12 +63,15 @@ class DistrictingsTab {
 
 	makeModal = () => {
 		// create sortModal
-	    var sortRadioLabels = [
-	        { 'label': 'Overall', 'value': 'overall'},
-	        { 'label': 'Close to enacted', 'value': 'enacted'},
-	        { 'label': 'Highest scoring with majority minority districts:', 'value': 'majmin'},
-	        { 'label': 'Most different area pair-deviations', 'value': 'different'}
-	    ]
+	    var sortRadioLabels = []
+	    //     { 'label': 'Overall', 'value': 'overall'},
+	    //     { 'label': 'Close to enacted', 'value': 'enacted'},
+	    //     { 'label': 'Highest scoring with majority minority districts:', 'value': 'majmin'},
+	    //     { 'label': 'Most different area pair-deviations', 'value': 'different'}
+	    // ]
+	    for (let sort in sortings) {
+	    	sortRadioLabels.push({'label': sortings[sort].desc, value: sort})
+	    }
 	    for (let l of sortRadioLabels) {
 	    	if (l.value == this.sorting) {
 	    		l.checked = true
@@ -71,17 +98,53 @@ class DistrictingsTab {
 		}
 	}
 
-
-
-	listDistricts = (dics, weights) => {
+	setDistricts = (dics, weights) => {
 		this.weights = weights
 		let l = this.list
-		// sort dics
+		this.dics = []
+		for (let dic of dics) {
+			this.dics.push(new Districting(dic, this))
+		}
+		this.sortList()
+	}
 
+	displayDistricting = (d) => {
+		if (this.currentDic && this.currentDic != d) {
+			this.currentDic.toggleDisplay(false)
+		}
+		this.currentDic = d
+		toggleDistrict(this.currentDic.featureGroup, true);
+	}
 
-		dics.forEach(function (item) {
-			l.append(districtListItem(item, weights));
-		});
-		
+	unselectDistricting = (d) => {
+		if (this.currentDic) {
+			toggleDistrict(this.currentDic.featureGroup, false);
+			this.currentDic = null
+		} else {console.log('this shouldntve happened..')}
+	}
+
+	sortList = () => {
+		this.clearList()
+		this.dics.sort(sortings[this.sorting].cmp)
+		for (let dic of this.dics) {
+			this.list.append(dic.listItem);
+		}
+	}
+
+	showDistrictInfo(d) {
+	    this.div.append(d.infoContainer)
+	    this.list.style.display = 'none';
+	    for (let c of this.sortDiv.children) {
+	    	c.style.display = 'none'
+	    }
+	}
+
+	showDistrictList = (d) => {
+	    d.infoContainer.remove();
+	    // reset to default display
+	    this.list.style.display = '';
+	    for (let c of this.sortDiv.children) {
+	    	c.style.display = ''
+	    }
 	}
 }

@@ -270,7 +270,6 @@ $(document).ready(function () {
     map.fitBounds(countryBounds);
     countryZoom = map.getZoom();
     map.setMinZoom(countryZoom);
-    console.log(map.getZoom())
 
 
     states.forEach(addStates);
@@ -290,9 +289,9 @@ $(document).ready(function () {
 
     center = L.control.center({ position: 'topleft' }).addTo(map);
 
-    map.on('zoom',function(){
-        console.log(map.getZoom())
-    })
+    // map.on('zoom',function(){
+    //     console.log(map.getZoom())
+    // })
 
 });
 

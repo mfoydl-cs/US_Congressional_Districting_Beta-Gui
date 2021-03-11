@@ -131,7 +131,6 @@ L.Control.States = L.Control.extend({
         buttons['AR'] = createButton(constraints, 'button', 'Arizona', 'btn btn-primary submitBtn');
         buttons['MI'] = createButton(constraints, 'button', 'Michigan', 'btn btn-primary submitBtn');
 
-        console.dir(buttons['AL']);
         Object.keys(buttons).forEach(function (key) {
             /*
             var geo = getGeoJSON(key);
@@ -326,112 +325,10 @@ function measuresTab(state) {
     L.DomEvent.on(subBtn, 'click', function (ev) { submitMeasures(state, weights) })
     return div;
 }
-/**
- * Create the content for the 'districts' Tab
- * @return {Element} div container of the content
- */
-// function districtsTab(state) {
-//     var div = L.DomUtil.create('div');
-//     createTextElement(div, 'p', "View Districtings", "h1 center")
-//     var list = createListGroup(div);
-//     list.id = "districtList";
-//     const emptyText = "Districting Parameters have not been set :("
-//     var text = L.DomUtil.create('p')
-//     text.innerHTML = emptyText;
-//     list.appendChild(text);
-
-//     return div;
-// }
-
-/**
- * Parses GeoJSON object to create list item
- * @param {Object} geoJSON geoJSON object representing the district
- * @return {Element} List Item element to add to list
- */
-function districtListItem(geoJSON, weights) {
-    var id = geoJSON.features[0].properties.CDSESSN;
-
-    var div = L.DomUtil.create('div');
-
-    var headerDiv = htmlElement(div, "div", 'd-flex w-100 justify-content-between');
-    createTextElement(headerDiv, "h5", id, "mb-1");
-    var check = L.DomUtil.create("input", "form-check-input", headerDiv);
-    check.type = "checkbox";
-
-    var contentDiv = htmlElement(div, "div", 'd-flex w-100 justify-content-between');
-    createTextElement(contentDiv, "p", "Score: " + getScore(geoJSON, weights).toFixed(2), "");
-    var link = createTextElement(contentDiv,'a','<em>more info</em>','modal-link')
-
-    //District List for Info Tab
-    var listgroupContainer = L.DomUtil.create('div');
-
-    var districtList = createListGroup(listgroupContainer);
-    districtList.classList.add('list-group-flush');
-    var featureGroup = new L.LayerGroup();
-
-    var district = L.geoJson(geoJSON, {
-        onEachFeature: function (feature, layer) {
-            var featureJson = L.geoJson(feature);
-            featureJson.addTo(featureGroup);
-            districtList.appendChild(districtAccordionItem(feature, featureJson))
-        }
-    }
-    );
-    var listItem = createListItem(div, false, false);
 
 
-    //Info Page
-    var infoContainer = L.DomUtil.create('div');
-    var infoHeader = htmlElement(infoContainer, 'div','d-flex w-100 justify-content-between');
-    createTextElement(infoHeader, 'h5', id, 'h5');
 
-    var checkDiv = htmlElement(infoHeader, 'div');
-    createLabel(checkDiv, '<i>show</i>&nbsp',id+'InfoCheck','small');
-    var infoCheck = L.DomUtil.create("input", "form-check-input custom-check", checkDiv);
-    infoCheck.id = id+"InfoCheck"
-    infoCheck.type = "checkbox";
 
-    var infoBody = htmlElement(infoContainer, 'div');
-    var stats = htmlElement(infoBody,'div','container');
-    createAccordian(infoBody, "Dist" + id, "districts", listgroupContainer);
-    var infoFooter = htmlElement(infoContainer, 'div', 'd-grid gap-2');
-
-    var back = createButton(infoFooter, 'button', 'Back', 'btn btn-secondary btn-lg ');
-
-    L.DomEvent.on(check, 'click', function (ev) {
-        toggleDistrict(featureGroup, check.checked);
-        infoCheck.checked = check.checked;
-    });
-
-    L.DomEvent.on(infoCheck, 'click', function (ev) {
-        toggleDistrict(featureGroup, infoCheck.checked);
-        check.checked = infoCheck.checked
-    });
-
-    L.DomEvent.on(link, 'click', function (ev) {
-        showDistrictInfo(infoContainer, featureGroup);
-    });
-
-    L.DomEvent.on(back, 'click', function (ev) {
-        showDistrictList(infoContainer, featureGroup);
-    });
-
-    return listItem;
-}
-
-function districtAccordionItem(district, feature) {
-    var id = "CD" + district.properties.CDSESSN + district.properties["CD" + district.properties.CDSESSN + "FP"]
-    var div = L.DomUtil.create('div', 'd-flex w-100 justify-content-between');
-    div.id = id;
-    //var div = htmlElement(div, "div", 'd-flex w-100 justify-content-between',id);
-    var p = createTextElement(div, 'p', "District " + district.properties["CD" + district.properties.CDSESSN + "FP"])
-    var colorPicker = createInput(div, 'color');
-
-    addDistrictHightlight(feature, div);
-
-    var item = createListItem(div, true, false);
-    return item;
-}
 
 function incumbentsContent(state) {
 
@@ -471,7 +368,7 @@ function submitMeasures(state, weights) {
 
     var districts = retrieveDistricts(state, weights);
 
-    dicTab.listDistricts(districts, weights)
+    dicTab.setDistricts(districts, weights)
 
     // districts.forEach(function (item) {
     //     list.append(districtListItem(item));
@@ -541,18 +438,7 @@ function disableTab(id) {
     tab.addClass('disabled')
 }
 
-function showDistrictInfo(info, featureGroup) {
-    var districtList = $("#districtList");
-    districtList.parent().append(info);
-    districtList.hide();
-    $("#sortDiv").children().hide();
-}
 
-function showDistrictList(info, featureGroup) {
-    info.remove();
-    $("#districtList").show();
-    $("#sortDiv").children().show();
-}
 
 
 /* ********************************************************** */
