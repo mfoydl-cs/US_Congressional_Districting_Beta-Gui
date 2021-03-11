@@ -475,7 +475,7 @@ function modalDialog(id, headerText, bodyContent, callback) {
     body.appendChild(bodyContent);
 
     var footer = htmlElement(content, 'div', 'modal-footer');
-    var closeBtn = createButton(footer, 'button', 'Confirm', 'btn btn-primary');
+    var closeBtn = createButton(footer, 'button', 'Done', 'btn btn-primary');
     closeBtn.setAttribute('data-bs-dismiss', 'modal');
 
     if (callback) {
