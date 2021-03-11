@@ -90,6 +90,55 @@ L.control.menu = function (opts) {
     return new L.Control.Menu(opts);
 }
 
+/**
+ * Creates the States control
+ */
+ L.Control.States = L.Control.extend({
+    onAdd: function (map) {
+
+        var div = L.DomUtil.create('div', 'dropdown');
+        L.DomEvent.disableClickPropagation(div);
+        L.DomEvent.disableScrollPropagation(div);
+
+        var constraints = htmlElement(div,'div','container');
+
+        var constraintsAccordion = createAccordian(div,'statesAccordion','Select a state to display',constraints)
+        var buttons = {};
+        buttons['AL'] = createButton(constraints, 'button', 'Alabama', 'btn btn-primary');
+        L.DomUtil.create('br', '', constraints);
+        buttons['AR'] = createButton(constraints, 'button', 'Arizona', 'btn btn-primary submitBtn');
+        L.DomUtil.create('br', '', constraints);
+        buttons['MI'] = createButton(constraints, 'button', 'Michigan', 'btn btn-primary submitBtn');
+
+        console.dir(buttons['AL']);
+        Object.keys(buttons).forEach(function(key) {
+            var geo = getGeoJSON(key);
+            var obj = {};
+            obj.abbr = key;
+            obj.state = geo.stateJSON;
+            obj.county = geo.counties;
+            obj.precinct = geo.precincts;
+            obj.senators = incumbentsJson[key]["senators"];
+            obj.reps = incumbentsJson[key]['representatives'];
+            buttons[key]['onclick'] = () => {zoomToState(geo.stateJSON, obj)}
+        })
+
+        return div;
+    },
+    onRemove: function (map) { },
+    setState: function(state){
+        this.state = state
+    }
+});
+
+/**
+ * Factory function for the states control
+ * @param {Object} opts Leaflet options object
+ */
+L.control.states = function (opts) {
+    return new L.Control.States(opts);
+}
+
 /* **********   SPECIFIC BUILDER FUNCTIONS W/ LEAFLET  ********** */
 
 function jobsTab(state) {
