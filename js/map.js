@@ -269,6 +269,10 @@ $(document).ready(function () {
     countryZoom = map.getZoom();
     map.setMinZoom(countryZoom);
 
+    map.setMaxBounds([
+        [23, -129], //southwest coords
+        [50, -63] //northeast coords
+    ]);
 
     states.forEach(addStates);
 
