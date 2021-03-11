@@ -1,4 +1,4 @@
-function retrieveDistricts(state){
+function retrieveDistricts(state, weights){
     switch(state){
         case "AL":
             return [AL_CD_116, AL_CD_113]

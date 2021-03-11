@@ -1,3 +1,4 @@
+// import { DistrictingsTab } from './districtings-tab.js'
 /* ********** CUSTOM LEAFLET UI CONTROL DEFINITIONS ********** */
 
 /**
@@ -52,6 +53,8 @@ L.control.backButton = function (opts) {
     return new L.Control.BackButton(opts);
 }
 
+window.dicTab = new DistrictingsTab();
+
 /**
  * Creates the Menu control
  */
@@ -68,7 +71,7 @@ L.Control.Menu = L.Control.extend({
         createTab(nav, "Constraints", constraintsTab(this.state), "constraints"); //Constraints Tab
         createTab(nav, "Constrain Results", constraintsSummaryTab(), 'constraintsSummary')//Jobs Tab //Measures Tab
         createTab(nav, "Measures", measuresTab(this.state), "measures"); //Measures Tab
-        createTab(nav, "Top Districtings", districtsTab(this.state), "districts"); //Districtings Tab
+        createTab(nav, "Top Districtings", window.dicTab.div, "districts"); //Districtings Tab
 
         $(document).ready(function () {
             $('#constraintsSummary-tab').hide();
@@ -221,32 +224,42 @@ function measuresTab(state) {
     var subDiv = htmlElement(div, 'div', 'd-grid gap-2 col-6 mx-auto submitBtn')
     var subBtn = createButton(subDiv, 'button', 'Submit', 'btn btn-primary btn-lg', 'submitButton');
 
-    L.DomEvent.on(subBtn, 'click', function (ev) { submitMeasures(state) })
+    // use default values of 0.5 for now
+    let weights = {
+        "compactness": 0.5,
+        "popEquality": 0.5,
+        "splitCounties": 0.5,
+        "devFromAvg": 0.5,
+        "devFromEnactedArea": 0.5,
+        "devFromEnactedPop": 0.5,
+        "fairness": 0.5,
+    }
+    L.DomEvent.on(subBtn, 'click', function (ev) { submitMeasures(state, weights) })
     return div;
 }
 /**
  * Create the content for the 'districts' Tab
  * @return {Element} div container of the content
  */
-function districtsTab(state) {
-    var div = L.DomUtil.create('div');
-    createTextElement(div, 'p', "View Districtings", "h1 center")
-    var list = createListGroup(div);
-    list.id = "districtList";
-    const emptyText = "Districting Parameters have not been set :("
-    var text = L.DomUtil.create('p')
-    text.innerHTML = emptyText;
-    list.appendChild(text);
+// function districtsTab(state) {
+//     var div = L.DomUtil.create('div');
+//     createTextElement(div, 'p', "View Districtings", "h1 center")
+//     var list = createListGroup(div);
+//     list.id = "districtList";
+//     const emptyText = "Districting Parameters have not been set :("
+//     var text = L.DomUtil.create('p')
+//     text.innerHTML = emptyText;
+//     list.appendChild(text);
 
-    return div;
-}
+//     return div;
+// }
 
 /**
  * Parses GeoJSON object to create list item
  * @param {Object} geoJSON geoJSON object representing the district
  * @return {Element} List Item element to add to list
  */
-function districtListItem(geoJSON) {
+function districtListItem(geoJSON, weights) {
     var id = geoJSON.features[0].properties.CDSESSN;
 
     var div = L.DomUtil.create('div');
@@ -257,7 +270,7 @@ function districtListItem(geoJSON) {
     check.type = "checkbox";
 
     var contentDiv = htmlElement(div, "div", 'd-flex w-100 justify-content-between');
-    createTextElement(contentDiv, "p", "Score: XXX", "");
+    createTextElement(contentDiv, "p", "Score: " + getScore(geoJSON, weights).toFixed(2), "");
     var link = createTextElement(contentDiv,'a','<em>more info</em>','modal-link')
 
     //District List for Info Tab
@@ -346,17 +359,19 @@ function incumbentsContent(state) {
  * Gathers form data from the parameters tab to be sent as request
  * Clears current districts list
  * Adds new dsitricts list to the UI
+ * Called from listener set up in measuresTab
  */
-function submitMeasures(state) {
+function submitMeasures(state, weights) {
+    dicTab = window.dicTab
+    dicTab.clearList()
 
-    clearDistricts();
-    var list = $("#districtList");
+    var districts = retrieveDistricts(state, weights);
 
-    var districts = retrieveDistricts(state);
+    dicTab.listDistricts(districts, weights)
 
-    districts.forEach(function (item) {
-        list.append(districtListItem(item));
-    });
+    // districts.forEach(function (item) {
+    //     list.append(districtListItem(item));
+    // });
 
     switchTabs('districts')
 }
@@ -383,9 +398,9 @@ function submitConstraints() {
 /**
  * Clears the List Group of districtings on the districts tab on the menu
  */
-function clearDistricts() {
-    $("#districtList").empty();
-}
+// function clearDistricts() {
+//     $("#districtList").empty();
+// }
 
 function switchTabs(id) {
     $(".nav-link.active,.tab-pane.active").attr({ 'aria-selected': 'false' }).removeClass('active show');
@@ -421,7 +436,7 @@ function showDistrictList(info,featureGroup){
 /* ********** GENERIC BUILDER FUNCTIONS W/ LEAFLET ********** */
 /* ********************************************************** */
 
-function modalDialog(id, headerText, bodyContent) {
+function modalDialog(id, headerText, bodyContent, callback) {
     var fade = L.DomUtil.create('div', 'modal fade');
     fade.id = id;
     fade.setAttribute('tabindex', '-1');
@@ -443,6 +458,10 @@ function modalDialog(id, headerText, bodyContent) {
     var footer = htmlElement(content, 'div', 'modal-footer');
     var closeBtn = createButton(footer, 'button', 'Confirm', 'btn btn-primary');
     closeBtn.setAttribute('data-bs-dismiss', 'modal');
+
+    if (callback) {
+        L.DomEvent.on(closeBtn, 'click', callback);
+    }
 
     //var saveBtn = createButton(footer, 'button','Save','btn btn-primary');
     return fade;
