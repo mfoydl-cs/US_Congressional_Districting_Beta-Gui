@@ -96,7 +96,6 @@ class Districting {
 		var featureJson = L.geoJson(feature);
         featureJson.addTo(this.featureGroup);
 
-
         var id = "CD" + feature.properties.CDSESSN + feature.properties["CD" + feature.properties.CDSESSN + "FP"]
 	    var div = L.DomUtil.create('div', 'd-flex w-100 justify-content-between');
 	    div.id = id;
