@@ -25,7 +25,6 @@ class Districting {
 	    var listgroupContainer = L.DomUtil.create('div');
 	    this.districtList = createListGroup(listgroupContainer);
 	    this.districtList.classList.add('list-group-flush');
-
 	    this.featureGroup = new L.LayerGroup();
 	    L.geoJson(geoJSON, {
 	        onEachFeature: this.processDistrict
@@ -62,8 +61,14 @@ class Districting {
 		// populate stats list
 		for (let score in this.geoJSON['scores']) {
 	    	var div = L.DomUtil.create('div', 'd-flex w-100 justify-content-between');
-			createTextElement(div, 'p', score, 'stat-col score')
 			let s = this.geoJSON.scores[score]
+			if (score == 'majmin') {
+				let link = createTextElement(div, 'a', 'Maj-Min Districts', 'stat-col score modal-link')
+				link.setAttribute('data-bs-toggle', 'modal');
+				link.setAttribute('data-bs-target', '#majminModal' + id);
+			} else {
+				createTextElement(div, 'p', score, 'stat-col score')
+			}
 			createTextElement(div, 'p', s, 'stat-col')
 			createTextElement(div, 'p', this.dicTab.weights[score], 'stat-col')
 			createTextElement(div, 'p', s*this.dicTab.weights[score], 'stat-col')
@@ -77,6 +82,37 @@ class Districting {
 		createTextElement(div, 'p', this.getScore().toFixed(2), 'stat-col')
 		statItem = createListItem(div, true, false)
 		this.statsList.appendChild(statItem)
+		
+		// make majmin modal
+		let majminDiv = L.DomUtil.create('div')
+		let table = htmlElement(majminDiv, 'table')
+		let row = htmlElement(table, 'tr')
+		let name = htmlElement(row, 'td')
+		name.innerHTML = "District Name"
+		let pop = htmlElement(row, 'td')
+		pop.innerHTML = "Population"
+		let minPop = htmlElement(row, 'td')
+		minPop.innerHTML = "Minority Population"
+		let minPer = htmlElement(row, 'td')
+		minPer.innerHTML = "Minority Percentage"
+		for (let d of this.geoJSON.features) {
+			console.log(d.properties)
+			let row = htmlElement(table, 'tr')
+			let name = htmlElement(row, 'td')
+			if ('NAMELSAD20' in d.properties) {
+				name.innerHTML = d.properties.NAMELSAD20
+			} else {
+				name.innerHTML = d.properties.NAMELSAD10
+			}
+			let pop = htmlElement(row, 'td')
+			pop.innerHTML = d.properties.population
+			let minPop = htmlElement(row, 'td')
+			minPop.innerHTML = d.properties.minorityPop
+			let minPer = htmlElement(row, 'td')
+			minPer.innerHTML = (100 * d.properties.minorityPop / d.properties.population).toFixed(2) + '%'
+		}
+		this.majminModal = modalDialog('majminModal' + id, 'Majority-Minority Districts', majminDiv)
+		$('body').append(this.majminModal)
 
 		//start chart popout
 		var aggregates = createTextElement(infoBody, 'a', 'Districting Data', 'modal-link',);

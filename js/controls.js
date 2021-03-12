@@ -321,6 +321,7 @@ function measuresTab(state) {
         "devFromEnactedArea": 0.5,
         "devFromEnactedPop": 0.5,
         "fairness": 0.5,
+		"majmin": 0.5,
     }
     L.DomEvent.on(subBtn, 'click', function (ev) { submitMeasures(state, weights) })
     return div;
