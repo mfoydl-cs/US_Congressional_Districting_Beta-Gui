@@ -10,7 +10,10 @@ function retrieveDistricts(state, weights){
 }
 
 function getJobsSummary(state){
-    return $.get("http://localhost:8080/rockies/api/jobs/all");
+    return $.get(
+        "http://localhost:8080/rockies/api/jobs/all",
+        {state: state}
+    );
     // return { 
     //     "jobs-summary": [
     //         { "name": "Job 01", "rounds": "200", "cooling-period": "50" }, 
