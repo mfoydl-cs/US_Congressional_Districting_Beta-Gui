@@ -31,3 +31,10 @@ function constrainJob(constraints){
         'population-diff': { 'label': 'Avg. Population Difference: ', 'type': 'Total Population', 'value': '1.2%' },
     }
 }
+
+function setJob(job) {
+    return $.post(
+        "http://localhost:8080/rockies/api/jobs/current-job",
+        job
+    )
+}

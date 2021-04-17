@@ -207,7 +207,7 @@ function jobListItem(job) {
     var footer = htmlElement(container, 'div', 'd-grid gap-2');
     var selectBtn = createButton(footer, 'button', 'Select', 'btn btn-primary', 'select-' + job.name);
 
-    L.DomEvent.on(selectBtn, 'click', function (ev) { selectJob(job.name) });
+    L.DomEvent.on(selectBtn, 'click', function (ev) { selectJob(job) });
 
     return createListItem(container, false, false);
 }
@@ -396,10 +396,13 @@ function addDistrictHightlight(district, div) {
 }
 
 function selectJob(job) {
-    disableTab('measures')
-    disableTab('districts')
-    switchTabs('constraints');
-    hideAll(districtLayer);
+    setJob(job).then(response => {
+        // console.log(response);
+        disableTab('measures')
+        disableTab('districts')
+        switchTabs('constraints');
+        hideAll(districtLayer);
+    });
 }
 
 function submitConstraints(constraints, menu) {
