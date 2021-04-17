@@ -170,22 +170,25 @@ L.control.states = function (opts) {
 /* **********   SPECIFIC BUILDER FUNCTIONS W/ LEAFLET  ********** */
 
 function jobsTab(state) {
-    var jobs = getJobsSummary(state)['jobs-summary'];
+    var jobs;
 
     var container = L.DomUtil.create('div');
 
-    var headerDiv = htmlElement(container, 'div', 'center tabContentTitle mb-3');
-    createTextElement(headerDiv, 'h5', 'Select a Job', 'h5');
+    getJobsSummary(state).then(response => {
+        jobs = response;
+        var headerDiv = htmlElement(container, 'div', 'center tabContentTitle mb-3');
+        createTextElement(headerDiv, 'h5', 'Select a Job', 'h5');
 
 
-    var bodyDiv = htmlElement(container, 'div');
-    var list = createListGroup(bodyDiv);
-    list.id = 'jobList';
-    list.classList.add('list-group-flush');
+        var bodyDiv = htmlElement(container, 'div');
+        var list = createListGroup(bodyDiv);
+        list.id = 'jobList';
+        list.classList.add('list-group-flush');
 
-    jobs.forEach(function (job) {
-        list.appendChild(jobListItem(job));
-    });
+        jobs.forEach(function (job) {
+            list.appendChild(jobListItem(job));
+        });
+    })
 
     return container;
 }
@@ -194,11 +197,12 @@ function jobListItem(job) {
     var container = L.DomUtil.create('div');
 
     var headerDiv = htmlElement(container, "div", 'd-flex w-100 justify-content-between');
-    createTextElement(headerDiv, "h5", job.name, "mb-1 center");
+    createTextElement(headerDiv, "h5", "Job " + job.id, "mb-1 center");
 
     var content = htmlElement(container, 'div', 'container');
     createTextElement(content, 'p', 'Rounds: ' + job.rounds);
-    createTextElement(content, 'p', 'Cooling-Period: ' + job['cooling-period']);
+    createTextElement(content, 'p', 'Cooling-Period: ' + job.coolingPeriod);
+    createTextElement(content, 'p', 'Districtings: ' + job.numDistrictings);
 
     var footer = htmlElement(container, 'div', 'd-grid gap-2');
     var selectBtn = createButton(footer, 'button', 'Select', 'btn btn-primary', 'select-' + job.name);

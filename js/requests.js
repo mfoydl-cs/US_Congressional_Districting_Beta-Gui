@@ -10,13 +10,14 @@ function retrieveDistricts(state, weights){
 }
 
 function getJobsSummary(state){
-    return { 
-        "jobs-summary": [
-            { "name": "Job 01", "rounds": "200", "cooling-period": "50" }, 
-            { "name": "Job 02", "rounds": "100,000", "cooling-period": "50" }, 
-            { "name": "Job 03", "rounds": "100,000", "cooling-period": "100" }
-        ]
-    }
+    return $.get("http://localhost:8080/rockies/api/jobs/all");
+    // return { 
+    //     "jobs-summary": [
+    //         { "name": "Job 01", "rounds": "200", "cooling-period": "50" }, 
+    //         { "name": "Job 02", "rounds": "100,000", "cooling-period": "50" }, 
+    //         { "name": "Job 03", "rounds": "100,000", "cooling-period": "100" }
+    //     ]
+    // }
 }
 
 function constrainJob(constraints){
