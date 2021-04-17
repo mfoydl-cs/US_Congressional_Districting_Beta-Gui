@@ -9,6 +9,11 @@ function retrieveDistricts(state, weights){
     }
 }
 
+/**
+ * Get all available jobs for a state
+ * @param {String} state 
+ * @returns List of job objects
+ */
 function getJobsSummary(state){
     return $.get(
         "http://localhost:8080/rockies/api/jobs/all",
@@ -32,6 +37,11 @@ function constrainJob(constraints){
     }
 }
 
+/**
+ * Posts job to be saved to session
+ * @param {Object} job 
+ * @returns job that was posted
+ */
 function setJob(job) {
     return $.post(
         "http://localhost:8080/rockies/api/jobs/current-job",
