@@ -29,12 +29,18 @@ function getJobsSummary(state){
 }
 
 function constrainJob(constraints){
-    return {
-        'count': { 'label': 'Districtings Returned: ', 'value': '1,000' },
-        'avg-compactness': { 'label': 'Avg. Compactness: ', 'type': 'Polsby-Popper', 'value': '.92' },
-        'avg-maj-min': { 'label': 'Avg. Majority-Minority Districts: ', 'value': '2' },
-        'population-diff': { 'label': 'Avg. Population Difference: ', 'type': 'Total Population', 'value': '1.2%' },
-    }
+    console.log(constraints)
+    return $.post(
+        "http://localhost:8080/rockies/api/jobs/constraints",
+        constraints
+    )
+
+    // return {
+    //     'count': { 'label': 'Districtings Returned: ', 'value': '1,000' },
+    //     'avg-compactness': { 'label': 'Avg. Compactness: ', 'type': 'Polsby-Popper', 'value': '.92' },
+    //     'avg-maj-min': { 'label': 'Avg. Majority-Minority Districts: ', 'value': '2' },
+    //     'population-diff': { 'label': 'Avg. Population Difference: ', 'type': 'Total Population', 'value': '1.2%' },
+    // }
 }
 
 /**

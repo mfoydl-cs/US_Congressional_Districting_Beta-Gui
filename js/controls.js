@@ -93,6 +93,7 @@ L.Control.Menu = L.Control.extend({
         this.state = state //Keep track of the current state selected
     },
     setConstraintsData: function (data) {
+        // console.log(data)
         this.constraintsData = data;
         Object.keys(data).forEach(function (key) {
             $("#" + key + "ConSummaryLabel").html(data[key].label)
@@ -263,7 +264,24 @@ function constraintsTab(state, menu) {
     var subBtn = createButton(subDiv, 'button', 'Submit', 'btn btn-primary btn-lg', 'submitButton');
 
     //Event Handler
-    L.DomEvent.on(subBtn, 'click', function (ev) { submitConstraints('', menu) })
+    L.DomEvent.on(subBtn, 'click', function (ev) {
+        var data = {}
+        data['compactness'] = document.getElementById('compactness-constraint').value;
+        data['majMin'] = document.getElementById('majmin-constraint').value;
+        data['popDiff'] = document.getElementById('population-constraint').value;
+        data['cmpMeasure'] = document.querySelector('input[name="compactnessRadio"]:checked').value;
+        data['popType'] = document.querySelector('input[name="populationRadio"]:checked').value;
+        var incumbentData = {};
+        statesObj[state]['senators'].forEach(function (senator) {
+            incumbentData[senator.name] = document.getElementById(senator.name).checked;
+        });
+        statesObj[state]['reps'].forEach(function (rep) {
+            incumbentData[rep.name] = document.getElementById(rep.name).checked;
+        });
+        data['incumbentProt'] = JSON.stringify(incumbentData);
+        
+        submitConstraints(data, menu);
+    });
 
     return div;
 }
@@ -345,6 +363,14 @@ function incumbentsContent(state) {
         elem.classList.add(senator.party);
         elem.classList.add('grayed');
         elem.setAttribute('checked', 'true')
+        L.DomEvent.on(elem, 'click', function (ev) {
+            if (this.getAttribute('checked') === 'true') {
+                this.setAttribute('checked', 'false');
+            } else {
+                this.setAttribute('checked', 'true');
+            }
+            console.log(this)
+        })
     });
     createTextElement(div, 'p', "Representative", "h5");
     statesObj[state]['reps'].forEach(function (rep) {
@@ -352,6 +378,14 @@ function incumbentsContent(state) {
         elem.classList.add(rep.party);
         elem.classList.add('grayed');
         elem.setAttribute('checked', 'true');
+        L.DomEvent.on(elem, 'click', function (ev) {
+            if (this.getAttribute('checked') === 'true') {
+                this.setAttribute('checked', 'false');
+            } else {
+                this.setAttribute('checked', 'true');
+            }
+            console.log(this)
+        })
     });
 
     return div;
@@ -406,9 +440,19 @@ function selectJob(job) {
 }
 
 function submitConstraints(constraints, menu) {
-    menu.setConstraintsData(constrainJob(constraints));
-    switchTabContent('constraints-tab', 'constraintsSummary');
-    hideAll(districtLayer);
+    constrainJob(constraints).then(response => {
+        // TODO: structure response to be same as stuff
+        var stuff = {
+            'count': { 'label': 'Districtings Returned: ', 'value': '1,000' },
+            'avg-compactness': { 'label': 'Avg. Compactness: ', 'type': 'Polsby-Popper', 'value': '.92' },
+            'avg-maj-min': { 'label': 'Avg. Majority-Minority Districts: ', 'value': '2' },
+            'population-diff': { 'label': 'Avg. Population Difference: ', 'type': 'Total Population', 'value': '1.2%' },
+        };
+        console.log(response);
+        menu.setConstraintsData(stuff);
+        switchTabContent('constraints-tab', 'constraintsSummary');
+        hideAll(districtLayer);
+    })
 }
 
 
