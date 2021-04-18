@@ -254,6 +254,7 @@ function toggleDistrict(district, checked) {
 }
 
 $(document).ready(function () {
+    $.ajaxSetup({xhrFields: { withCredentials: true } });
     map = L.map('map');
 
     L.tileLayer('https://api.mapbox.com/styles/v1/mfoydl/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWZveWRsIiwiYSI6ImNrbGNqdnNocDBpZ2Qyd214bDZ2Y2piMDgifQ.nxwFI-kYDMC7ag_O8PgNhg', {
