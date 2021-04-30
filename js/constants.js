@@ -63,4 +63,18 @@ const darkPalette = [
   "#ccbf14", "#ddda0f", "#e0c816", "#cc7f0c", "#e0a016", //Yellows
   "#ba3e09", "#e27216", "#e05804", "#d63f08", "#ff652d", //Oranges
   "#af08d8", "#520d84", "#c10d97", "#680c96", "#7b12cc", //Purples
-]
+];
+
+const precinctTileOptions = {
+  maxZoom: 12,  // max zoom to preserve detail on; can't be higher than 24
+  tolerance: 10, // simplification tolerance (higher means simpler)
+  extent: 4096, // tile extent (both width and height)
+  buffer: 64,   // tile buffer on each side
+  debug: 0,     // logging level (0 to disable, 1 or 2)
+  lineMetrics: false, // whether to enable line metrics tracking for LineString/MultiLineString features
+  promoteId: null,    // name of a feature property to promote to feature.id. Cannot be used with `generateId`
+  generateId: false,  // whether to generate feature ids. Cannot be used with `promoteId`
+  indexMaxZoom: 12,       // max zoom in the initial tile index
+  indexMaxPoints: 100000 // max number of points per tile in the index
+}
+
