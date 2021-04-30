@@ -11,47 +11,47 @@ class Districting {
 
 		// create list item
 		var id = geoJSON.features[0].properties.CDSESSN;
-	    var div = L.DomUtil.create('div');
-	    var headerDiv = htmlElement(div, "div", 'd-flex w-100 justify-content-between');
-	    createTextElement(headerDiv, "h5", id, "mb-1");
-	    this.check = L.DomUtil.create("input", "form-check-input", headerDiv);
-	    this.check.type = "checkbox";
-	    var contentDiv = htmlElement(div, "div", 'd-flex w-100 justify-content-between');
-	    createTextElement(contentDiv, "p", "Score: " + this.getScore().toFixed(2), "");
-	    var link = createTextElement(contentDiv,'a','<em>more info</em>','modal-link')
-	    this.listItem = createListItem(div, false, false);
+		var div = L.DomUtil.create('div');
+		var headerDiv = htmlElement(div, "div", 'd-flex w-100 justify-content-between');
+		createTextElement(headerDiv, "h5", id, "mb-1");
+		this.check = L.DomUtil.create("input", "form-check-input", headerDiv);
+		this.check.type = "checkbox";
+		var contentDiv = htmlElement(div, "div", 'd-flex w-100 justify-content-between');
+		createTextElement(contentDiv, "p", "Score: " + this.getScore().toFixed(2), "");
+		var link = createTextElement(contentDiv,'a','<em>more info</em>','modal-link')
+		this.listItem = createListItem(div, false, false);
 
-	    // District List for Info Tab
-	    var listgroupContainer = L.DomUtil.create('div');
-	    this.districtList = createListGroup(listgroupContainer);
-	    this.districtList.classList.add('list-group-flush');
-	    this.featureGroup = new L.LayerGroup();
-	    L.geoJson(geoJSON, {
-	        onEachFeature: this.processDistrict
-	    });
+		// District List for Info Tab
+		var listgroupContainer = L.DomUtil.create('div');
+		this.districtList = createListGroup(listgroupContainer);
+		this.districtList.classList.add('list-group-flush');
+		this.featureGroup = new L.LayerGroup();
+		L.geoJson(geoJSON, {
+				onEachFeature: this.processDistrict
+		});
 
 
-	    //Info Page
-	    var infoContainer = L.DomUtil.create('div');
-	    this.infoContainer = infoContainer
-	    var infoHeader = htmlElement(infoContainer, 'div','d-flex w-100 justify-content-between');
-	    createTextElement(infoHeader, 'h5', id, 'h5');
+		//Info Page
+		var infoContainer = L.DomUtil.create('div');
+		this.infoContainer = infoContainer
+		var infoHeader = htmlElement(infoContainer, 'div','d-flex w-100 justify-content-between');
+		createTextElement(infoHeader, 'h5', id, 'h5');
 
-	    var checkDiv = htmlElement(infoHeader, 'div');
-	    createLabel(checkDiv, '<i>show</i>&nbsp',id+'InfoCheck','small');
-	    this.infoCheck = L.DomUtil.create("input", "form-check-input custom-check", checkDiv);
-	    this.infoCheck.id = id+"InfoCheck"
-	    this.infoCheck.type = "checkbox";
+		var checkDiv = htmlElement(infoHeader, 'div');
+		createLabel(checkDiv, '<i>show</i>&nbsp',id+'InfoCheck','small');
+		this.infoCheck = L.DomUtil.create("input", "form-check-input custom-check", checkDiv);
+		this.infoCheck.id = id+"InfoCheck"
+		this.infoCheck.type = "checkbox";
 
-	    var infoBody = htmlElement(infoContainer, 'div');
+		var infoBody = htmlElement(infoContainer, 'div');
 
-	    createAccordian(infoBody, "Dist" + id, "Districts", listgroupContainer);
+		createAccordian(infoBody, "Dist" + id, "Districts", listgroupContainer);
 
 		var stats = htmlElement(infoBody,'div','container');
 		var statsListContainer = L.DomUtil.create('div')
 		this.statsList = createListGroup(statsListContainer)
 		createAccordian(infoBody, "stats" + id, "Objective Function Breakdown", statsListContainer)
-	    div = L.DomUtil.create('div', 'd-flex w-100 justify-content-between');
+		div = L.DomUtil.create('div', 'd-flex w-100 justify-content-between');
 		createTextElement(div, 'p', 'Measure', 'stat-col score')
 		createTextElement(div, 'p', 'Value', 'stat-col')
 		createTextElement(div, 'p', 'Weight', 'stat-col')
@@ -96,7 +96,7 @@ class Districting {
 		let minPer = htmlElement(row, 'td')
 		minPer.innerHTML = "Minority Percentage"
 		for (let d of this.geoJSON.features) {
-			console.log(d.properties)
+			// console.log(d.properties)
 			let row = htmlElement(table, 'tr')
 			let name = htmlElement(row, 'td')
 			if ('NAMELSAD20' in d.properties) {

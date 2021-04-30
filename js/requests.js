@@ -1,12 +1,18 @@
 function retrieveDistricts(state, weights){
-    switch(state){
-        case "AL":
-            return [AL_CD_116, AL_CD_113]
-        case "AR":
-            return [AR_CD_116, AR_CD_113]
-        case "MI":
-            return [MI_CD_116, MI_CD_113]
-    }
+    var stuff = $.get(
+        "http://localhost:8080/rockies/api/fjobs/show",
+        {id: 10}
+    )
+    return stuff;
+    // stuff.then(response => {console.log(response)})
+    // switch(state){
+    //     case "AL":
+    //         return [AL_CD_116, AL_CD_113]
+    //     case "AR":
+    //         return [AR_CD_116, AR_CD_113]
+    //     case "MI":
+    //         return [MI_CD_116, MI_CD_113]
+    // }
 }
 
 /**
@@ -28,6 +34,11 @@ function getJobsSummary(state){
     // }
 }
 
+/**
+ * Send constraints and return summary
+ * @param {Object} constraints 
+ * @returns Summary results
+ */
 function constrainJob(constraints){
     console.log(constraints)
     return $.post(
