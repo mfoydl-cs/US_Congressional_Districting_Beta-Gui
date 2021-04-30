@@ -413,24 +413,30 @@ function incumbentsContent(state) {
 
     var div = L.DomUtil.create('div');
 
+    // Send incumbents request if not available
+    if (!('senators' in statesObj[state])){
+        incumbents = getIncumbents(state);
+        statesObj[state].sentators = incumbents.senators
+        statesObj[state].reps = incumbents.reps
+    }
+
     createTextElement(div, 'p', "Senators", "h5");
     statesObj[state]['senators'].forEach(function (senator) {
-        var elem = createSwitch(div, senator.name, senator.name + " <em>[" + senator.party + "]</em>");
+        let elem = createSwitch(div, senator.name, senator.name + " <em>[" + senator.party + "]</em>");
         elem.classList.add(senator.party);
         elem.classList.add('grayed');
-        elem.setAttribute('checked', 'true')
+        elem.setAttribute('checked', 'true');
         L.DomEvent.on(elem, 'click', function (ev) {
             if (this.getAttribute('checked') === 'true') {
                 this.setAttribute('checked', 'false');
             } else {
                 this.setAttribute('checked', 'true');
             }
-            console.log(this)
         })
     });
     createTextElement(div, 'p', "Representative", "h5");
     statesObj[state]['reps'].forEach(function (rep) {
-        var elem = createSwitch(div, rep.name, rep.name + " -<em> " + rep.district + ' District ' + " [" + rep.party + "]</em>");
+        let elem = createSwitch(div, rep.name, rep.name + " -<em> " + rep.district + ' District ' + " [" + rep.party + "]</em>");
         elem.classList.add(rep.party);
         elem.classList.add('grayed');
         elem.setAttribute('checked', 'true');
@@ -440,8 +446,7 @@ function incumbentsContent(state) {
             } else {
                 this.setAttribute('checked', 'true');
             }
-            console.log(this)
-        })
+        });
     });
 
     return div;

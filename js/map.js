@@ -177,9 +177,22 @@ function zoomToState(state, obj) {
     map.removeControl(dropdown);
     stateLayer.remove();
 
+    //Send requests for state-level geometry
+    if (!('counties' in obj)){
+        obj.counties = L.geoJson(getCounties(state), {
+            style: countyStyle
+        });
+    }
+    if(!('precincts' in obj)){
+        let tileIndex = geojsonvt(getPrecints(state), precinctTileOptions);
+        obj.precincts = L.gridLayer.precincts();
+        obj.precincts.setTileIndex(tileIndex);
+    }
+    
+
     //Add state level UI controls and geometry
-    obj.county.addTo(countyLayer);
-    obj.precinct.addTo(precinctLayer);
+    obj.counties.addTo(countyLayer);
+    obj.precincts.addTo(precinctLayer);
     layersControl.setPosition("topleft").addTo(map);
     backButton.addTo(map);
     menu.setState(obj.abbr)
@@ -197,7 +210,7 @@ function recenter() {
     map.flyToBounds(bounds);
 }
 
-
+/*
 function getGeoJSON(stateAbbr) {
     var stateJSON = L.geoJson(window["" + stateAbbr + "_STATE_20"], {
         style: statesStyle,
@@ -217,7 +230,7 @@ function getGeoJSON(stateAbbr) {
         counties: counties,
         precincts: precincts,
     }
-}
+}*/
 
 /**
  * Initializes State geometry and adds state to StateObj
@@ -225,7 +238,7 @@ function getGeoJSON(stateAbbr) {
  */
 function addState(stateAbbr) {
     statesObj[stateAbbr] = {}
-    var obj = statesObj[stateAbbr];
+    let obj = statesObj[stateAbbr];
 
     obj.abbr = stateAbbr;
     obj.state = getStateOutline(stateAbbr);
