@@ -180,11 +180,19 @@ input[type='range']:hover::-webkit-slider-runnable-track{
 .score {
 	width: 120px;
 }
-table,
-      th,
-	        td {
-			        padding: 10px;
-					        border: 1px solid black;
-							        border-collapse: collapse;
-									      }
+table,th,td {
+	padding: 10px;
+	border: 1px solid black;
+	border-collapse: collapse;
+}
 
+.slider-table th{
+    border: none;
+}
+
+.slider-table tr:not(:last-child) {
+    border-bottom: 1px solid gray;
+}
+th p{
+    margin: 0;
+}
