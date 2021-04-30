@@ -93,6 +93,7 @@ L.Control.Menu = L.Control.extend({
         this.state = state //Keep track of the current state selected
     },
     setConstraintsData: function (data) {
+        // console.log(data)
         this.constraintsData = data;
         Object.keys(data).forEach(function (key) {
             $("#" + key + "ConSummaryLabel").html(data[key].label)
@@ -170,22 +171,25 @@ L.control.states = function (opts) {
 /* **********   SPECIFIC BUILDER FUNCTIONS W/ LEAFLET  ********** */
 
 function jobsTab(state) {
-    var jobs = getJobsSummary(state)['jobs-summary'];
+    var jobs;
 
     var container = L.DomUtil.create('div');
 
-    var headerDiv = htmlElement(container, 'div', 'center tabContentTitle mb-3');
-    createTextElement(headerDiv, 'h5', 'Select a Job', 'h5');
+    getJobsSummary(state).then(response => {
+        jobs = response;
+        var headerDiv = htmlElement(container, 'div', 'center tabContentTitle mb-3');
+        createTextElement(headerDiv, 'h5', 'Select a Job', 'h5');
 
 
-    var bodyDiv = htmlElement(container, 'div');
-    var list = createListGroup(bodyDiv);
-    list.id = 'jobList';
-    list.classList.add('list-group-flush');
+        var bodyDiv = htmlElement(container, 'div');
+        var list = createListGroup(bodyDiv);
+        list.id = 'jobList';
+        list.classList.add('list-group-flush');
 
-    jobs.forEach(function (job) {
-        list.appendChild(jobListItem(job));
-    });
+        jobs.forEach(function (job) {
+            list.appendChild(jobListItem(job));
+        });
+    })
 
     return container;
 }
@@ -194,16 +198,17 @@ function jobListItem(job) {
     var container = L.DomUtil.create('div');
 
     var headerDiv = htmlElement(container, "div", 'd-flex w-100 justify-content-between');
-    createTextElement(headerDiv, "h5", job.name, "mb-1 center");
+    createTextElement(headerDiv, "h5", "Job " + job.id, "mb-1 center");
 
     var content = htmlElement(container, 'div', 'container');
     createTextElement(content, 'p', 'Rounds: ' + job.rounds);
-    createTextElement(content, 'p', 'Cooling-Period: ' + job['cooling-period']);
+    createTextElement(content, 'p', 'Cooling-Period: ' + job.coolingPeriod);
+    createTextElement(content, 'p', 'Districtings: ' + job.numDistrictings);
 
     var footer = htmlElement(container, 'div', 'd-grid gap-2');
     var selectBtn = createButton(footer, 'button', 'Select', 'btn btn-primary', 'select-' + job.name);
 
-    L.DomEvent.on(selectBtn, 'click', function (ev) { selectJob(job.name) });
+    L.DomEvent.on(selectBtn, 'click', function (ev) { selectJob(job) });
 
     return createListItem(container, false, false);
 }
@@ -259,7 +264,24 @@ function constraintsTab(state, menu) {
     var subBtn = createButton(subDiv, 'button', 'Submit', 'btn btn-primary btn-lg', 'submitButton');
 
     //Event Handler
-    L.DomEvent.on(subBtn, 'click', function (ev) { submitConstraints('', menu) })
+    L.DomEvent.on(subBtn, 'click', function (ev) {
+        var data = {}
+        data['compactness'] = document.getElementById('compactness-constraint').value;
+        data['majMin'] = document.getElementById('majmin-constraint').value;
+        data['popDiff'] = document.getElementById('population-constraint').value;
+        data['cmpMeasure'] = document.querySelector('input[name="compactnessRadio"]:checked').value;
+        data['popType'] = document.querySelector('input[name="populationRadio"]:checked').value;
+        var incumbentData = {};
+        statesObj[state]['senators'].forEach(function (senator) {
+            incumbentData[senator.name] = document.getElementById(senator.name).checked;
+        });
+        statesObj[state]['reps'].forEach(function (rep) {
+            incumbentData[rep.name] = document.getElementById(rep.name).checked;
+        });
+        data['incumbentProt'] = JSON.stringify(incumbentData);
+        
+        submitConstraints(data, menu);
+    });
 
     return div;
 }
@@ -332,9 +354,6 @@ function measuresTab(state) {
 }
 
 
-
-
-
 function incumbentsContent(state) {
 
     var div = L.DomUtil.create('div');
@@ -345,6 +364,14 @@ function incumbentsContent(state) {
         elem.classList.add(senator.party);
         elem.classList.add('grayed');
         elem.setAttribute('checked', 'true')
+        L.DomEvent.on(elem, 'click', function (ev) {
+            if (this.getAttribute('checked') === 'true') {
+                this.setAttribute('checked', 'false');
+            } else {
+                this.setAttribute('checked', 'true');
+            }
+            console.log(this)
+        })
     });
     createTextElement(div, 'p', "Representative", "h5");
     statesObj[state]['reps'].forEach(function (rep) {
@@ -352,6 +379,14 @@ function incumbentsContent(state) {
         elem.classList.add(rep.party);
         elem.classList.add('grayed');
         elem.setAttribute('checked', 'true');
+        L.DomEvent.on(elem, 'click', function (ev) {
+            if (this.getAttribute('checked') === 'true') {
+                this.setAttribute('checked', 'false');
+            } else {
+                this.setAttribute('checked', 'true');
+            }
+            console.log(this)
+        })
     });
 
     return div;
@@ -373,16 +408,28 @@ function submitMeasures(state, weights) {
     dicTab = window.dicTab
     dicTab.clearList()
 
-    var districts = retrieveDistricts(state, weights);
-
-    dicTab.setDistricts(districts, weights)
+    retrieveDistricts(state, weights).then(response => {
+        response['scores'] = {
+            "compactness": 0.1,
+            "popEquality": 0.8,
+            "splitCounties": 1,
+            "devFromAvg": 0.9,
+            "devFromEnactedArea": 0.4,
+            "devFromEnactedPop": 0.7,
+            "fairness": 0.3,
+            "majmin": 1
+        }
+        console.log(response)
+        var districts = [response];
+        dicTab.setDistricts(districts, weights);
+        switchTabs('districts');
+        hideAll(districtLayer);
+        
+    });
 
     // districts.forEach(function (item) {
     //     list.append(districtListItem(item));
     // });
-
-    switchTabs('districts');
-    hideAll(districtLayer)
 }
 
 function addDistrictHightlight(district, div) {
@@ -396,16 +443,29 @@ function addDistrictHightlight(district, div) {
 }
 
 function selectJob(job) {
-    disableTab('measures')
-    disableTab('districts')
-    switchTabs('constraints');
-    hideAll(districtLayer);
+    setJob(job).then(response => {
+        // console.log(response);
+        disableTab('measures')
+        disableTab('districts')
+        switchTabs('constraints');
+        hideAll(districtLayer);
+    });
 }
 
 function submitConstraints(constraints, menu) {
-    menu.setConstraintsData(constrainJob(constraints));
-    switchTabContent('constraints-tab', 'constraintsSummary');
-    hideAll(districtLayer);
+    constrainJob(constraints).then(response => {
+        // TODO: structure response to be same as stuff
+        var stuff = {
+            'count': { 'label': 'Districtings Returned: ', 'value': '1,000' },
+            'avg-compactness': { 'label': 'Avg. Compactness: ', 'type': 'Polsby-Popper', 'value': '.92' },
+            'avg-maj-min': { 'label': 'Avg. Majority-Minority Districts: ', 'value': '2' },
+            'population-diff': { 'label': 'Avg. Population Difference: ', 'type': 'Total Population', 'value': '1.2%' },
+        };
+        console.log(response);
+        menu.setConstraintsData(stuff);
+        switchTabContent('constraints-tab', 'constraintsSummary');
+        hideAll(districtLayer);
+    })
 }
 
 

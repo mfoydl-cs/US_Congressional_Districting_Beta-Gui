@@ -1,6 +1,4 @@
-const countryBounds = [[20, -127], [53, -65]];
 var countryZoom;
-const states = ["AL", "AR", "MI"];
 
 var map;
 
@@ -12,70 +10,6 @@ var zoomLayer = [districtLayer, countyLayer, precinctLayer];
 
 var overlays = { "Counties": countyLayer, "Districts": districtLayer, "Voting Districts": precinctLayer };
 var layersControl = L.control.layers(null, overlays);
-
-//Feature Style variables
-const style = {
-    weight: 2,
-    opacity: 0.9,
-    fillOpacity: 0.5
-}
-
-const statesStyle = { //Styling for State GeoJSON features
-    fillColor: '#3388FF',
-    color: '#3388FF',
-    weight: 2,
-    opacity: 0.9,
-    fillOpacity: 0.2
-}
-
-const districtStyle = { //Styling (besides color) for District GeoJSON features
-    weight: 3,
-    opacity: 1,
-    fillOpacity: 0.2
-}
-
-const highLightStyle = { //Style for highlighted features
-    weight: 4,
-    opacity: 1,
-    fillOpacity: 0.7
-}
-
-const countyStyle = {
-    weight: 2,
-    opacity: 0.8,
-    fillOpacity: 0,
-    color: 'white',
-    dashArray: '3 8'
-}
-
-const precinctStyle = {
-    weight: 1,
-    opacity: 1,
-    fillOpacity: 0,
-    color: 'white',
-    dashArray: '1 3'
-}
-
-//Pastel color palette for coloring the districts
-const pastelPalette = [
-    "#e89af9", "#f18bf4", "#dd74f2", "#f78fd8",
-    "#9bffa7", "#97ff9e", "#7fefac", "#93f9bf",
-    "#f4869a", "#f18bf4", "#ed6a82", "#f780a6",
-    "#f7a08f", "#ffc5c4", "#f2c091", "#ff967f",
-    "#83fcdc", "#bff8ff", "#b2cef4", "#b7d5ff",
-    "#fffbbf", "#f7dc8a", "#ffeeb5", "#ecf280",
-    "#d4b7ff", "#e6c9ff", "#e3a0f7", "#a869e0",
-]
-
-const darkPalette = [
-    "#1a7003", "#6d8908", "#019356", "#08876f", "#66a310", //Greens
-    "#992300", "#ba3f01", "#961b06", "#960f30", "#b73110", //Reds
-    "#04838e", "#0b557c", "#0faf9f", "#0b7e82", "#004e66", //Blues
-    "#28056d", "#053177", "#0d3393", "#05005b", "#033d60", //Dark-blues
-    "#ccbf14", "#ddda0f", "#e0c816", "#cc7f0c", "#e0a016", //Yellows
-    "#ba3e09", "#e27216", "#e05804", "#d63f08", "#ff652d", //Oranges
-    "#af08d8", "#520d84", "#c10d97", "#680c96", "#7b12cc", //Purples
-]
 
 //Function to set up highlight on mouseover on geoFeature
 function addHighlight(layer, style) {
@@ -158,25 +92,20 @@ function backToCountry() {
     stateLayer.eachLayer(function (layer) { layer.setStyle(statesStyle) })
     map.flyToBounds(countryBounds);
     bounds = countryBounds;
-
 }
 
 var bounds = countryBounds;
 
 function zoomToState(state, obj) {
     map.removeControl(dropdown);
-
     stateLayer.remove();
 
     obj.county.addTo(countyLayer);
     obj.precinct.addTo(precinctLayer);
-
     layersControl.setPosition("topleft").addTo(map);
-
     backButton.addTo(map);
     menu.setState(obj.abbr)
     menu.addTo(map);
-
 
     bounds = state.getBounds();
     map.flyToBounds(bounds);
@@ -216,7 +145,6 @@ function getGeoJSON(stateAbbr) {
     var precincts = L.gridLayer.precincts();
     precincts.setTileIndex(tileIndex);
 
-
     return {
         stateJSON: stateJSON,
         counties: counties,
@@ -227,7 +155,6 @@ function getGeoJSON(stateAbbr) {
 function addStates(stateAbbr, index) {
     statesObj[stateAbbr] = {}
     var obj = statesObj[stateAbbr];
-
     var geo = getGeoJSON(stateAbbr);
 
     obj.abbr = stateAbbr;
@@ -238,7 +165,6 @@ function addStates(stateAbbr, index) {
     obj.reps = incumbentsJson[stateAbbr]['representatives'];
 
     stateLayer.addLayer(obj.state);
-
     geo.stateJSON.on('click', function () {
         zoomToState(this, obj);
     });
@@ -254,6 +180,7 @@ function toggleDistrict(district, checked) {
 }
 
 $(document).ready(function () {
+    $.ajaxSetup({xhrFields: { withCredentials: true } });
     map = L.map('map');
 
     L.tileLayer('https://api.mapbox.com/styles/v1/mfoydl/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWZveWRsIiwiYSI6ImNrbGNqdnNocDBpZ2Qyd214bDZ2Y2piMDgifQ.nxwFI-kYDMC7ag_O8PgNhg', {
@@ -268,33 +195,20 @@ $(document).ready(function () {
     map.fitBounds(countryBounds);
     countryZoom = map.getZoom();
     map.setMinZoom(countryZoom);
-
     map.setMaxBounds([
         [23, -129], //southwest coords
         [50, -63] //northeast coords
     ]);
-
     states.forEach(addStates);
-
 
     stateLayer.addTo(map);
     districtLayer.addTo(map);
     countyLayer.addTo(map);
 
-
     backButton = L.control.backButton({ position: 'bottomleft' });
-
     menu = L.control.menu({ position: 'topright' });
-
-
     dropdown = L.control.states({ position: 'topright' }).addTo(map);
-
     center = L.control.center({ position: 'topleft' }).addTo(map);
-
-    // map.on('zoom',function(){
-    //     console.log(map.getZoom())
-    // })
-
 });
 
 function test(obj) {
