@@ -222,9 +222,9 @@ function constraintsTab(state, menu) {
     var constraints = htmlElement(div, 'div', 'container');
 
     //Constraints Sliders
-    createSlider(constraints, 'compactness-constraint', 'Compactness', 0, 1, 0.1);
-    createSlider(constraints, 'majmin-constraint', 'Majority-Minority Districts (>=)', 0, 10, 1);
-    createSlider(constraints, 'population-constraint', 'Population Difference (<=%)', 0, 3, 0.1);
+    createSlider(constraints, 'compactness-constraint', 'Compactness', 0, 1, 0.1,'Comp');
+    createSlider(constraints, 'majmin-constraint', 'Majority-Minority Districts (>=)', 0, 10, 1,'Maj-Min');
+    createSlider(constraints, 'population-constraint', 'Population Difference (<=%)', 0, 3, 0.1,"Pop-Diff");
 
     //Incumbents Protection Menu
     var incumbentsDiv = htmlElement(constraints, 'div', 'container')
@@ -301,12 +301,16 @@ function measuresTab(state) {
 
     var measures = htmlElement(div, 'div', 'container');
 
-    createSlider(measures, 'population-equality', 'Population Equality', 0, 1, 0.1);
-    createSlider(measures, 'avgerage-deviation', 'Deviation from Average Districting', 0, 1, 0.1);
-    createSlider(measures, 'enacted-deviation', 'Deviation from Enacted Plan', 0, 1, 0.1);
-    createSlider(measures, 'compactness', 'Compactness', 0, 1, 0.1);
-    createSlider(measures, 'political-fairness', 'Political Fairness', 0, 1, 0.1);
-    createSwitch(measures, 'split-counties', "Allow Split Counties");
+    var table = L.DomUtil.create('table', 'table table-sm slider-table align-middle', measures);
+    var body = L.DomUtil.create('tbody', '', table);
+
+    createSlider(body, 'population-equality', 'Population Equality', 0, 1.0, 0.1,'Pop-Eq');
+    createSlider(body, 'avgerage-deviation', 'Deviation from Average Districting', 0, 1, 0.1, 'Avg-Dev');
+    createSlider(body, 'enacted-deviation', 'Deviation from Enacted Plan', 0, 1, 0.1, 'Enacacted-Dev');
+    createSlider(body, 'compactness', 'Compactness', 0, 1, 0.1, 'Comp');
+    createSlider(body, 'political-fairness', 'Political Fairness', 0, 1, 0.1, 'Pol-Fairness');
+    createSlider(body, 'split-counties', 'Split Counties', 0, 1, 0.1, 'Split');
+    //createSwitch(measures, 'split-counties', "Allow Split Counties");
 
 
     var subDiv = htmlElement(div, 'div', 'd-grid gap-2 col-6 mx-auto submitBtn')
@@ -666,7 +670,7 @@ function createButton(parent, type, text, classes, id) {
  * @param {number} step step value of the slider - 'step' attribute value
  * @return {Element}
  */
-function createSlider(parent, id, text, min, max, step) {
+function Slider(parent, id, text, min, max, step) {
     var div = htmlElement(parent, 'div', 'container');
     var range = htmlElement(div, 'div', 'range');
     createLabel(range, text, id);
@@ -679,6 +683,35 @@ function createSlider(parent, id, text, min, max, step) {
         value.innerHTML = this.value;
     }
     return div;
+}
+
+function createSlider(parent, id, text, min, max, step, abbr){
+   
+    var tr = L.DomUtil.create('tr','',parent);
+
+    //var slider = Slider(tr,id,text,min,max,step);
+    var labelCol = L.DomUtil.create('th','',tr);
+    var rangeCol = L.DomUtil.create('th', '', tr);
+    var valueCol = L.DomUtil.create('th', '', tr);
+
+    var range = htmlElement(rangeCol, 'div', 'range');
+    
+    var p = L.DomUtil.create('p','',labelCol)
+    var abbrEl = L.DomUtil.create('abbr','',p);
+    abbrEl.setAttribute('title',text)
+    abbrEl.innerHTML = abbr
+    //createLabel(labelCol, abbr, id);
+
+    var slider = createInput(range, 'range', 'form-range', id);
+    slider.min = min;
+    slider.max = max;
+    slider.step = step;
+    var value = createLabel(valueCol, Number(slider.value).toFixed(1), id, "range-value smalls", id + "Value");
+    slider.oninput = function () {
+        value.innerHTML = Number(this.value).toFixed(1);
+    }
+
+    return tr;
 }
 
 /**
