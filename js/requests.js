@@ -101,8 +101,14 @@ function retrieveDistricts(state, weights) {
  * @returns 
  */
 function getIncumbents(state){
-    return $.post(
+    return $.get(
         "http://localhost:8080/rockies/api/states/incumbents",
         {state:state}
+    )
+}
+
+function getBoxplot(){
+    return $.get(
+        'http://localhost:8080/rockies/api/fjobs/boxplot'
     )
 }

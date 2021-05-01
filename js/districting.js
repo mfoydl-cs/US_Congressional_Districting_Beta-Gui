@@ -218,10 +218,11 @@ class Districting {
 	}
 
 	boxPlot = () => {
+		/*
 		function linspace(a,b,n) {
 			return Plotly.d3.range(n).map(function(i){return a+i*(b-a)/(n-1);});
-		}
-		var boxNumber = 30;
+		}*/
+		//var boxNumber = 30;
 		// var boxColor = [];
 		// var allColors = linspace(0, 360, boxNumber);
 		var data = [];
@@ -233,13 +234,13 @@ class Districting {
 		// 	var result = 'hsl('+ allColors[i] +',50%'+',50%)';
 		// 	boxColor.push(result);
 		// }
-		
+		/*
 		function getRandomArbitrary(min, max) {
 			return Math.random() * (max - min) + min;
-		};
+		};*/
 		
 		//Create Y Values
-		
+		/*
 		for( var i = 0; i < boxNumber;  i++ ){
 			var ySingleArray = [];
 				for( var j = 0; j < 10;  j++ ){
@@ -249,23 +250,31 @@ class Districting {
 				}
 			yValues.push(ySingleArray);
 		}
+		*/
+		//Get y-values from server
+
+		getBoxplot().then(response => {
+			yValues = response.data
+
+			for (var i = 0; i < yValues.length; i++) {
+				var result = {
+					y: yValues[i],
+					type: 'box',
+					marker: {
+						color: 'black'
+					}
+				};
+				data.push(result);
+			};
+		});
 		
 		//Create Traces
 		
-		for( var i = 0; i < boxNumber;  i++ ){
-			var result = {
-				y: yValues[i],
-				type:'box',
-				marker:{
-					color: 'black'
-				}
-			};
-			data.push(result);
-		};
+		
 		
 		//Format the layout
 		
-		var layout = {
+		let layout = {
 			width: 450,
 			height: 300,
 			margin: {
