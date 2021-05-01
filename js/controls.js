@@ -126,7 +126,10 @@ L.Control.States = L.Control.extend({
 
         createAccordian(div, 'statesAccordion', 'Select a state to display', constraints)
         var buttons = {};
-        statesObj.forEach((state) => createButton(constraints, 'button', state.name, 'btn btn-primary'));
+        Object.keys(statesObj).forEach(function (key) {
+            state = statesObj[key]
+            createButton(constraints, 'button', state.name, 'btn btn-primary')
+        });
         //buttons['AL'] = createButton(constraints, 'button', 'Alabama', 'btn btn-primary');
         //buttons['AR'] = createButton(constraints, 'button', 'Arizona', 'btn btn-primary submitBtn');
         //buttons['MI'] = createButton(constraints, 'button', 'Michigan', 'btn btn-primary submitBtn');
@@ -411,42 +414,45 @@ function measuresTab(state) {
 function incumbentsContent(state) {
 
     var div = L.DomUtil.create('div');
+    getIncumbents(state).then(response => {
+        statesObj[state].senators = response.senators
+        statesObj[state].reps = response.representatives
 
-    // Send incumbents request if not available
-    if (!('senators' in statesObj[state])){
-        incumbents = getIncumbents(state);
-        statesObj[state].sentators = incumbents.senators
-        statesObj[state].reps = incumbents.reps
-    }
-
-    createTextElement(div, 'p', "Senators", "h5");
-    statesObj[state]['senators'].forEach(function (senator) {
-        let elem = createSwitch(div, senator.name, senator.name + " <em>[" + senator.party + "]</em>");
-        elem.classList.add(senator.party);
-        elem.classList.add('grayed');
-        elem.setAttribute('checked', 'true');
-        L.DomEvent.on(elem, 'click', function (ev) {
-            if (this.getAttribute('checked') === 'true') {
-                this.setAttribute('checked', 'false');
-            } else {
-                this.setAttribute('checked', 'true');
-            }
-        })
-    });
-    createTextElement(div, 'p', "Representative", "h5");
-    statesObj[state]['reps'].forEach(function (rep) {
-        let elem = createSwitch(div, rep.name, rep.name + " -<em> " + rep.district + ' District ' + " [" + rep.party + "]</em>");
-        elem.classList.add(rep.party);
-        elem.classList.add('grayed');
-        elem.setAttribute('checked', 'true');
-        L.DomEvent.on(elem, 'click', function (ev) {
-            if (this.getAttribute('checked') === 'true') {
-                this.setAttribute('checked', 'false');
-            } else {
-                this.setAttribute('checked', 'true');
-            }
+        createTextElement(div, 'p', "Senators", "h5");
+        statesObj[state]['senators'].forEach(function (senator) {
+            let elem = createSwitch(div, senator.name, senator.name + " <em>[" + senator.party + "]</em>");
+            elem.classList.add(senator.party);
+            elem.classList.add('grayed');
+            elem.setAttribute('checked', 'true');
+            L.DomEvent.on(elem, 'click', function (ev) {
+                if (this.getAttribute('checked') === 'true') {
+                    this.setAttribute('checked', 'false');
+                } else {
+                    this.setAttribute('checked', 'true');
+                }
+            })
         });
-    });
+        createTextElement(div, 'p', "Representative", "h5");
+        statesObj[state]['reps'].forEach(function (rep) {
+            let elem = createSwitch(div, rep.name, rep.name + " -<em> " + rep.district + ' District ' + " [" + rep.party + "]</em>");
+            elem.classList.add(rep.party);
+            elem.classList.add('grayed');
+            elem.setAttribute('checked', 'true');
+            L.DomEvent.on(elem, 'click', function (ev) {
+                if (this.getAttribute('checked') === 'true') {
+                    this.setAttribute('checked', 'false');
+                } else {
+                    this.setAttribute('checked', 'true');
+                }
+            });
+        });
+    })
+    // Send incumbents request if not available
+    // if (!('senators' in statesObj[state])){
+        
+    // }
+
+    
 
     return div;
 }
