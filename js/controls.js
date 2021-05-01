@@ -92,7 +92,6 @@ L.Control.Menu = L.Control.extend({
         this.state = state //Keep track of the current state selected
     },
     setConstraintsData: function (data) {
-        // console.log(data)
         this.constraintsData = data;
         Object.keys(data).forEach(function (key) {
             $("#" + key + "ConSummaryLabel").html(data[key].label)
@@ -504,7 +503,6 @@ function addDistrictHightlight(district, div) {
 
 function selectJob(job) {
     setJob(job).then(response => {
-        // console.log(response);
         disableTab('measures')
         disableTab('districts')
         switchTabs('constraints');

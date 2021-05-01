@@ -1,5 +1,4 @@
 const countryBounds = [[20, -127], [53, -65]];
-const states = ["AL", "AR", "MI"];
 
 //Feature Style variables
 const style = {

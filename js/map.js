@@ -37,6 +37,8 @@ $(document).ready(function () {
         [50, -63] //northeast coords
     ]);
 
+    let states = getStates()
+
     //Load initial state data
     states.forEach(addState);
 
@@ -50,6 +52,102 @@ $(document).ready(function () {
     dropdown = L.control.states({ position: 'topright' }).addTo(map);
     center = L.control.center({ position: 'topleft' }).addTo(map);
 });
+
+/**
+ * Initializes State geometry and adds state to StateObj
+ * @param {String} stateAbbr
+ */
+function addState(state) {
+    let stateAbbr = state.id
+    statesObj[stateAbbr] = {}
+    let obj = statesObj[stateAbbr];
+
+    obj.abbr = stateAbbr;
+    obj.name = state.name;
+    obj.state = getStateOutline(stateAbbr);
+
+    //Add state geometry to map
+    stateLayer.addLayer(obj.state);
+    geo.stateJSON.on('click', function () {
+        zoomToState(this, obj);
+    });
+}
+
+function backToCountry() {
+    // Remove uneeded UI controls from map
+    map.removeControl(backButton);
+    map.removeControl(menu);
+    map.removeControl(layersControl);
+
+    //Add country level UI controls to map
+    dropdown.addTo(map);
+    stateLayer.addTo(map);
+
+    //remove state-level geometries
+    zoomLayer.forEach(function (layer) { layer.clearLayers() });
+
+    //add state outlines back to map and set view
+    stateLayer.eachLayer(function (layer) { layer.setStyle(statesStyle) });
+    map.flyToBounds(countryBounds);
+    bounds = countryBounds;
+}
+
+/**
+ * Zooms Map view to state level and updates UI options 
+ * @param {String} state 
+ * @param {Object} obj 
+ */
+function zoomToState(state, obj) {
+    //Remove country-level UI controls and outline geometry
+    map.removeControl(dropdown);
+    stateLayer.remove();
+
+    //Send requests for state-level geometry if needed
+    if (!('counties' in obj)) {
+        obj.counties = L.geoJson(getCounties(state), {
+            style: countyStyle
+        });
+    }
+    if (!('precincts' in obj)) {
+        let tileIndex = geojsonvt(getPrecints(state), precinctTileOptions);
+        obj.precincts = L.gridLayer.precincts();
+        obj.precincts.setTileIndex(tileIndex);
+    }
+
+
+    //Add state level UI controls and geometry
+    obj.counties.addTo(countyLayer);
+    obj.precincts.addTo(precinctLayer);
+    layersControl.setPosition("topleft").addTo(map);
+    backButton.addTo(map);
+    menu.setState(obj.abbr)
+    menu.addTo(map);
+
+    //Set view to state
+    bounds = state.getBounds();
+    map.flyToBounds(bounds);
+}
+
+/**
+ * Set map view back to center of currently focused feature level (state/country)
+ */
+function recenter() {
+    map.flyToBounds(bounds);
+}
+
+/**
+ * Toggles whether a district's geometry is displayed on the map
+ * @param {GeoJSON} district Leaflet GeoJSON Object for district geometry
+ * @param {Boolean} checked True if district is currently displayed, otherwise false
+ */
+function toggleDistrict(district, checked) {
+    if (checked) {
+        district.addTo(districtLayer);
+    }
+    else {
+        districtLayer.removeLayer(district);
+    }
+}
 
 /**
  * Add highlight on mouseover functionality to featuregroup
@@ -97,6 +195,13 @@ function resetDistrictHighlight(district, style) {
     district.setStyle(style);
 }
 
+
+
+function randomPresetColor(palette) {
+    return palette[Math.floor(Math.random() * palette.length)];
+}
+
+//#region 
 /*
 //Adds all layers of a Leaflet LayerGroup into another LayerGroup
 function addGroup(newGroup, group) {
@@ -141,74 +246,12 @@ function getRandomColor() {
 /**
  * Random color generator from a limited pre-determined palatte
  */
-function randomPresetColor(palette) {
-    return palette[Math.floor(Math.random() * palette.length)];
-}
+
 
 /**
  * Zoom map back out to country overview and updates controls on map accordingly
  */
-function backToCountry() {
-    // Remove uneeded UI controls from map
-    map.removeControl(backButton);
-    map.removeControl(menu);
-    map.removeControl(layersControl);
 
-    //Add country level UI controls to map
-    dropdown.addTo(map);
-    stateLayer.addTo(map);
-
-    //remove state-level geometries
-    zoomLayer.forEach(function (layer) { layer.clearLayers() });
-
-    //add state outlines back to map and set view
-    stateLayer.eachLayer(function (layer) { layer.setStyle(statesStyle) });
-    map.flyToBounds(countryBounds);
-    bounds = countryBounds;
-}
-
-/**
- * Zooms Map view to state level and updates UI options 
- * @param {String} state 
- * @param {Object} obj 
- */
-function zoomToState(state, obj) {
-    //Remove country-level UI controls and outline geometry
-    map.removeControl(dropdown);
-    stateLayer.remove();
-
-    //Send requests for state-level geometry
-    if (!('counties' in obj)){
-        obj.counties = L.geoJson(getCounties(state), {
-            style: countyStyle
-        });
-    }
-    if(!('precincts' in obj)){
-        let tileIndex = geojsonvt(getPrecints(state), precinctTileOptions);
-        obj.precincts = L.gridLayer.precincts();
-        obj.precincts.setTileIndex(tileIndex);
-    }
-    
-
-    //Add state level UI controls and geometry
-    obj.counties.addTo(countyLayer);
-    obj.precincts.addTo(precinctLayer);
-    layersControl.setPosition("topleft").addTo(map);
-    backButton.addTo(map);
-    menu.setState(obj.abbr)
-    menu.addTo(map);
-
-    //Set view to state
-    bounds = state.getBounds();
-    map.flyToBounds(bounds);
-}
-
-/**
- * Set map view back to center of currently focused feature level (state/country)
- */
-function recenter() {
-    map.flyToBounds(bounds);
-}
 
 /*
 function getGeoJSON(stateAbbr) {
@@ -231,44 +274,7 @@ function getGeoJSON(stateAbbr) {
         precincts: precincts,
     }
 }*/
+//#endregion
 
-/**
- * Initializes State geometry and adds state to StateObj
- * @param {String} stateAbbr
- */
-function addState(stateAbbr) {
-    statesObj[stateAbbr] = {}
-    let obj = statesObj[stateAbbr];
-
-    obj.abbr = stateAbbr;
-    obj.state = getStateOutline(stateAbbr);
-
-    // THESE NEED TO BE ADDED AS SEPPARATE REQUESTS WHEN  STATE IS SELECTED
-    //var geo = getGeoJSON(stateAbbr);
-    //obj.county = geo.counties; 
-    //obj.precinct = geo.precincts;
-    //obj.senators = incumbentsJson[stateAbbr]["senators"];
-    //obj.reps = incumbentsJson[stateAbbr]['representatives'];
-
-    //Add state geometry to map
-    stateLayer.addLayer(obj.state);
-    geo.stateJSON.on('click', function () {
-        zoomToState(this, obj);
-    });
-}
-
-/**
- * Toggles whether a district's geometry is displayed on the map
- * @param {GeoJSON} district Leaflet GeoJSON Object for district geometry
- * @param {Boolean} checked True if district is currently displayed, otherwise false
- */
-function toggleDistrict(district, checked) {
-    if (checked) {
-        district.addTo(districtLayer);
-    }
-    else {
-        districtLayer.removeLayer(district);
-    }
-}
 
 

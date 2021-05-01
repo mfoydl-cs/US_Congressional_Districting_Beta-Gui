@@ -94,3 +94,15 @@ function retrieveDistricts(state, weights) {
     )
     return stuff;
 }
+
+/**
+ * 
+ * @param {*} state 
+ * @returns 
+ */
+function getIncumbents(state){
+    return $.post(
+        "http://localhost:8080/rockies/api/states/incumbents",
+        {state:state}
+    )
+}
