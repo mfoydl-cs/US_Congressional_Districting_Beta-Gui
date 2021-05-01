@@ -37,20 +37,21 @@ $(document).ready(function () {
         [50, -63] //northeast coords
     ]);
 
-    let states = getStates()
+    getStates().then(response => {
+        //Load initial state data
+        response.item.forEach(addState);
 
-    //Load initial state data
-    states.forEach(addState);
+        //Add controls and layers to the map
+        stateLayer.addTo(map);
+        districtLayer.addTo(map);
+        countyLayer.addTo(map);
 
-    //Add controls and layers to the map
-    stateLayer.addTo(map);
-    districtLayer.addTo(map);
-    countyLayer.addTo(map);
+        backButton = L.control.backButton({ position: 'bottomleft' });
+        menu = L.control.menu({ position: 'topright' });
+        dropdown = L.control.states({ position: 'topright' }).addTo(map);
+        center = L.control.center({ position: 'topleft' }).addTo(map);
+    })
 
-    backButton = L.control.backButton({ position: 'bottomleft' });
-    menu = L.control.menu({ position: 'topright' });
-    dropdown = L.control.states({ position: 'topright' }).addTo(map);
-    center = L.control.center({ position: 'topleft' }).addTo(map);
 });
 
 /**
@@ -64,13 +65,16 @@ function addState(state) {
 
     obj.abbr = stateAbbr;
     obj.name = state.name;
-    obj.state = getStateOutline(stateAbbr);
+    getStateOutline(stateAbbr).then(response => {
+        obj.state = L.geoJson(JSON.parse(response.json))
 
-    //Add state geometry to map
-    stateLayer.addLayer(obj.state);
-    geo.stateJSON.on('click', function () {
-        zoomToState(this, obj);
-    });
+        //Add state geometry to map
+        stateLayer.addLayer(obj.state);
+        obj.state.on('click', function () {
+            zoomToState(obj.abbr, obj);
+        });
+    })
+
 }
 
 function backToCountry() {
@@ -103,28 +107,36 @@ function zoomToState(state, obj) {
     stateLayer.remove();
 
     //Send requests for state-level geometry if needed
-    if (!('counties' in obj)) {
-        obj.counties = L.geoJson(getCounties(state), {
-            style: countyStyle
-        });
-    }
-    if (!('precincts' in obj)) {
-        let tileIndex = geojsonvt(getPrecints(state), precinctTileOptions);
-        obj.precincts = L.gridLayer.precincts();
-        obj.precincts.setTileIndex(tileIndex);
-    }
+    // if (!('counties' in obj)) {
+        getCounties(state).then(res => {
+            console.log(res)
+            obj.counties = L.geoJson(JSON.parse(res.counties), {
+                style: countyStyle
+            });
+            obj.counties.addTo(countyLayer);
+        })
+    // }
+    // if (!('precincts' in obj)) {
+        getPrecincts(state).then(res => {
+            let tileIndex = geojsonvt(JSON.parse(res.precincts), precinctTileOptions);
+            obj.precincts = L.gridLayer.precincts();
+            obj.precincts.setTileIndex(tileIndex); 
+            // obj.precincts = L.geoJson(JSON.parse(res.precincts), {
+            //     style: precinctStyle
+            // })
+            obj.precincts.addTo(precinctLayer);
+        })
+    // }
 
 
-    //Add state level UI controls and geometry
-    obj.counties.addTo(countyLayer);
-    obj.precincts.addTo(precinctLayer);
+    // Add state level UI controls and geometry
     layersControl.setPosition("topleft").addTo(map);
     backButton.addTo(map);
     menu.setState(obj.abbr)
     menu.addTo(map);
 
     //Set view to state
-    bounds = state.getBounds();
+    bounds = obj.state.getBounds();
     map.flyToBounds(bounds);
 }
 
