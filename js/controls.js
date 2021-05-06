@@ -4,7 +4,7 @@ const constraintsDataFormat = {
     'count': { 'label': 'Districtings Returned: ', 'value': 0 },
     'avg-compactness': { 'label': 'Average Compactness: ', 'type': '', 'value': 0 },
     'avg-maj-min': { 'label': 'Average Majority-Minority Districts: ', 'value': 0 },
-    'population-diff': { 'label': 'Average Population Difference: ', 'type': '', 'value': 0 },
+    'population-diff': { 'label': 'Average Population Difference: ', 'value': 0 },
 }
 
 /**
@@ -92,15 +92,17 @@ L.Control.Menu = L.Control.extend({
         this.state = state //Keep track of the current state selected
     },
     setConstraintsData: function (data) {
-        this.constraintsData = data;
-        Object.keys(data).forEach(function (key) {
-            $("#" + key + "ConSummaryLabel").html(data[key].label)
+    	for (let key in data) {
+    		this.constraintsData[key].value = data[key]
+    	}
+        for (let key in this.constraintsData) {
+            $("#" + key + "ConSummaryLabel").html(this.constraintsData[key].label)
             var value = $("#" + key + "ConSummaryValue")
-            value.html(data[key].value)
-            if (data[key].type) {
-                value.append(" <i>[" + data[key].type + "]</i>");
+            value.html(this.constraintsData[key].value)
+            if (this.constraintsData[key].type) {
+                value.append(" <i>[" + this.constraintsData[key].type + "]</i>");
             }
-        });
+        };
     }
 });
 
