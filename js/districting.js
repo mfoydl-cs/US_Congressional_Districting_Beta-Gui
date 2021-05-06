@@ -113,14 +113,6 @@ class Districting {
 		}
 		this.majminModal = modalDialog('majminModal' + id, 'Majority-Minority Districts', majminDiv)
 		$('body').append(this.majminModal)
-
-		
-		
-
-		//add charts to popout
-		$(document).ready(() => {
-			$('body').append(aggregatesModal);
-		});
 	    
 		var infoFooter = htmlElement(infoContainer, 'div', 'd-grid gap-2');
 	    var back = createButton(infoFooter, 'button', 'Back', 'btn btn-secondary btn-lg ');

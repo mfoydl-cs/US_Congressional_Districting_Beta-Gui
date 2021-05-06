@@ -83,11 +83,7 @@ class DistrictingsTab {
 		//Create Sorting popup
 		$(document).ready(() => {
 			this.makeModal;
-			getBoxplot().then(response => {
-				let graph = this.boxPlot(response.boxplot);
-				Plotly.newPlot('analysisDiv', graph.data, graph.layout);
-				Plotly.addTraces('analysisDiv', this.scatterPlot(response.scatterValues))
-			});	
+			$('body').append(aggregatesModal);
 		});
 			
 
@@ -100,7 +96,7 @@ class DistrictingsTab {
 		aggregates.setAttribute('data-bs-toggle', 'modal');
 		aggregates.setAttribute('data-bs-target', '#aggregatesModal');
 		let content = this.analysisContent();
-		modalDialog('aggregatesModal', 'Aggregate Districting Data', content);
+		let aggregatesModal = modalDialog('aggregatesModal', 'Aggregate Districting Data', content);
 
 		// Get Summary Info
 		const data = {
@@ -120,6 +116,14 @@ class DistrictingsTab {
 			if (data[key].type) {
 				value.innerHTML += "(" + data[key].type + ")";
 			}
+		});
+
+		getBoxplot().then(response => {
+			console.log('box')
+			console.log(response);
+			let graph = this.boxPlot(JSON.parse(response.boxplot));
+			Plotly.newPlot('analysisDiv', graph.data, graph.layout);
+			Plotly.addTraces('analysisDiv', this.scatterPlot(JSON.parse(response.scatterplot)))
 		});
 	}
 
@@ -208,6 +212,7 @@ class DistrictingsTab {
 	}
 
 	boxPlot = (yValues) => {
+		var data = [];
 
 		for (var i = 0; i < yValues.length; i++) {
 			var result = {
@@ -224,24 +229,16 @@ class DistrictingsTab {
 			data: data,
 			layout: plotLayout
 		}
-
-		//Create Traces
-
-		
 	}
 
-	scatterPlot = () => {
+	scatterPlot = (data) => {
 		var xtraces = []
-		for (var i = 0; i < 30; i++) {
+		for (var i = 0; i < data.length; i++) {
 			xtraces.push('trace ' + i.toString());
-		}
-		var yvals = []
-		for (var i = 0; i < 30; i++) {
-			yvals.push(Math.random() + i * .2);
 		}
 		return {
 			x: xtraces,
-			y: yvals,
+			y: data,
 			mode: 'markers',
 			marker: { color: 'red' }
 		}

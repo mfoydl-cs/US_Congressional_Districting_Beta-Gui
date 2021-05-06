@@ -87,12 +87,19 @@ function setJob(job) {
  * @param {*} weights 
  * @returns 
  */
-function retrieveDistricts(state, weights) {
+function retrieveDistricts(id) {
     var stuff = $.get(
-        "http://localhost:8080/rockies/api/fjobs/show",
+        "http://localhost:8080/rockies/api/fjobs/weights",
         { id: 10 }
     )
     return stuff;
+}
+
+function submitWeights(weights) {
+    return $.get(
+        "http://localhost:8080/rockies/api/fjobs/weights",
+        weights
+    )
 }
 
 /**

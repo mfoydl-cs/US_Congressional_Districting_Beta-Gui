@@ -40,6 +40,7 @@ $(document).ready(function () {
     getStates().then(response => {
         //Load initial state data
         response.item.forEach(addState);
+        //dropdown.addTo(map);
     });
 
     //Add controls and layers to the map
@@ -48,8 +49,8 @@ $(document).ready(function () {
     countyLayer.addTo(map);
 
     backButton = L.control.backButton({ position: 'bottomleft' });
-    menu = L.control.menu({ position: 'topright' })//.addTo(map);
-    dropdown = L.control.states({ position: 'topright' }).addTo(map);
+    menu = L.control.menu({ position: 'topright' });
+    dropdown = L.control.states({ position: 'topright' });
     center = L.control.center({ position: 'topleft' }).addTo(map);
 
 });
@@ -73,6 +74,7 @@ function addState(state) {
         obj.state.on('click', function () {
             zoomToState(obj.abbr, obj);
         });
+        dropdown.addTo(map);
     })
 
 }

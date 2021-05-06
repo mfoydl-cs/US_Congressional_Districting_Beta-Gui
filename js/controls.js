@@ -128,15 +128,15 @@ L.Control.States = L.Control.extend({
         var buttons = {};
         Object.keys(statesObj).forEach(function (key) {
             state = statesObj[key]
-            createButton(constraints, 'button', state.name, 'btn btn-primary')
+            buttons[key] = createButton(constraints, 'button', state.name, 'btn btn-primary')
         });
         //buttons['AL'] = createButton(constraints, 'button', 'Alabama', 'btn btn-primary');
         //buttons['AR'] = createButton(constraints, 'button', 'Arizona', 'btn btn-primary submitBtn');
         //buttons['MI'] = createButton(constraints, 'button', 'Michigan', 'btn btn-primary submitBtn');
-
+        console.log(buttons)
         Object.keys(buttons).forEach(function (key) {
             var obj = statesObj[key];
-
+            console.log(obj)
             buttons[key]['onclick'] = () => { zoomToState(obj.state, obj) }
             buttons[key]['onmouseover'] = () => { obj.state.setStyle(highLightStyle) }
             buttons[key]['onmouseout'] = () => { obj.state.setStyle(statesStyle) }
@@ -481,7 +481,8 @@ function submitMeasures(state, weights) {
     dicTab = window.dicTab
     dicTab.clearList()
 
-    retrieveDistricts(state, weights).then(response => {
+    submitWeights(state, weights).then(response => {
+        /*
         response['scores'] = {
             "compactness": 0.1,
             "popEquality": 0.8,
@@ -491,7 +492,7 @@ function submitMeasures(state, weights) {
             "devFromEnactedPop": 0.7,
             "fairness": 0.3,
             "majmin": 1
-        }
+        }*/
         console.log(response)
         var districts = [response];
         dicTab.setDistricts(districts, weights);
