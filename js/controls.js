@@ -494,7 +494,7 @@ function submitMeasures(state, weights) {
             "majmin": 1
         }*/
         console.log(response)
-        var districts = [response];
+        var districts = response;
         dicTab.setDistricts(districts, weights);
         switchTabs('districts');
         districtLayer.clearLayers();
