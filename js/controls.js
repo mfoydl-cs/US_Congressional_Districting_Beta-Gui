@@ -413,7 +413,7 @@ function measuresTab(state) {
         "DEV_ENACTED_GEO": 0.5,
         "devFromEnactedPop": 0.5,
         "FAIRNESS": 0.5,
-		"majmin": 0.5,
+		"MAJMIN": 0.5,
     }
     L.DomEvent.on(subBtn, 'click', function (ev) { submitMeasures(state, weights) })
     return div;
