@@ -31,36 +31,96 @@ let sortings = {
 	}
 }
 
+const plotLayout = {
+	width: 450,
+	height: 300,
+	margin: {
+		l: 20,
+		r: 0,
+		b: 30,
+		t: 10,
+		pad: 4
+	},
+	xaxis: {
+		showgrid: false,
+		zeroline: false,
+		tickangle: 60,
+		showticklabels: false
+	},
+	yaxis: {
+		zeroline: false,
+		gridcolor: 'white'
+	},
+	paper_bgcolor: 'rgb(233,233,233)',
+	plot_bgcolor: 'rgb(233,233,233)',
+	showlegend: false
+};
+
 class DistrictingsTab {
 	/**
 	 * Create the content for the 'districts' Tab
 	 * @return {Element} div container of the content
 	 */
 	constructor() {
+		// Set default sort value
 		this.sorting = 'overall'
 
+		//Root
 		this.div = L.DomUtil.create('div');
 
-		var headerDiv = htmlElement(this.div, 'div', 'center tabContentTitle mb-3');
+		//Header
+		let headerDiv = htmlElement(this.div, 'div', 'center tabContentTitle mb-3');
 		createTextElement(headerDiv, 'h5', 'Examine Districtings', 'h5');
 
 		
-
+		//Div for sorting
 		this.sortDiv = htmlElement(this.div, "div", 'd-flex w-100 justify-content-between','sortDiv');
-		createTextElement(this.sortDiv, "p", "Sorted by " + sortings[this.sorting].desc, "");
-		var sortBtn = createButton(this.sortDiv, 'button', 'Sort', 'btn btn-primary modal-link');
+		createTextElement(this.sortDiv, "p", "Sorted by: " + sortings[this.sorting].desc, "");
+		let sortBtn = createButton(this.sortDiv, 'button', 'Sort', 'btn btn-outline-primary btn-sm modal-link');
 		sortBtn.setAttribute('data-bs-toggle', 'modal');
 		sortBtn.setAttribute('data-bs-target', '#sortModal');
 		
-		$(document).ready(this.makeModal)
+		//Create Sorting popup
+		$(document).ready(() => {
+			this.makeModal;
+			getBoxplot().then(response => {
+				let graph = this.boxPlot(response.boxplot);
+				Plotly.newPlot('analysisDiv', graph.data, graph.layout);
+				Plotly.addTraces('analysisDiv', this.scatterPlot(response.scatterValues))
+			});	
+		});
+			
 
+		//Create list
 		this.list = createListGroup(this.div);
 		this.list.id = "districtList";
 
-		const emptyText = "Districting Parameters have not been set :("
-		let text = L.DomUtil.create('p')
-		text.innerHTML = emptyText;
-		this.list.appendChild(text);
+		//Box and Whisker Plot Model
+		let aggregates = createTextElement(infoBody, 'a', 'Districting Data', 'modal-link',);
+		aggregates.setAttribute('data-bs-toggle', 'modal');
+		aggregates.setAttribute('data-bs-target', '#aggregatesModal');
+		let content = this.analysisContent();
+		modalDialog('aggregatesModal', 'Aggregate Districting Data', content);
+
+		// Get Summary Info
+		const data = {
+			'count': { 'label': 'Districtings Returned: ', 'value': 1000 },
+			'avg-compactness': { 'label': 'Average Compactness: ', 'type': '', 'value': '.92 [Polsby-Popper]' },
+			'avg-maj-min': { 'label': 'Average Majority-Minority Districts: ', 'value': 2 },
+			'population-diff': { 'label': 'Average Population Difference: ', 'type': '', 'value': '1.2% [Total Population]' },
+		}
+
+		//Generate summary info on bottom
+		htmlElement(content, 'br');
+		let body = htmlElement(content, 'div', '',);
+		Object.keys(data).forEach(function (key) {
+			var row = htmlElement(body, 'div', 'row');
+			createTextElement(row, 'p', data[key].label, 'col', key + "ConSummaryLabel");
+			var value = createTextElement(row, 'p', data[key].value, 'col', key + "ConSummaryValue");
+			if (data[key].type) {
+				value.innerHTML += "(" + data[key].type + ")";
+			}
+		});
 	}
 
 	makeModal = () => {
@@ -70,7 +130,7 @@ class DistrictingsTab {
 			sortRadioLabels.push({'label': sortings[sort].desc, value: sort})
 		}
 		sortRadioLabels[0].checked = true
-		var form = L.DomUtil.create('form');
+		let form = L.DomUtil.create('form');
 		createRadioGroup(form, sortRadioLabels, "Sort By", "sortRadio");
 		this.sortModal = modalDialog('sortModal', 'Sort Districtings', form, this.modalClosed);
 		$('body').append(this.sortModal);
@@ -138,6 +198,58 @@ class DistrictingsTab {
 		this.list.style.display = '';
 		for (let c of this.sortDiv.children) {
 			c.style.display = ''
+		}
+	}
+
+	analysisContent = () => {
+		let div = L.DomUtil.create('div');
+		div['id'] = 'analysisDiv'
+		return div;
+	}
+
+	boxPlot = () => {
+		//var data = [];
+		var yValues = [];
+
+		//Get y-values from server
+
+		//yValues = response.data
+
+		for (var i = 0; i < yValues.length; i++) {
+			var result = {
+				y: yValues[i],
+				type: 'box',
+				marker: {
+					color: 'black'
+				}
+			};
+			data.push(result);
+		};
+
+		return {
+			data: data,
+			layout: plotLayout
+		}
+
+		//Create Traces
+
+		
+	}
+
+	scatterPlot = () => {
+		var xtraces = []
+		for (var i = 0; i < 30; i++) {
+			xtraces.push('trace ' + i.toString());
+		}
+		var yvals = []
+		for (var i = 0; i < 30; i++) {
+			yvals.push(Math.random() + i * .2);
+		}
+		return {
+			x: xtraces,
+			y: yvals,
+			mode: 'markers',
+			marker: { color: 'red' }
 		}
 	}
 

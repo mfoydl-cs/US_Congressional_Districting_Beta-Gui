@@ -76,10 +76,10 @@ L.Control.Menu = L.Control.extend({
         this.constraintsData = constraintsDataFormat;
 
         createTab(nav, "Jobs", jobsTab(this.state), 'jobs', true)//Jobs Tab
-        createTab(nav, "Constraints", constraintsTab(this.state, this), "constraints", false, true); //Constraints Tab
+        createTab(nav, "Constraints", constraintsTab(this.state, this), "constraints", false, false); //Constraints Tab
         createTab(nav, "Constrain Results", constraintsSummaryTab(this.constraintsData), 'constraintsSummary', false, true)//Summary Tab
-        createTab(nav, "Measures", measuresTab(this.state), "measures", false, true); //Measures Tab
-        createTab(nav, "Top Districtings", window.dicTab.div, "districts", false, true); //Districtings Tab
+        createTab(nav, "Measures", measuresTab(this.state), "measures", false, false); //Measures Tab
+        createTab(nav, "Top Districtings", window.dicTab.div, "districts", false, false); //Districtings Tab
 
         $(document).ready(function () {
             $('#constraintsSummary-tab').hide(); //Hide the physical tab, content accesssed through buttons
@@ -233,6 +233,7 @@ function jobsTab(state) {
     var container = L.DomUtil.create('div');
 
     getJobsSummary(state).then(response => {
+        console.log(response);
         jobs = response;
         var headerDiv = htmlElement(container, 'div', 'center tabContentTitle mb-3');
         createTextElement(headerDiv, 'h5', 'Select a Job', 'h5');
@@ -283,10 +284,13 @@ function constraintsTab(state, menu) {
 
     var constraints = htmlElement(div, 'div', 'container');
 
+    var table = L.DomUtil.create('table', 'table table-sm slider-table align-middle', constraints);
+    var body = L.DomUtil.create('tbody', '', table);
+
     //Constraints Sliders
-    createSlider(constraints, 'compactness-constraint', 'Compactness', 0, 1, 0.1,'Comp');
-    createSlider(constraints, 'majmin-constraint', 'Majority-Minority Districts (>=)', 0, 10, 1,'Maj-Min');
-    createSlider(constraints, 'population-constraint', 'Population Difference (<=%)', 0, 3, 0.1,"Pop-Diff");
+    createSlider(body, 'compactness-constraint', 'Compactness', 0, 1, 0.1,'Comp');
+    createSlider(body, 'majmin-constraint', 'Majority-Minority Districts (>=)', 0, 10, 1,'Maj-Min');
+    createSlider(body, 'population-constraint', 'Population Difference (<=%)', 0, 3, 0.1,"Pop-Diff");
 
     //Incumbents Protection Menu
     var incumbentsDiv = htmlElement(constraints, 'div', 'container')
@@ -374,12 +378,17 @@ function constraintsSummaryTab(data, menu) {
 }
 
 function measuresTab(state) {
+    //Root div
     var div = L.DomUtil.create('div');
+
+    //Header
     var headerDiv = htmlElement(div, 'div', 'center tabContentTitle mb-3');
     createTextElement(headerDiv, 'h5', 'Objective Function Weights', 'h5');
 
+    //Measures controls container
     var measures = htmlElement(div, 'div', 'container');
 
+    //Slider table
     var table = L.DomUtil.create('table', 'table table-sm slider-table align-middle', measures);
     var body = L.DomUtil.create('tbody', '', table);
 
@@ -389,9 +398,8 @@ function measuresTab(state) {
     createSlider(body, 'compactness', 'Compactness', 0, 1, 0.1, 'Comp');
     createSlider(body, 'political-fairness', 'Political Fairness', 0, 1, 0.1, 'Pol-Fairness');
     createSlider(body, 'split-counties', 'Split Counties', 0, 1, 0.1, 'Split');
-    //createSwitch(measures, 'split-counties', "Allow Split Counties");
 
-
+    //Submit button
     var subDiv = htmlElement(div, 'div', 'd-grid gap-2 col-6 mx-auto submitBtn')
     var subBtn = createButton(subDiv, 'button', 'Submit', 'btn btn-primary btn-lg', 'submitButton');
 
@@ -487,14 +495,9 @@ function submitMeasures(state, weights) {
         var districts = [response];
         dicTab.setDistricts(districts, weights);
         switchTabs('districts');
-        //hideAll(districtLayer);
         districtLayer.clearLayers();
         
     });
-
-    // districts.forEach(function (item) {
-    //     list.append(districtListItem(item));
-    // });
 }
 
 function addDistrictHightlight(district, div) {
@@ -509,27 +512,19 @@ function addDistrictHightlight(district, div) {
 
 function selectJob(job) {
     setJob(job).then(response => {
+        console.log(response)
         disableTab('measures')
         disableTab('districts')
         switchTabs('constraints');
-        //hideAll(districtLayer);
         districtLayer.clearLayers();
     });
 }
 
 function submitConstraints(constraints, menu) {
     constrainJob(constraints).then(response => {
-        // TODO: structure response to be same as stuff
-        var stuff = {
-            'count': { 'label': 'Districtings Returned: ', 'value': '1,000' },
-            'avg-compactness': { 'label': 'Avg. Compactness: ', 'type': 'Polsby-Popper', 'value': '.92' },
-            'avg-maj-min': { 'label': 'Avg. Majority-Minority Districts: ', 'value': '2' },
-            'population-diff': { 'label': 'Avg. Population Difference: ', 'type': 'Total Population', 'value': '1.2%' },
-        };
         console.log(response);
-        menu.setConstraintsData(stuff);
+        menu.setConstraintsData(response);
         switchTabContent('constraints-tab', 'constraintsSummary');
-        //hideAll(districtLayer);
         districtLayer.clearLayers();
     })
 }

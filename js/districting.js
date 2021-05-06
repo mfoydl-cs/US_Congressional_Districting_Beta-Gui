@@ -114,37 +114,12 @@ class Districting {
 		this.majminModal = modalDialog('majminModal' + id, 'Majority-Minority Districts', majminDiv)
 		$('body').append(this.majminModal)
 
-		//start chart popout
-		var aggregates = createTextElement(infoBody, 'a', 'Districting Data', 'modal-link',);
-		aggregates.setAttribute('data-bs-toggle', 'modal');
-		aggregates.setAttribute('data-bs-target', '#aggregatesModal');
-		var content = this.analysisContent();
-		var aggregatesModal = modalDialog('aggregatesModal', 'Aggregate Districting Data', content);
-
-		// add more data to popout
-		const data = {
-			'count': { 'label': 'Districtings Returned: ', 'value': 1000 },
-			'avg-compactness': { 'label': 'Average Compactness: ', 'type': '', 'value': '.92 [Polsby-Popper]' },
-			'avg-maj-min': { 'label': 'Average Majority-Minority Districts: ', 'value': 2 },
-			'population-diff': { 'label': 'Average Population Difference: ', 'type': '', 'value': '1.2% [Total Population]' },
-		}
-		htmlElement(content, 'br');
-		var body = htmlElement(content, 'div', '',); //Content container
-		Object.keys(data).forEach(function (key) {
-			var row = htmlElement(body, 'div', 'row');
-			createTextElement(row, 'p', data[key].label, 'col', key + "ConSummaryLabel");
-			var value = createTextElement(row, 'p', data[key].value, 'col', key + "ConSummaryValue");
-			if (data[key].type) {
-				value.innerHTML += "(" + data[key].type + ")";
-			}
-		});
+		
+		
 
 		//add charts to popout
 		$(document).ready(() => {
 			$('body').append(aggregatesModal);
-			var graph = this.boxPlot();
-			Plotly.newPlot('analysisDiv', graph.data, graph.layout);
-			Plotly.addTraces('analysisDiv', this.scatterPlot())
 		});
 	    
 		var infoFooter = htmlElement(infoContainer, 'div', 'd-grid gap-2');
@@ -155,14 +130,9 @@ class Districting {
 	    L.DomEvent.on(this.infoCheck, 'click', this.checkClicked);
 
 	    L.DomEvent.on(link, 'click', this.dicTab.showDistrictInfo.bind(this.dicTab, this))
-	    // 	function (ev) {
-	    //     showDistrictInfo(infoContainer, featureGroup);
-	    // });
+
 
 	    L.DomEvent.on(back, 'click', this.dicTab.showDistrictList.bind(this.dicTab, this))
-	    // function (ev) {
-	    //     showDistrictList(infoContainer, featureGroup);
-	    // });
 	}
 
 	getScore = () => {
@@ -205,121 +175,5 @@ class Districting {
 
         this.districtList.appendChild(item)
 	}
-	
-	analysisContent = () => {
-		var div = L.DomUtil.create('div');
-		div['id'] = 'analysisDiv'
-		// console.dir(div)
 
-		// var img = L.DomUtil.create('img', 'modal-content', div);
-		// img.src = './chart.jpg';
-
-		return div;
-	}
-
-	boxPlot = () => {
-		/*
-		function linspace(a,b,n) {
-			return Plotly.d3.range(n).map(function(i){return a+i*(b-a)/(n-1);});
-		}*/
-		//var boxNumber = 30;
-		// var boxColor = [];
-		// var allColors = linspace(0, 360, boxNumber);
-		var data = [];
-		var yValues = [];
-		
-		//Colors
-		
-		// for( var i = 0; i < boxNumber;  i++ ){
-		// 	var result = 'hsl('+ allColors[i] +',50%'+',50%)';
-		// 	boxColor.push(result);
-		// }
-		/*
-		function getRandomArbitrary(min, max) {
-			return Math.random() * (max - min) + min;
-		};*/
-		
-		//Create Y Values
-		/*
-		for( var i = 0; i < boxNumber;  i++ ){
-			var ySingleArray = [];
-				for( var j = 0; j < 10;  j++ ){
-					var randomNum = getRandomArbitrary(0, 1);
-					var yIndValue = randomNum +i*.2;
-					ySingleArray.push(yIndValue);
-				}
-			yValues.push(ySingleArray);
-		}
-		*/
-		//Get y-values from server
-
-		getBoxplot().then(response => {
-			yValues = response.data
-
-			for (var i = 0; i < yValues.length; i++) {
-				var result = {
-					y: yValues[i],
-					type: 'box',
-					marker: {
-						color: 'black'
-					}
-				};
-				data.push(result);
-			};
-		});
-		
-		//Create Traces
-		
-		
-		
-		//Format the layout
-		
-		let layout = {
-			width: 450,
-			height: 300,
-			margin: {
-				l: 20,
-				r: 0,
-				b: 30,
-				t: 10,
-				pad: 4
-			},
-			xaxis: {
-				showgrid: false,
-				zeroline: false,
-				tickangle: 60,
-				showticklabels: false
-			},
-			yaxis: {
-				zeroline: false,
-				gridcolor: 'white'
-			},
-			paper_bgcolor: 'rgb(233,233,233)',
-			plot_bgcolor: 'rgb(233,233,233)',
-			showlegend:false
-		};
-		// console.dir(data)
-
-		return {
-			data: data,
-			layout: layout
-		}
-	}
-
-	scatterPlot = () => {
-		var xtraces = []
-		for (var i = 0; i < 30; i++) {
-			xtraces.push('trace ' + i.toString());
-		}
-		var yvals = []
-		for (var i = 0; i < 30; i++) {
-			yvals.push(Math.random() +i*.2);
-		}
-		return {
-			x: xtraces,
-			y: yvals,
-			mode: 'markers',
-			marker: {color: 'red'}
-		}
-	}
 }

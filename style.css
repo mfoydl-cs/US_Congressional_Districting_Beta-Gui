@@ -186,7 +186,7 @@ table,th,td {
 	border-collapse: collapse;
 }
 
-.slider-table th{
+.slider-table,.slider-table th{
     border: none;
 }
 
@@ -195,4 +195,8 @@ table,th,td {
 }
 th p{
     margin: 0;
+}
+
+#sortDiv {
+    align-items: baseline;
 }

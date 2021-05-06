@@ -109,6 +109,6 @@ function getIncumbents(state){
 
 function getBoxplot(){
     return $.get(
-        'http://localhost:8080/rockies/api/fjobs/boxplot'
+        'http://localhost:8080/rockies/api/fjobs/incumbents'
     )
 }

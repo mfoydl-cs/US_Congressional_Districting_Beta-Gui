@@ -40,23 +40,23 @@ $(document).ready(function () {
     getStates().then(response => {
         //Load initial state data
         response.item.forEach(addState);
+    });
 
-        //Add controls and layers to the map
-        stateLayer.addTo(map);
-        districtLayer.addTo(map);
-        countyLayer.addTo(map);
+    //Add controls and layers to the map
+    stateLayer.addTo(map);
+    districtLayer.addTo(map);
+    countyLayer.addTo(map);
 
-        backButton = L.control.backButton({ position: 'bottomleft' });
-        menu = L.control.menu({ position: 'topright' });
-        dropdown = L.control.states({ position: 'topright' }).addTo(map);
-        center = L.control.center({ position: 'topleft' }).addTo(map);
-    })
+    backButton = L.control.backButton({ position: 'bottomleft' });
+    menu = L.control.menu({ position: 'topright' }).addTo(map);
+    dropdown = L.control.states({ position: 'topright' })//.addTo(map);
+    center = L.control.center({ position: 'topleft' }).addTo(map);
 
 });
 
 /**
  * Initializes State geometry and adds state to StateObj
- * @param {String} stateAbbr
+ * @param {Object} state containing state abbreviation and name
  */
 function addState(state) {
     let stateAbbr = state.id
@@ -212,81 +212,6 @@ function resetDistrictHighlight(district, style) {
 function randomPresetColor(palette) {
     return palette[Math.floor(Math.random() * palette.length)];
 }
-
-//#region 
-/*
-//Adds all layers of a Leaflet LayerGroup into another LayerGroup
-function addGroup(newGroup, group) {
-    newGroup.eachLayer(function (layer) {
-        group.addLayer(layer);
-    })
-}*/
-/*
-//Styles all the layers of a leaflet LayerGroup
-function styleGroup(layerGroup, style) {
-    layerGroup.eachLayer(function (layer) {
-        layer.setStyle(style);
-    });
-}*/
-/*
-// Clears the map of all features
-function hideAll(group) {
-    group.clearLayers();
-}*/
-/*
-//Sets the style of each district
-function styleDistrict() {
-    return {
-        fillColor: randomPresetColor(darkPalette),
-        weight: districtStyle.weight,
-        opacity: districtStyle.opacity,
-        color: districtStyle.color,
-        fillOpacity: districtStyle.fillOpacity
-    };
-}*/
-/*
-//Random color generator
-function getRandomColor() {
-    var letters = '0123456789ABCDEF';
-    var color = '#';
-    for (var i = 0; i < 6; i++) {
-        color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-}*/
-
-/**
- * Random color generator from a limited pre-determined palatte
- */
-
-
-/**
- * Zoom map back out to country overview and updates controls on map accordingly
- */
-
-
-/*
-function getGeoJSON(stateAbbr) {
-    var stateJSON = L.geoJson(window["" + stateAbbr + "_STATE_20"], {
-        style: statesStyle,
-        onEachFeature: function (feature, layer) { addHighlight(layer, statesStyle) }
-    });
-
-    var counties = L.geoJson(window["" + stateAbbr + "_COUNTY_20"], {
-        style: countyStyle
-    });
-
-    var tileIndex = geojsonvt(window["" + stateAbbr + "_VTD_20"], precinctTileOptions);
-    var precincts = L.gridLayer.precincts();
-    precincts.setTileIndex(tileIndex);
-
-    return {
-        stateJSON: stateJSON,
-        counties: counties,
-        precincts: precincts,
-    }
-}*/
-//#endregion
 
 
 
