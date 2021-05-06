@@ -87,7 +87,7 @@ function setJob(job) {
  * @param {*} weights 
  * @returns 
  */
-function retrieveDistricts(id) {
+function retrieveDistricting(id) {
     var stuff = $.get(
         "http://localhost:8080/rockies/api/fjobs/show",
         { id: 10 }

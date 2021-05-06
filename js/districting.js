@@ -8,10 +8,47 @@ class Districting {
 		// maybe one day dicTab won't be global...
 		this.dicTab = dicTab
 		this.scores = scores;
-		//this.geoJSON = geoJSON
 
-		// create list item
-		//var id = geoJSON.features[0].properties.CDSESSN;
+		retrieveDistricting(id).then(response => {
+			this.geoJSON = response;
+
+			this.featureGroup = new L.LayerGroup();
+			L.geoJson(this.geoJSON, {
+				onEachFeature: this.processDistrict
+			});
+
+			// make majmin modal
+			let majminDiv = L.DomUtil.create('div')
+			let table = htmlElement(majminDiv, 'table')
+			let row = htmlElement(table, 'tr')
+			let name = htmlElement(row, 'td')
+			name.innerHTML = "District Name"
+			let pop = htmlElement(row, 'td')
+			pop.innerHTML = "Population"
+			let minPop = htmlElement(row, 'td')
+			minPop.innerHTML = "Minority Population"
+			let minPer = htmlElement(row, 'td')
+			minPer.innerHTML = "Minority Percentage"
+			for (let d of this.geoJSON.features) {
+				// console.log(d.properties)
+				let row = htmlElement(table, 'tr')
+				let name = htmlElement(row, 'td')
+				if ('NAMELSAD20' in d.properties) {
+					name.innerHTML = d.properties.NAMELSAD20
+				} else {
+					name.innerHTML = d.properties.NAMELSAD10
+				}
+				let pop = htmlElement(row, 'td')
+				pop.innerHTML = d.properties.population
+				let minPop = htmlElement(row, 'td')
+				minPop.innerHTML = d.properties.minorityPop
+				let minPer = htmlElement(row, 'td')
+				minPer.innerHTML = (100 * d.properties.minorityPop / d.properties.population).toFixed(2) + '%'
+			}
+			this.majminModal = modalDialog('majminModal' + id, 'Majority-Minority Districts', majminDiv)
+			$('body').append(this.majminModal);
+		});
+
 		var div = L.DomUtil.create('div');
 		var headerDiv = htmlElement(div, "div", 'd-flex w-100 justify-content-between');
 		createTextElement(headerDiv, "h5", id, "mb-1");
@@ -27,10 +64,7 @@ class Districting {
 		this.districtList = createListGroup(listgroupContainer);
 		this.districtList.classList.add('list-group-flush');
 		/*
-		this.featureGroup = new L.LayerGroup();
-		L.geoJson(geoJSON, {
-				onEachFeature: this.processDistrict
-		});
+		
 		*/
 
 
@@ -62,11 +96,11 @@ class Districting {
 		let statItem = createListItem(div, true, false)
 		this.statsList.appendChild(statItem)
 
-		/*
+		
 		// populate stats list
-		for (let score in this.geoJSON['scores']) {
+		for (let score in this.scores) {
 	    	var div = L.DomUtil.create('div', 'd-flex w-100 justify-content-between');
-			let s = this.geoJSON.scores[score]
+			let s = this.scores[score]
 			if (score == 'majmin') {
 				let link = createTextElement(div, 'a', 'Maj-Min Districts', 'stat-col score modal-link')
 				link.setAttribute('data-bs-toggle', 'modal');
@@ -87,39 +121,8 @@ class Districting {
 		createTextElement(div, 'p', this.getScore().toFixed(2), 'stat-col')
 		statItem = createListItem(div, true, false)
 		this.statsList.appendChild(statItem)
-		*/
-		/*
-		// make majmin modal
-		let majminDiv = L.DomUtil.create('div')
-		let table = htmlElement(majminDiv, 'table')
-		let row = htmlElement(table, 'tr')
-		let name = htmlElement(row, 'td')
-		name.innerHTML = "District Name"
-		let pop = htmlElement(row, 'td')
-		pop.innerHTML = "Population"
-		let minPop = htmlElement(row, 'td')
-		minPop.innerHTML = "Minority Population"
-		let minPer = htmlElement(row, 'td')
-		minPer.innerHTML = "Minority Percentage"
-		for (let d of this.geoJSON.features) {
-			// console.log(d.properties)
-			let row = htmlElement(table, 'tr')
-			let name = htmlElement(row, 'td')
-			if ('NAMELSAD20' in d.properties) {
-				name.innerHTML = d.properties.NAMELSAD20
-			} else {
-				name.innerHTML = d.properties.NAMELSAD10
-			}
-			let pop = htmlElement(row, 'td')
-			pop.innerHTML = d.properties.population
-			let minPop = htmlElement(row, 'td')
-			minPop.innerHTML = d.properties.minorityPop
-			let minPer = htmlElement(row, 'td')
-			minPer.innerHTML = (100 * d.properties.minorityPop / d.properties.population).toFixed(2) + '%'
-		}
-		this.majminModal = modalDialog('majminModal' + id, 'Majority-Minority Districts', majminDiv)
-		$('body').append(this.majminModal)
-	    */
+		
+
 		var infoFooter = htmlElement(infoContainer, 'div', 'd-grid gap-2');
 	    var back = createButton(infoFooter, 'button', 'Back', 'btn btn-secondary btn-lg ');
 
