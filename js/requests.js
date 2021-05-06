@@ -90,7 +90,7 @@ function setJob(job) {
 function retrieveDistricting(id) {
     var stuff = $.get(
         "http://localhost:8080/rockies/api/fjobs/show",
-        { id: 10 }
+        { id: id }
     )
     return stuff;
 }
