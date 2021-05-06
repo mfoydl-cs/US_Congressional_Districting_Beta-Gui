@@ -406,12 +406,12 @@ function measuresTab(state) {
 
     // use default values of 0.5 for now
     let weights = {
-        "COMPACT_FATNESS": 0.5,
+        "COMPACT_POLPOP": 0.5,
         "POP_EQUAL": 0.5,
         "SPLIT_COUNTIES": 0.5,
         "DEV_AVG": 0.5,
         "DEV_ENACTED_GEO": 0.5,
-        "devFromEnactedPop": 0.5,
+        "DEV_ENACTED_POP": 0.5,
         "FAIRNESS": 0.5,
 		"MAJMIN": 0.5,
     }
