@@ -4,13 +4,14 @@
  * @return {Element} List Item element to add to list
  */
 class Districting {
-	constructor(geoJSON, dicTab) {
+	constructor(id, scores, dicTab) {
 		// maybe one day dicTab won't be global...
 		this.dicTab = dicTab
-		this.geoJSON = geoJSON
+		this.scores = scores;
+		//this.geoJSON = geoJSON
 
 		// create list item
-		var id = geoJSON.features[0].properties.CDSESSN;
+		//var id = geoJSON.features[0].properties.CDSESSN;
 		var div = L.DomUtil.create('div');
 		var headerDiv = htmlElement(div, "div", 'd-flex w-100 justify-content-between');
 		createTextElement(headerDiv, "h5", id, "mb-1");
@@ -25,10 +26,12 @@ class Districting {
 		var listgroupContainer = L.DomUtil.create('div');
 		this.districtList = createListGroup(listgroupContainer);
 		this.districtList.classList.add('list-group-flush');
+		/*
 		this.featureGroup = new L.LayerGroup();
 		L.geoJson(geoJSON, {
 				onEachFeature: this.processDistrict
 		});
+		*/
 
 
 		//Info Page
@@ -58,6 +61,8 @@ class Districting {
 		createTextElement(div, 'p', 'Contrib', 'stat-col')
 		let statItem = createListItem(div, true, false)
 		this.statsList.appendChild(statItem)
+
+		/*
 		// populate stats list
 		for (let score in this.geoJSON['scores']) {
 	    	var div = L.DomUtil.create('div', 'd-flex w-100 justify-content-between');
@@ -82,7 +87,8 @@ class Districting {
 		createTextElement(div, 'p', this.getScore().toFixed(2), 'stat-col')
 		statItem = createListItem(div, true, false)
 		this.statsList.appendChild(statItem)
-		
+		*/
+		/*
 		// make majmin modal
 		let majminDiv = L.DomUtil.create('div')
 		let table = htmlElement(majminDiv, 'table')
@@ -113,7 +119,7 @@ class Districting {
 		}
 		this.majminModal = modalDialog('majminModal' + id, 'Majority-Minority Districts', majminDiv)
 		$('body').append(this.majminModal)
-	    
+	    */
 		var infoFooter = htmlElement(infoContainer, 'div', 'd-grid gap-2');
 	    var back = createButton(infoFooter, 'button', 'Back', 'btn btn-secondary btn-lg ');
 
@@ -130,8 +136,13 @@ class Districting {
 	getScore = () => {
 		let score = 0
 		let weights = this.dicTab.weights
-		for (let s in weights) {
-			score += this.geoJSON['scores'][s] * weights[s]
+		console.log(weights)
+		console.log(this.scores)
+		for (let s in this.scores) {
+			score += this.scores[s] * weights[s];
+			console.log(s)
+			console.log(this.scores[s])
+			console.log(weights[s])
 		}
 		return score
 	}

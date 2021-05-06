@@ -133,10 +133,10 @@ L.Control.States = L.Control.extend({
         //buttons['AL'] = createButton(constraints, 'button', 'Alabama', 'btn btn-primary');
         //buttons['AR'] = createButton(constraints, 'button', 'Arizona', 'btn btn-primary submitBtn');
         //buttons['MI'] = createButton(constraints, 'button', 'Michigan', 'btn btn-primary submitBtn');
-        console.log(buttons)
+        //console.log(buttons)
         Object.keys(buttons).forEach(function (key) {
             var obj = statesObj[key];
-            console.log(obj)
+            //console.log(obj)
             buttons[key]['onclick'] = () => { zoomToState(obj.state, obj) }
             buttons[key]['onmouseover'] = () => { obj.state.setStyle(highLightStyle) }
             buttons[key]['onmouseout'] = () => { obj.state.setStyle(statesStyle) }
@@ -233,7 +233,7 @@ function jobsTab(state) {
     var container = L.DomUtil.create('div');
 
     getJobsSummary(state).then(response => {
-        console.log(response);
+        //console.log(response);
         jobs = response;
         var headerDiv = htmlElement(container, 'div', 'center tabContentTitle mb-3');
         createTextElement(headerDiv, 'h5', 'Select a Job', 'h5');
@@ -406,13 +406,13 @@ function measuresTab(state) {
 
     // use default values of 0.5 for now
     let weights = {
-        "compactness": 0.5,
-        "popEquality": 0.5,
-        "splitCounties": 0.5,
-        "devFromAvg": 0.5,
-        "devFromEnactedArea": 0.5,
+        "COMPACT_FATNESS": 0.5,
+        "POP_EQUAL": 0.5,
+        "SPLIT_COUNTIES": 0.5,
+        "DEV_AVG": 0.5,
+        "DEV_ENACTED_GEO": 0.5,
         "devFromEnactedPop": 0.5,
-        "fairness": 0.5,
+        "FAIRNESS": 0.5,
 		"majmin": 0.5,
     }
     L.DomEvent.on(subBtn, 'click', function (ev) { submitMeasures(state, weights) })
@@ -493,7 +493,7 @@ function submitMeasures(state, weights) {
             "fairness": 0.3,
             "majmin": 1
         }*/
-        console.log(response)
+        //console.log(response);
         var districts = response;
         dicTab.setDistricts(districts, weights);
         switchTabs('districts');

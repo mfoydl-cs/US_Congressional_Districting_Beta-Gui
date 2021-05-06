@@ -1,4 +1,4 @@
-let sortings = {
+var sortings = {
 	overall: {
 		desc:'overall best objective function score',
 		cmp: function(d1, d2) {
@@ -82,9 +82,9 @@ class DistrictingsTab {
 		
 		//Create Sorting popup
 		$(document).ready(() => {
-			this.makeModal;
 			$('body').append(aggregatesModal);
 		});
+		$(document).ready(this.makeModal);
 			
 
 		//Create list
@@ -156,12 +156,14 @@ class DistrictingsTab {
 	}
 
 	setDistricts = (dics, weights) => {
+		console.log(dics)
 		this.weights = weights
 		let l = this.list
 		this.dics = []
-		for (let dic of dics) {
-			this.dics.push(new Districting(dic, this))
-		}
+		Object.keys(dics).forEach((dic) =>{
+			console.log(dics[dic])
+			this.dics.push(new Districting(dic,dics[dic], this))
+		});
 		this.sortList()
 	}
 
