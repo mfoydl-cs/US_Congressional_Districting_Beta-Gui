@@ -96,7 +96,7 @@ class DistrictingsTab {
 		this.list.id = "districtList";
 
 		//Box and Whisker Plot Model
-		let aggregates = createTextElement(infoBody, 'a', 'Districting Data', 'modal-link',);
+		let aggregates = createTextElement(this.div, 'a', 'Districting Data', 'modal-link',);
 		aggregates.setAttribute('data-bs-toggle', 'modal');
 		aggregates.setAttribute('data-bs-target', '#aggregatesModal');
 		let content = this.analysisContent();
@@ -207,13 +207,7 @@ class DistrictingsTab {
 		return div;
 	}
 
-	boxPlot = () => {
-		//var data = [];
-		var yValues = [];
-
-		//Get y-values from server
-
-		//yValues = response.data
+	boxPlot = (yValues) => {
 
 		for (var i = 0; i < yValues.length; i++) {
 			var result = {
