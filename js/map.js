@@ -48,8 +48,8 @@ $(document).ready(function () {
     countyLayer.addTo(map);
 
     backButton = L.control.backButton({ position: 'bottomleft' });
-    menu = L.control.menu({ position: 'topright' }).addTo(map);
-    dropdown = L.control.states({ position: 'topright' })//.addTo(map);
+    menu = L.control.menu({ position: 'topright' })//.addTo(map);
+    dropdown = L.control.states({ position: 'topright' }).addTo(map);
     center = L.control.center({ position: 'topleft' }).addTo(map);
 
 });
