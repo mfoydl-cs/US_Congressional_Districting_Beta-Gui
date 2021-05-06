@@ -291,7 +291,7 @@ function constraintsTab(state, menu) {
     createSlider(body, 'compactness-constraint', 'Compactness', 0, 1, 0.1,'Comp');
     createSlider(body, 'majmin-constraint', 'Majority-Minority Districts (>=)', 0, 10, 1,'Maj-Min');
     createSlider(body, 'majmin-threshold', 'Majority-Minority Threshold ', 0, 1, 0.1, 'Maj-Min-Thrsh');
-    createSlider(body, 'population-constraint', 'Population Difference (<=%)', 0, 3, 0.1,"Pop-Diff");
+    createSlider(body, 'population-constraint', 'Population Difference (<=%)', 0, 10, 0.1,"Pop-Diff");
 
     //Incumbents Protection Menu
     var incumbentsDiv = htmlElement(constraints, 'div', 'container')
