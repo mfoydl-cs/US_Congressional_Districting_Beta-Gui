@@ -1,5 +1,7 @@
 const countryBounds = [[20, -127], [53, -65]];
 
+const minorities = ['Black','Native','Asian','Pacific','Other','Mix'];
+
 //Feature Style variables
 const style = {
   weight: 2,

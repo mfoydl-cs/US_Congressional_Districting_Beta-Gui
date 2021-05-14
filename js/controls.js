@@ -328,6 +328,7 @@ function constraintsTab(state, menu) {
     var optionsContainer = L.DomUtil.create('div');
     createRadioGroup(optionsContainer, compactnessRadioLabels, "Compactness Measure", "compactnessRadio");
     createRadioGroup(optionsContainer, populationRadioLabels, "Population Constraint-Type", "populationRadio");
+    createSelect(optionsContainer,minorities,'minority','minoritySelect');
     createAccordian(constraints, 'compactnessAccordion', '<i>options</i>', optionsContainer);
 
     //Submit Buttons
