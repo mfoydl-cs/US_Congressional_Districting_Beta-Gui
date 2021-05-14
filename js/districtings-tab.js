@@ -118,13 +118,6 @@ class DistrictingsTab {
 			}
 		});
 
-		getBoxplot().then(response => {
-			console.log('box')
-			console.log(response);
-			let graph = this.boxPlot(JSON.parse(response.boxplot));
-			Plotly.newPlot('analysisDiv', graph.data, graph.layout);
-			Plotly.addTraces('analysisDiv', this.scatterPlot(JSON.parse(response.scatterplot)))
-		});
 	}
 
 	makeModal = () => {
@@ -211,6 +204,14 @@ class DistrictingsTab {
 		let div = L.DomUtil.create('div');
 		div['id'] = 'analysisDiv'
 		return div;
+	}
+
+	generateBoxplot = () => {
+		getBoxplot().then(response => {
+			let graph = this.boxPlot(JSON.parse(response.boxplot));
+			Plotly.newPlot('analysisDiv', graph.data, graph.layout);
+			Plotly.addTraces('analysisDiv', this.scatterPlot(JSON.parse(response.scatterplot)));
+		});
 	}
 
 	boxPlot = (yValues) => {

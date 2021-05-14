@@ -6,13 +6,14 @@
 class Districting {
 	constructor(id, scores, dicTab) {
 		// maybe one day dicTab won't be global...
-		this.dicTab = dicTab
+		this.dicTab = dicTab;
 		this.scores = scores;
 
 		retrieveDistricting(id).then(response => {
 			this.geoJSON = response;
 
 			this.featureGroup = new L.LayerGroup();
+			
 			L.geoJson(this.geoJSON, {
 				onEachFeature: this.processDistrict
 			});
@@ -30,7 +31,6 @@ class Districting {
 			let minPer = htmlElement(row, 'td')
 			minPer.innerHTML = "Minority Percentage"
 			for (let d of this.geoJSON.features) {
-				// console.log(d.properties)
 				let row = htmlElement(table, 'tr')
 				let name = htmlElement(row, 'td')
 				if ('NAMELSAD20' in d.properties) {
@@ -47,13 +47,29 @@ class Districting {
 			}
 			this.majminModal = modalDialog('majminModal' + id, 'Majority-Minority Districts', majminDiv)
 			$('body').append(this.majminModal);
+
+			this.checkDiv.classList = "";
+			this.infocheckDiv.classList = "";
+
+			createLabel(this.checkDiv, '<i>show</i>&nbsp', id + 'Check', 'small');
+			this.check = L.DomUtil.create("input", "form-check-input custom-check", this.checkDiv);
+			this.check.id = id + "Check";
+			this.check.type = "checkbox";
+			L.DomEvent.on(this.check, 'click', this.checkClicked);
+			
+			createLabel(this.infocheckDiv, '<i>show</i>&nbsp', id + 'InfoCheck', 'small');
+			this.infoCheck = L.DomUtil.create("input", "form-check-input custom-check", this.infocheckDiv);
+			this.infoCheck.id = id+"InfoCheck";
+			this.infoCheck.type = "checkbox";
+			L.DomEvent.on(this.infoCheck, 'click', this.checkClicked);
 		});
 
 		var div = L.DomUtil.create('div');
 		var headerDiv = htmlElement(div, "div", 'd-flex w-100 justify-content-between');
 		createTextElement(headerDiv, "h5", id, "mb-1");
-		this.check = L.DomUtil.create("input", "form-check-input", headerDiv);
-		this.check.type = "checkbox";
+
+		this.checkDiv = htmlElement(headerDiv, 'div', 'spinner');
+
 		var contentDiv = htmlElement(div, "div", 'd-flex w-100 justify-content-between');
 		createTextElement(contentDiv, "p", "Score: " + this.getScore().toFixed(2), "");
 		var link = createTextElement(contentDiv,'a','<em>more info</em>','modal-link')
@@ -63,10 +79,6 @@ class Districting {
 		var listgroupContainer = L.DomUtil.create('div');
 		this.districtList = createListGroup(listgroupContainer);
 		this.districtList.classList.add('list-group-flush');
-		/*
-		
-		*/
-
 
 		//Info Page
 		var infoContainer = L.DomUtil.create('div');
@@ -74,11 +86,7 @@ class Districting {
 		var infoHeader = htmlElement(infoContainer, 'div','d-flex w-100 justify-content-between');
 		createTextElement(infoHeader, 'h5', id, 'h5');
 
-		var checkDiv = htmlElement(infoHeader, 'div');
-		createLabel(checkDiv, '<i>show</i>&nbsp',id+'InfoCheck','small');
-		this.infoCheck = L.DomUtil.create("input", "form-check-input custom-check", checkDiv);
-		this.infoCheck.id = id+"InfoCheck"
-		this.infoCheck.type = "checkbox";
+		this.infocheckDiv = htmlElement(infoHeader, 'div','spinner');
 
 		var infoBody = htmlElement(infoContainer, 'div');
 
@@ -126,10 +134,6 @@ class Districting {
 		var infoFooter = htmlElement(infoContainer, 'div', 'd-grid gap-2');
 	    var back = createButton(infoFooter, 'button', 'Back', 'btn btn-secondary btn-lg ');
 
-	    L.DomEvent.on(this.check, 'click', this.checkClicked);
-
-	    L.DomEvent.on(this.infoCheck, 'click', this.checkClicked);
-
 	    L.DomEvent.on(link, 'click', this.dicTab.showDistrictInfo.bind(this.dicTab, this))
 
 
@@ -139,15 +143,10 @@ class Districting {
 	getScore = () => {
 		let score = 0
 		let weights = this.dicTab.weights
-		console.log(weights)
-		console.log(this.scores)
 		for (let s in this.scores) {
 			score += this.scores[s] * weights[s];
-			console.log(s)
-			console.log(this.scores[s])
-			console.log(weights[s])
 		}
-		return score
+		return score//score.toFixed(2);
 	}
 
 	checkClicked = (ev) => {

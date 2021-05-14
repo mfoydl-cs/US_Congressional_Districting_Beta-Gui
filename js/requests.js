@@ -16,7 +16,8 @@ function getStates(){
 function getStateOutline(state){
     return $.get(
         "http://localhost:8080/rockies/api/states/state",
-        {state: state}
+        {state: state},
+        "json"
     );
 }
 
