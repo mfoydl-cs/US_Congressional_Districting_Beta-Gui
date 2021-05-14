@@ -88,7 +88,7 @@ var incumbentsJson = {
         since: "Jan 03, 2019",
       },
       {
-        name: "Ra\u00c3\u00bal Grijalva",
+        name: "Ral Grijalva",
         party: "Democrat",
         district: "3rd",
         since: "Jan 03, 2013",
