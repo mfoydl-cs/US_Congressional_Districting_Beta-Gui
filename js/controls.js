@@ -124,36 +124,39 @@ L.control.menu = function (opts) {
 L.Control.States = L.Control.extend({
     onAdd: function (map) {
 
-        var div = L.DomUtil.create('div', 'dropdown');
+        let div = L.DomUtil.create('div', 'dropdown');
         L.DomEvent.disableClickPropagation(div);
         L.DomEvent.disableScrollPropagation(div);
 
-        var constraints = htmlElement(div, 'div', 'd-grid gap-1');
+        this.constraints = htmlElement(div, 'div', 'd-grid gap-1');
 
-        createAccordian(div, 'statesAccordion', 'Select a state to display', constraints)
-        var buttons = {};
+        createAccordian(div, 'statesAccordion', 'Select a state to display', this.constraints)
+        this.buttons = {};
+        /*
         Object.keys(statesObj).forEach(function (key) {
             state = statesObj[key]
             buttons[key] = createButton(constraints, 'button', state.name, 'btn btn-primary')
         });
-        //buttons['AL'] = createButton(constraints, 'button', 'Alabama', 'btn btn-primary');
-        //buttons['AR'] = createButton(constraints, 'button', 'Arizona', 'btn btn-primary submitBtn');
-        //buttons['MI'] = createButton(constraints, 'button', 'Michigan', 'btn btn-primary submitBtn');
-        //console.log(buttons)
         Object.keys(buttons).forEach(function (key) {
             var obj = statesObj[key];
             //console.log(obj)
-            buttons[key]['onclick'] = () => { zoomToState(obj.state, obj) }
-            buttons[key]['onmouseover'] = () => { obj.state.setStyle(highLightStyle) }
-            buttons[key]['onmouseout'] = () => { obj.state.setStyle(statesStyle) }
+            
 
-        });
+        });*/
 
         return div;
     },
     onRemove: function (map) { },
     setState: function (state) {
         this.state = state
+    },
+    addState: function(key) {
+        let state = statesObj[key];
+        console.log(state);
+        let button = createButton(this.constraints, 'button', state.name, 'btn btn-primary');
+        button['onclick'] = () => { zoomToState(state); }
+        button['onmouseover'] = () => { state.state.setStyle(highLightStyle); }
+        button['onmouseout'] = () => { state.state.setStyle(statesStyle); }
     }
 });
 
@@ -502,6 +505,7 @@ function submitMeasures(state, weights) {
         //console.log(response);
         var districts = response;
         dicTab.setDistricts(districts, weights);
+        dicTab.generateBoxplot();
         switchTabs('districts');
         districtLayer.clearLayers();
         
