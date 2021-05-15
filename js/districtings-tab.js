@@ -1,34 +1,10 @@
-var sortings = {
-	overall: {
-		desc:'overall best objective function score',
-		cmp: function(d1, d2) {
-			return d2.getScore() - d1.getScore()
-		}
-	},
-	overallworst: {
-		desc:'overall worst objective function score',
-		cmp: function(d1, d2) {
-			return d1.getScore() - d2.getScore()
-		}
-	},
-	enacted: {
-		desc:'closest to enacted',
-		cmp: function(d1, d2) {
-			return d2.getScore() - d1.getScore()
-		}
-	},
-	majmin: {
-		desc:'highest scoring majority minority',
-		cmp: function(d1, d2) {
-			return d2.getScore() - d1.getScore()
-		}
-	},
-	different: {
-		desc:'most different area pair-deviations',
-		cmp: function(d1, d2) {
-			return d2.getScore() - d1.getScore()
-		}
-	}
+var sortNames = {
+	'bestOF': 'Best Objective Function Score',
+	'worstOF': 'Worst Objective Function Score',
+	'areaPairDevs': 'Top 5 Plans With Very Different Area-Pair Deviations',
+	'closeToEnacted': 'High Scoring Plans Close to the Enacted',
+	'highMM': 'Top Plans With the Most Majority-Minority Districts',
+	'closeToAvg': 'Plans Closest to the Average Plan Population'
 }
 
 const plotLayout = {
@@ -63,7 +39,7 @@ class DistrictingsTab {
 	 */
 	constructor() {
 		// Set default sort value
-		this.sorting = 'overall'
+		this.sorting = 'bestOF'
 
 		//Root
 		this.div = L.DomUtil.create('div');
@@ -75,7 +51,7 @@ class DistrictingsTab {
 		
 		//Div for sorting
 		this.sortDiv = htmlElement(this.div, "div", 'd-flex w-100 justify-content-between','sortDiv');
-		createTextElement(this.sortDiv, "p", "Sorted by: " + sortings[this.sorting].desc, "");
+		createTextElement(this.sortDiv, "p", "Sorted by: " + sortNames[this.sorting], "", 'sort-label');
 		let sortBtn = createButton(this.sortDiv, 'button', 'Sort', 'btn btn-outline-primary btn-sm modal-link');
 		sortBtn.setAttribute('data-bs-toggle', 'modal');
 		sortBtn.setAttribute('data-bs-target', '#sortModal');
@@ -123,8 +99,8 @@ class DistrictingsTab {
 	makeModal = () => {
 		// create sortModal
 		let sortRadioLabels = []
-		for (let sort in sortings) {
-			sortRadioLabels.push({'label': sortings[sort].desc, value: sort})
+		for (let sort in sortNames) {
+			sortRadioLabels.push({'label': sortNames[sort], value: sort})
 		}
 		sortRadioLabels[0].checked = true
 		let form = L.DomUtil.create('form');
@@ -136,7 +112,8 @@ class DistrictingsTab {
 	modalClosed = (e) => {
 		let data = new FormData(this.sortModal.querySelector('form'))
 		this.sorting = data.get('sortRadio')
-		this.sortList()
+		document.getElementById('sort-label').innerHTML = "Sorted by: " + sortNames[this.sorting]
+		this.updateDics()
 	}
 
 	/**
@@ -157,8 +134,6 @@ class DistrictingsTab {
 			for (let i = 0; i < list.length; i++) {
 				let plan = list[i]
 				let id = plan['id']
-				console.log(plans)
-				console.log(plan['id'])
 				if (id in plans) {
 					list[i] = plans[id]
 				} else {
