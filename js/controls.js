@@ -404,28 +404,23 @@ function measuresTab(state) {
     var body = L.DomUtil.create('tbody', '', table);
 
     createSlider(body, 'population-equality', 'Population Equality', 0, 1.0, 0.1,'Pop-Eq');
-    createSlider(body, 'avgerage-deviation', 'Deviation from Average Districting', 0, 1, 0.1, 'Avg-Dev');
-    createSlider(body, 'enacted-deviation', 'Deviation from Enacted Plan', 0, 1, 0.1, 'Enacacted-Dev');
-    createSlider(body, 'compactness', 'Compactness', 0, 1, 0.1, 'Comp');
-    createSlider(body, 'political-fairness', 'Political Fairness', 0, 1, 0.1, 'Pol-Fairness');
-    createSlider(body, 'split-counties', 'Split Counties', 0, 1, 0.1, 'Split');
+    createSlider(body, 'dev-average', 'Deviation from Average Districting', 0, 1, 0.1, 'Avg-Dev');
+    createSlider(body, 'dev-enacted-geo', 'Deviation from Enacted Plan Geometry', 0, 1, 0.1, 'Enacted-Dev-Geo');
+    createSlider(body, 'dev-enacted-pop', 'Deviation from Enacted Plan Population', 0, 1, 0.1, 'Enacted-Dev-Pop');
+    createSlider(body, 'compactness', 'Compactness', 0, 1, 0.1, 'Compact');
 
     //Submit button
     var subDiv = htmlElement(div, 'div', 'd-grid gap-2 col-6 mx-auto submitBtn')
     var subBtn = createButton(subDiv, 'button', 'Submit', 'btn btn-primary btn-lg', 'submitButton');
 
-    // use default values of 0.5 for now
-    let weights = {
-        "COMPACT_POLPOP": 0.5,
-        "POP_EQUAL": 0.5,
-        "SPLIT_COUNTIES": 0.5,
-        "DEV_AVG": 0.5,
-        "DEV_ENACTED_GEO": 0.5,
-        "DEV_ENACTED_POP": 0.5,
-        "FAIRNESS": 0.5,
-		"MAJMIN": 0.5,
-    }
-    L.DomEvent.on(subBtn, 'click', function (ev) { submitMeasures(state, weights) })
+    L.DomEvent.on(subBtn, 'click', function (ev) {
+		let ids = ['population-equality', 'dev-average', 'dev-enacted-geo', 'dev-enacted-pop', 'compactness']
+		let weights = {}
+		for (let id of ids) {
+			weights[id] = document.getElementById(id).value
+		}
+		submitMeasures(state, weights)
+	})
     return div;
 }
 
@@ -491,7 +486,7 @@ function submitMeasures(state, weights) {
     dicTab = window.dicTab
     dicTab.clearList()
 
-    submitWeights(state, weights).then(response => {
+    submitWeights(weights).then(response => {
         /*
         response['scores'] = {
             "compactness": 0.1,
@@ -503,7 +498,7 @@ function submitMeasures(state, weights) {
             "fairness": 0.3,
             "majmin": 1
         }*/
-        //console.log(response);
+        console.log(response);
         var districts = response;
         dicTab.setDistricts(districts, weights);
         dicTab.generateBoxplot();
