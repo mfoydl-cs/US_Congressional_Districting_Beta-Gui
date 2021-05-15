@@ -437,7 +437,8 @@ function incumbentsContent(state) {
             let elem = createSwitch(div, senator.name, senator.name + " <em>[" + senator.party + "]</em>");
             elem.classList.add(senator.party);
             elem.classList.add('grayed');
-            elem.setAttribute('checked', 'true');
+            //elem.setAttribute('checked', 'true');
+            elem.setAttribute('checked', 'false');
             L.DomEvent.on(elem, 'click', function (ev) {
                 if (this.getAttribute('checked') === 'true') {
                     this.setAttribute('checked', 'false');
@@ -451,7 +452,8 @@ function incumbentsContent(state) {
             let elem = createSwitch(div, rep.name, rep.name + " -<em> " + rep.district + ' District ' + " [" + rep.party + "]</em>");
             elem.classList.add(rep.party);
             elem.classList.add('grayed');
-            elem.setAttribute('checked', 'true');
+            //elem.setAttribute('checked', 'true');
+            elem.setAttribute('checked', 'false');
             L.DomEvent.on(elem, 'click', function (ev) {
                 if (this.getAttribute('checked') === 'true') {
                     this.setAttribute('checked', 'false');

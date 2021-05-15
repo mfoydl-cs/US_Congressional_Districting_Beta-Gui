@@ -7,6 +7,9 @@ class Districting {
 	constructor(id, scores, dicTab) {
 		// maybe one day dicTab won't be global...
 		this.dicTab = dicTab;
+		this.score = scores.score
+		delete scores.score
+		delete scores.id
 		this.scores = scores;
 
 		retrieveDistricting(id).then(response => {
@@ -71,7 +74,7 @@ class Districting {
 		this.checkDiv = htmlElement(headerDiv, 'div', 'spinner');
 
 		var contentDiv = htmlElement(div, "div", 'd-flex w-100 justify-content-between');
-		createTextElement(contentDiv, "p", "Score: " + this.getScore().toFixed(2), "");
+		createTextElement(contentDiv, "p", "Score: " + this.score.toFixed(2), "");
 		var link = createTextElement(contentDiv,'a','<em>more info</em>','modal-link')
 		this.listItem = createListItem(div, false, false);
 
@@ -126,7 +129,7 @@ class Districting {
 		createTextElement(div, 'p', 'Total', 'stat-col score')
 		createTextElement(div, 'p', '', 'stat-col')
 		createTextElement(div, 'p', '', 'stat-col')
-		createTextElement(div, 'p', this.getScore().toFixed(2), 'stat-col')
+		createTextElement(div, 'p', this.score.toFixed(2), 'stat-col')
 		statItem = createListItem(div, true, false)
 		this.statsList.appendChild(statItem)
 		
@@ -140,12 +143,14 @@ class Districting {
 	    L.DomEvent.on(back, 'click', this.dicTab.showDistrictList.bind(this.dicTab, this))
 	}
 
+	// deprecated
 	getScore = () => {
 		let score = 0
 		let weights = this.dicTab.weights
 		for (let s in this.scores) {
 			score += this.scores[s] * weights[s];
 		}
+		console.log(score)
 		return score//score.toFixed(2);
 	}
 

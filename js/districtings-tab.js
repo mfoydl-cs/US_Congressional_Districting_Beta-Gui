@@ -149,15 +149,31 @@ class DistrictingsTab {
 	}
 
 	setDistricts = (dics, weights) => {
-		console.log(dics)
+		this.sorts = dics
+		let plans = {}
 		this.weights = weights
-		let l = this.list
-		this.dics = []
-		Object.keys(dics).forEach((dic) =>{
-			console.log(dics[dic])
-			this.dics.push(new Districting(dic,dics[dic], this))
-		});
-		this.sortList()
+		for (let sort in this.sorts) {
+			let list = this.sorts[sort]
+			for (let i = 0; i < list.length; i++) {
+				let plan = list[i]
+				let id = plan['id']
+				console.log(plans)
+				console.log(plan['id'])
+				if (id in plans) {
+					list[i] = plans[id]
+				} else {
+					list[i] = new Districting(id, plan, this)
+					plans[id] = list[i]
+				}
+			}
+		}
+		this.sorting = "bestOF"
+		this.updateDics()
+	}
+
+	updateDics = () => {
+		this.dics = this.sorts[this.sorting]
+		this.updateList()
 	}
 
 	displayDistricting = (d) => {
@@ -175,9 +191,9 @@ class DistrictingsTab {
 		} else {console.log('this shouldntve happened..')}
 	}
 
-	sortList = () => {
+	updateList = () => {
 		this.clearList()
-		this.dics.sort(sortings[this.sorting].cmp)
+		//this.dics.sort(sortings[this.sorting].cmp)
 		for (let dic of this.dics) {
 			this.list.append(dic.listItem);
 		}
