@@ -138,7 +138,6 @@ class DistrictingsTab {
 		this.sorts = dics
 		let plans = {}
 		this.weights = weights
-<<<<<<< Updated upstream
 		for (let sort in this.sorts) {
 			let list = this.sorts[sort]
 			for (let i = 0; i < list.length; i++) {
@@ -159,15 +158,6 @@ class DistrictingsTab {
 	updateDics = () => {
 		this.dics = this.sorts[this.sorting]
 		this.updateList()
-=======
-		let l = this.list
-		this.dics = []
-		Object.keys(dics).forEach((dic) =>{
-			console.log(dics[dic])
-			this.dics.push(new Districting(dic,dics[dic], this));
-		});
-		this.sortList()
->>>>>>> Stashed changes
 	}
 
 	displayDistricting = (d) => {

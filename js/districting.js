@@ -132,11 +132,7 @@ class Districting {
 		createTextElement(div, 'p', 'Total', 'stat-col score')
 		createTextElement(div, 'p', '', 'stat-col')
 		createTextElement(div, 'p', '', 'stat-col')
-<<<<<<< Updated upstream
-		createTextElement(div, 'p', this.score.toFixed(2), 'stat-col')
-=======
 		createTextElement(div, 'p', this.getScore().toFixed(3), 'stat-col')
->>>>>>> Stashed changes
 		statItem = createListItem(div, true, false)
 		this.statsList.appendChild(statItem)
 		
