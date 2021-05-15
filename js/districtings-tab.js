@@ -61,6 +61,13 @@ class DistrictingsTab {
 			$('body').append(aggregatesModal);
 		});
 		$(document).ready(this.makeModal);
+
+		let enactedDiv = htmlElement(this.div,'div');
+		getEnactedDistricting(this.state).then(res => {
+			//enactedDiv.append((new Districting()))
+			console.log("enacated")
+			console.log(res);
+		})
 			
 
 		//Create list
@@ -68,9 +75,11 @@ class DistrictingsTab {
 		this.list.id = "districtList";
 
 		//Box and Whisker Plot Model
-		let aggregates = createTextElement(this.div, 'a', 'Districting Data', 'modal-link',);
-		aggregates.setAttribute('data-bs-toggle', 'modal');
-		aggregates.setAttribute('data-bs-target', '#aggregatesModal');
+		//this.aggregates = createTextElement(this.div, 'a', 'Districting Data', 'modal-link',);
+		let aggDiv = htmlElement(this.div, 'div','d-grid gap-2 col-6 mx-auto submitBtn');
+		this.aggregates = createButton(aggDiv, 'button', 'Aggregate Districtings Data','btn btn-primary btn-sm')
+		this.aggregates.setAttribute('data-bs-toggle', 'modal');
+		this.aggregates.setAttribute('data-bs-target', '#aggregatesModal');
 		let content = this.analysisContent();
 		let aggregatesModal = modalDialog('aggregatesModal', 'Aggregate Districting Data', content);
 
@@ -129,6 +138,7 @@ class DistrictingsTab {
 		this.sorts = dics
 		let plans = {}
 		this.weights = weights
+<<<<<<< Updated upstream
 		for (let sort in this.sorts) {
 			let list = this.sorts[sort]
 			for (let i = 0; i < list.length; i++) {
@@ -149,6 +159,15 @@ class DistrictingsTab {
 	updateDics = () => {
 		this.dics = this.sorts[this.sorting]
 		this.updateList()
+=======
+		let l = this.list
+		this.dics = []
+		Object.keys(dics).forEach((dic) =>{
+			console.log(dics[dic])
+			this.dics.push(new Districting(dic,dics[dic], this));
+		});
+		this.sortList()
+>>>>>>> Stashed changes
 	}
 
 	displayDistricting = (d) => {
@@ -177,6 +196,7 @@ class DistrictingsTab {
 	showDistrictInfo = (d) => {
 		this.div.append(d.infoContainer)
 		this.list.style.display = 'none';
+		this.aggregates.style.display = 'none';
 		for (let c of this.sortDiv.children) {
 			c.style.display = 'none'
 		}
@@ -186,6 +206,7 @@ class DistrictingsTab {
 		d.infoContainer.remove();
 		// reset to default display
 		this.list.style.display = '';
+		this.aggregates.style.display = '';
 		for (let c of this.sortDiv.children) {
 			c.style.display = ''
 		}
@@ -236,6 +257,10 @@ class DistrictingsTab {
 			mode: 'markers',
 			marker: { color: 'red' }
 		}
+	}
+
+	setState = (state) => {
+		this.state=state;
 	}
 
 }

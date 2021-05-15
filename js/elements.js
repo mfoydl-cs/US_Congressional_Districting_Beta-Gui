@@ -228,19 +228,19 @@ function Slider(parent, id, text, min, max, step) {
 
 function createSlider(parent, id, text, min, max, step, abbr) {
 
-  let tr = L.DomUtil.create('tr', '', parent);
+  let tr = L.DomUtil.create('tr', 'd-flex', parent);
 
   //let slider = Slider(tr,id,text,min,max,step);
-  let labelCol = L.DomUtil.create('th', '', tr);
-  let rangeCol = L.DomUtil.create('th', '', tr);
-  let valueCol = L.DomUtil.create('th', '', tr);
+  let labelCol = L.DomUtil.create('div', 'slider-flex-label overflow-ellipsis', tr);
+  let rangeCol = L.DomUtil.create('div', 'slider-flex-slider', tr);
+  let valueCol = L.DomUtil.create('div', 'slider-flex-value', tr);
 
   let range = htmlElement(rangeCol, 'div', 'range');
 
-  let p = L.DomUtil.create('p', '', labelCol)
+  let p = L.DomUtil.create('p', 'overflow-ellipsis', labelCol)
   let abbrEl = L.DomUtil.create('abbr', '', p);
   abbrEl.setAttribute('title', text)
-  abbrEl.innerHTML = abbr
+  abbrEl.innerHTML = abbr;
   //createLabel(labelCol, abbr, id);
 
   let slider = createInput(range, 'range', 'form-range', id);
