@@ -112,6 +112,7 @@ class Districting {
 
 		
 		// populate stats list
+		// TODO this.scores is enum string but weights is different keys
 		for (let score in this.scores) {
 	    	var div = L.DomUtil.create('div', 'd-flex w-100 justify-content-between');
 			let s = this.scores[score];
@@ -122,6 +123,10 @@ class Districting {
 			} else {
 				createTextElement(div, 'p', score, 'stat-col score')
 			}
+			console.log(s)
+			console.log(score)
+			console.log(this.dicTab.weights)
+			console.log(Number(this.dicTab.weights[score]))
 			createTextElement(div, 'p', Number(s).toFixed(3), 'stat-col')
 			createTextElement(div, 'p', Number(this.dicTab.weights[score]).toFixed(3), 'stat-col')
 			createTextElement(div, 'p', Number(s*this.dicTab.weights[score]).toFixed(3), 'stat-col')
@@ -132,7 +137,7 @@ class Districting {
 		createTextElement(div, 'p', 'Total', 'stat-col score')
 		createTextElement(div, 'p', '', 'stat-col')
 		createTextElement(div, 'p', '', 'stat-col')
-		createTextElement(div, 'p', this.getScore().toFixed(3), 'stat-col')
+		createTextElement(div, 'p', this.score.toFixed(3), 'stat-col')
 		statItem = createListItem(div, true, false)
 		this.statsList.appendChild(statItem)
 		
@@ -148,6 +153,7 @@ class Districting {
 
 	// deprecated
 	getScore = () => {
+		return this.score // incase anyone ignores the deprecated comment
 		let score = 0
 		let weights = this.dicTab.weights
 		for (let s in this.scores) {

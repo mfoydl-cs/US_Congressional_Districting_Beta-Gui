@@ -317,9 +317,9 @@ function constraintsTab(state, menu) {
 
     //Compactness and Population Options menu
     var compactnessRadioLabels = [
-        { 'label': 'Graph Compactness', 'value': 'graph', 'checked': true },
-        { 'label': 'Population Fatness', 'value': 'fatness' },
-        { 'label': 'Polsby-Popper', 'value': 'polsby' }
+        { 'label': 'Polsby-Popper', 'value': 'polsby', 'checked': true},
+        { 'label': 'Graph Compactness', 'value': 'graph', 'disabled': true },
+        { 'label': 'Population Fatness', 'value': 'fatness', 'disabled': true }
     ];
     var populationRadioLabels = [
         { 'label': 'Total Population', 'value': 'total', 'checked': true },
@@ -342,6 +342,7 @@ function constraintsTab(state, menu) {
         var data = {}
         data['compactness'] = document.getElementById('compactness-constraint').value;
         data['majMin'] = document.getElementById('majmin-constraint').value;
+        data['majMinThreshold'] = document.getElementById('majmin-threshold').value;
         data['popDiff'] = document.getElementById('population-constraint').value;
         data['cmpMeasure'] = document.querySelector('input[name="compactnessRadio"]:checked').value;
         data['popType'] = document.querySelector('input[name="populationRadio"]:checked').value;
