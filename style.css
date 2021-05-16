@@ -241,3 +241,46 @@ th p{
     max-width: 10%;
     font-weight: bold;
 }
+
+.enacted{
+    border-bottom: 2px solid darkgray;
+    padding: 1vh 0;
+}
+
+#districtList{
+    padding-top: 1vh;
+    overflow-y: scroll;
+    max-height: 55vh;
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+#districtList::-webkit-scrollbar {
+    background-color: rgba(255,255,255,0);
+    width: .5vw;
+}
+
+#districtList:hover::-webkit-scrollbar-track {
+    background: lightgray;
+    border: 1px solid darkgray;
+    border-radius: 50vw;
+}
+
+
+#districtList:hover::-webkit-scrollbar-thumb {
+  background-color: #0D6EFD;
+  border-radius: 6px;
+  border: 3px solid var(--scrollbarBG);
+}
+
+.list-group-item p {
+    margin-bottom: 0;
+}
+
+#sort-label{
+    margin-bottom: 0;
+}
+
+
+

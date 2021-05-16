@@ -75,6 +75,7 @@ L.Control.Menu = L.Control.extend({
 
         this.constraintsData = constraintsDataFormat;
         window.dicTab.setState(this.state);
+        console.log(this.state);
 
         createTab(nav, "Jobs", jobsTab(this.state), 'jobs', true)//Jobs Tab
         createTab(nav, "Constraints", constraintsTab(this.state, this), "constraints", false, true); //Constraints Tab

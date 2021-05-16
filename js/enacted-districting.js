@@ -3,26 +3,22 @@
  * @param {Object} geoJSON geoJSON object representing the district
  * @return {Element} List Item element to add to list
  */
-class Districting {
-	constructor(id, scores, dicTab) {
+class EnactedDistricting {
+	constructor(geoJson, dicTab) {
 		// maybe one day dicTab won't be global...
-		this.id = id;
+		this.id = 'enacted';
+        let id = this.id;
 		this.dicTab = dicTab;
-		this.score = scores.score
-		delete scores.score
-		delete scores.id
-		this.scores = scores;
+        this.geoJSON = geoJson;
 
-		this.geoJSON = null;
+        this.featureGroup = new L.LayerGroup();
 		
-
 		var div = L.DomUtil.create('div');
 		var headerDiv = htmlElement(div, "div", 'd-flex w-100 justify-content-between');
-		createTextElement(headerDiv, "h6", "Districting "+id, "mb-1");
+		createTextElement(headerDiv, "h6", "Enacted Districting ", "mb-1");
 
 		
 
-	
 		this.checkDiv = htmlElement(headerDiv, 'div', '');
 		createLabel(this.checkDiv, '<i>show</i>&nbsp', id + 'Check', 'small');
 		this.check = L.DomUtil.create("input", "form-check-input custom-check", this.checkDiv);
@@ -31,7 +27,8 @@ class Districting {
 		L.DomEvent.on(this.check, 'click', this.checkClicked);
 
 		var contentDiv = htmlElement(div, "div", 'd-flex w-100 justify-content-between');
-		createTextElement(contentDiv, "p", "Score: " + this.score.toFixed(2), "");
+		//createTextElement(contentDiv, "p", "Score: " + this.score.toFixed(2), "");
+        createTextElement(contentDiv, "p", "", "");
 		var link = createTextElement(contentDiv,'a','<em>more info</em>','modal-link')
 		this.listItem = createListItem(div, false, false);
 
@@ -44,7 +41,7 @@ class Districting {
 		var infoContainer = L.DomUtil.create('div');
 		this.infoContainer = infoContainer
 		var infoHeader = htmlElement(infoContainer, 'div','d-flex w-100 justify-content-between');
-		createTextElement(infoHeader, 'h5', "Districting " + id, 'h5');
+		createTextElement(infoHeader, 'h5', "Enacted Districting", 'h5');
 
 		this.infocheckDiv = htmlElement(infoHeader, 'div','');
 		createLabel(this.infocheckDiv, '<i>show</i>&nbsp', id + 'InfoCheck', 'small');
@@ -69,7 +66,7 @@ class Districting {
 		let statItem = createListItem(div, true, false)
 		this.statsList.appendChild(statItem)
 
-		
+		/*
 		// populate stats list
 		for (let score in this.scores) {
 	    	var div = L.DomUtil.create('div', 'd-flex w-100 justify-content-between');
@@ -94,14 +91,16 @@ class Districting {
 		createTextElement(div, 'p', this.getScore().toFixed(3), 'stat-col')
 		statItem = createListItem(div, true, false)
 		this.statsList.appendChild(statItem)
-		
+		*/
 
 		var infoFooter = htmlElement(infoContainer, 'div', 'd-grid gap-2');
 	    var back = createButton(infoFooter, 'button', 'Back', 'btn btn-secondary btn-lg ');
 
+        L.geoJson(geoJson, {
+            onEachFeature: this.processDistrict
+        });
+
 	    L.DomEvent.on(link, 'click', this.dicTab.showDistrictInfo.bind(this.dicTab, this))
-
-
 	    L.DomEvent.on(back, 'click', this.dicTab.showDistrictList.bind(this.dicTab, this))
 	}
 
@@ -126,19 +125,7 @@ class Districting {
 		this.infoCheck.checked = display
 
 		if (display) {
-			console.log(this.geoJSON)
-			if (this.geoJSON == undefined) {
-				console.log('hi?');
-				this.checkDiv.classList = "spinner";
-				this.check.style.display = 'none';
-				this.infocheckDiv.classList = "spinner";
-				this.infoCheck.style.display = 'none';
-				this.getGeoJson();
-			}
-			else {
-				this.dicTab.displayDistricting(this);
-			}
-			
+			this.dicTab.displayDistricting(this);
 		} else {
 			this.dicTab.unselectDistricting()
 		}
@@ -149,16 +136,15 @@ class Districting {
 		var featureJson = L.geoJson(feature);
         featureJson.addTo(this.featureGroup);
 
-        var id = "D"+this.id + "d" + this.count;
+        var id = "D"+this.id + "d"
 	    var div = L.DomUtil.create('div', 'd-flex w-100 justify-content-between');
 	    div.id = id;
 	    //var div = htmlElement(div, "div", 'd-flex w-100 justify-content-between',id);
-	    var p = createTextElement(div, 'p', "District " + this.count);
+	    var p = createTextElement(div, 'p', feature.properties.DIST_NAME);
 	    addDistrictHightlight(featureJson, div);
 	    var item = createListItem(div, true, false);
 
         this.districtList.appendChild(item);
-		this.count+=1;
 	}
 
 	majmin = () => {
@@ -191,29 +177,6 @@ class Districting {
 		}
 		this.majminModal = modalDialog('majminModal' + id, 'Majority-Minority Districts', majminDiv)
 		$('body').append(this.majminModal);
-	}
-
-	getGeoJson = () => {
-		console.log('getting...')
-		retrieveDistricting(this.id).then(response => {
-			console.log('Got')
-			this.geoJSON = response;
-			
-			this.featureGroup = new L.LayerGroup();
-			this.count = 1;
-
-			L.geoJson(this.geoJSON, {
-				onEachFeature: this.processDistrict
-			});
-
-			this.checkDiv.classList = "";
-			this.infocheckDiv.classList = "";
-			this.check.style.display = '';
-			this.infoCheck.style.display = '';
-
-			this.dicTab.displayDistricting(this);
-			console.log('done');
-		});
 	}
 
 }

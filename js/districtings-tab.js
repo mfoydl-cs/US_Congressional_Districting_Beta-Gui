@@ -46,44 +46,49 @@ class DistrictingsTab {
 
 		//Header
 		let headerDiv = htmlElement(this.div, 'div', 'center tabContentTitle mb-3');
-		createTextElement(headerDiv, 'h5', 'Examine Districtings', 'h5');
+
+		//Sort
+		this.sortDiv = htmlElement(this.div, "div", 'd-flex w-100 justify-content-between', 'sortDiv');
+
+		//Enacted
+		this.enactedDiv = htmlElement(this.div, 'div','enacted');
+
+		//DISTRICTING LIST CONTENT
+		this.list = createListGroup(this.div);
+		this.list.id = "districtList";
+
+		//Boxplot Button
+		this.aggDiv = htmlElement(this.div, 'div', 'd-grid gap-2 col-6 mx-auto submitBtn');
 
 		
-		//Div for sorting
-		this.sortDiv = htmlElement(this.div, "div", 'd-flex w-100 justify-content-between','sortDiv');
+		// HEADER CONTENT
+		createTextElement(headerDiv, 'h5', 'Examine Districtings', 'h5');
+		
+		//SORTING CONTENT
 		createTextElement(this.sortDiv, "p", "Sorted by: " + sortNames[this.sorting], "", 'sort-label');
 		let sortBtn = createButton(this.sortDiv, 'button', 'Sort', 'btn btn-outline-primary btn-sm modal-link');
 		sortBtn.setAttribute('data-bs-toggle', 'modal');
 		sortBtn.setAttribute('data-bs-target', '#sortModal');
+
 		
-		//Create Sorting popup
-		$(document).ready(() => {
-			$('body').append(aggregatesModal);
-		});
-		$(document).ready(this.makeModal);
+		
+		
+		
+		//BOXPLOT MODAL
+		this.makeAggregatesModal() //Create boxplot aggregate Modal Window
 
-		let enactedDiv = htmlElement(this.div,'div');
-		getEnactedDistricting(this.state).then(res => {
-			//enactedDiv.append((new Districting()))
-			console.log("enacated")
-			console.log(res);
-		})
-			
+		$(document).ready(() => {$('body').append(this.aggregatesModal);}); //Add boxplot modal to DOM
+	}
 
-		//Create list
-		this.list = createListGroup(this.div);
-		this.list.id = "districtList";
-
+	makeAggregatesModal = () => {
 		//Box and Whisker Plot Model
 		//this.aggregates = createTextElement(this.div, 'a', 'Districting Data', 'modal-link',);
-		let aggDiv = htmlElement(this.div, 'div','d-grid gap-2 col-6 mx-auto submitBtn');
-		this.aggregates = createButton(aggDiv, 'button', 'Aggregate Districtings Data','btn btn-primary btn-sm')
+		this.aggregates = createButton(this.aggDiv, 'button', 'Aggregate Districtings Data', 'btn btn-primary btn-sm')
 		this.aggregates.setAttribute('data-bs-toggle', 'modal');
 		this.aggregates.setAttribute('data-bs-target', '#aggregatesModal');
 		let content = this.analysisContent();
-		let aggregatesModal = modalDialog('aggregatesModal', 'Aggregate Districting Data', content);
+		this.aggregatesModal = modalDialog('aggregatesModal', 'Aggregate Districting Data', content);
 
-		// Get Summary Info
 		const data = {
 			'count': { 'label': 'Districtings Returned: ', 'value': 1000 },
 			'avg-compactness': { 'label': 'Average Compactness: ', 'type': '', 'value': '.92 [Polsby-Popper]' },
@@ -102,10 +107,9 @@ class DistrictingsTab {
 				value.innerHTML += "(" + data[key].type + ")";
 			}
 		});
-
 	}
 
-	makeModal = () => {
+	makeSortModal = () => {
 		// create sortModal
 		let sortRadioLabels = []
 		for (let sort in sortNames) {
@@ -132,6 +136,9 @@ class DistrictingsTab {
 		while (this.list.firstChild) {
 			this.list.removeChild(this.list.firstChild)
 		}
+		this.enactedDiv.innerHTML = '';
+		this.enactedDiv.append(this.enacted);
+
 	}
 
 	setDistricts = (dics, weights) => {
@@ -190,6 +197,7 @@ class DistrictingsTab {
 		this.div.append(d.infoContainer)
 		this.list.style.display = 'none';
 		this.aggregates.style.display = 'none';
+		this.enactedDiv.style.display = 'none';
 		for (let c of this.sortDiv.children) {
 			c.style.display = 'none'
 		}
@@ -200,6 +208,7 @@ class DistrictingsTab {
 		// reset to default display
 		this.list.style.display = '';
 		this.aggregates.style.display = '';
+		this.enactedDiv.style.display = '';
 		for (let c of this.sortDiv.children) {
 			c.style.display = ''
 		}
@@ -253,7 +262,15 @@ class DistrictingsTab {
 	}
 
 	setState = (state) => {
-		this.state=state;
+		//ENACTED CONTENT
+		getEnactedDistricting(state).then(res => {
+			this.makeEnacted(JSON.parse(res.enacted));
+		})
+	}
+
+	makeEnacted = (enacted) => {
+		this.enacted = new EnactedDistricting(enacted, this).listItem;
+		this.enactedDiv.append(this.enacted);
 	}
 
 }
