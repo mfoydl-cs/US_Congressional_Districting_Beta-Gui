@@ -13,68 +13,22 @@ class Districting {
 		delete scores.id
 		this.scores = scores;
 
-		retrieveDistricting(id).then(response => {
-			this.geoJSON = response;
-
-			this.featureGroup = new L.LayerGroup();
-			
-			this.count = 1;
-
-			L.geoJson(this.geoJSON, {
-				onEachFeature: this.processDistrict
-			});
-
-			// make majmin modal
-			let majminDiv = L.DomUtil.create('div')
-			let table = htmlElement(majminDiv, 'table')
-			let row = htmlElement(table, 'tr')
-			let name = htmlElement(row, 'td')
-			name.innerHTML = "District Name"
-			let pop = htmlElement(row, 'td')
-			pop.innerHTML = "Population"
-			let minPop = htmlElement(row, 'td')
-			minPop.innerHTML = "Minority Population"
-			let minPer = htmlElement(row, 'td')
-			minPer.innerHTML = "Minority Percentage"
-			for (let d of this.geoJSON.features) {
-				let row = htmlElement(table, 'tr')
-				let name = htmlElement(row, 'td')
-				if ('NAMELSAD20' in d.properties) {
-					name.innerHTML = d.properties.NAMELSAD20
-				} else {
-					name.innerHTML = d.properties.NAMELSAD10
-				}
-				let pop = htmlElement(row, 'td')
-				pop.innerHTML = d.properties.population
-				let minPop = htmlElement(row, 'td')
-				minPop.innerHTML = d.properties.minorityPop
-				let minPer = htmlElement(row, 'td')
-				minPer.innerHTML = (100 * d.properties.minorityPop / d.properties.population).toFixed(2) + '%'
-			}
-			this.majminModal = modalDialog('majminModal' + id, 'Majority-Minority Districts', majminDiv)
-			$('body').append(this.majminModal);
-
-			this.checkDiv.classList = "";
-			this.infocheckDiv.classList = "";
-
-			createLabel(this.checkDiv, '<i>show</i>&nbsp', id + 'Check', 'small');
-			this.check = L.DomUtil.create("input", "form-check-input custom-check", this.checkDiv);
-			this.check.id = id + "Check";
-			this.check.type = "checkbox";
-			L.DomEvent.on(this.check, 'click', this.checkClicked);
-			
-			createLabel(this.infocheckDiv, '<i>show</i>&nbsp', id + 'InfoCheck', 'small');
-			this.infoCheck = L.DomUtil.create("input", "form-check-input custom-check", this.infocheckDiv);
-			this.infoCheck.id = id+"InfoCheck";
-			this.infoCheck.type = "checkbox";
-			L.DomEvent.on(this.infoCheck, 'click', this.checkClicked);
-		});
+		this.geoJSON = null;
+		
 
 		var div = L.DomUtil.create('div');
 		var headerDiv = htmlElement(div, "div", 'd-flex w-100 justify-content-between');
 		createTextElement(headerDiv, "h5", "Districting "+id, "mb-1");
 
-		this.checkDiv = htmlElement(headerDiv, 'div', 'spinner');
+		
+
+	
+		this.checkDiv = htmlElement(headerDiv, 'div', '');
+		createLabel(this.checkDiv, '<i>show</i>&nbsp', id + 'Check', 'small');
+		this.check = L.DomUtil.create("input", "form-check-input custom-check", this.checkDiv);
+		this.check.id = id + "Check";
+		this.check.type = "checkbox";
+		L.DomEvent.on(this.check, 'click', this.checkClicked);
 
 		var contentDiv = htmlElement(div, "div", 'd-flex w-100 justify-content-between');
 		createTextElement(contentDiv, "p", "Score: " + this.score.toFixed(2), "");
@@ -92,7 +46,12 @@ class Districting {
 		var infoHeader = htmlElement(infoContainer, 'div','d-flex w-100 justify-content-between');
 		createTextElement(infoHeader, 'h5', "Districting " + id, 'h5');
 
-		this.infocheckDiv = htmlElement(infoHeader, 'div','spinner');
+		this.infocheckDiv = htmlElement(infoHeader, 'div','');
+		createLabel(this.infocheckDiv, '<i>show</i>&nbsp', id + 'InfoCheck', 'small');
+		this.infoCheck = L.DomUtil.create("input", "form-check-input custom-check", this.infocheckDiv);
+		this.infoCheck.id = id + "InfoCheck";
+		this.infoCheck.type = "checkbox";
+		L.DomEvent.on(this.infoCheck, 'click', this.checkClicked);
 
 		var infoBody = htmlElement(infoContainer, 'div');
 
@@ -165,8 +124,21 @@ class Districting {
 	toggleDisplay = (display) => {
 		this.check.checked = display
 		this.infoCheck.checked = display
+
 		if (display) {
-			this.dicTab.displayDistricting(this)
+			console.log(this.geoJSON)
+			if (this.geoJSON == undefined) {
+				console.log('hi?');
+				this.checkDiv.classList = "spinner";
+				this.check.style.display = 'none';
+				this.infocheckDiv.classList = "spinner";
+				this.infoCheck.style.display = 'none';
+				this.getGeoJson();
+			}
+			else {
+				this.dicTab.displayDistricting(this);
+			}
+			
 		} else {
 			this.dicTab.unselectDistricting()
 		}
@@ -187,6 +159,61 @@ class Districting {
 
         this.districtList.appendChild(item);
 		this.count+=1;
+	}
+
+	majmin = () => {
+		// make majmin modal
+		let majminDiv = L.DomUtil.create('div')
+		let table = htmlElement(majminDiv, 'table')
+		let row = htmlElement(table, 'tr')
+		let name = htmlElement(row, 'td')
+		name.innerHTML = "District Name"
+		let pop = htmlElement(row, 'td')
+		pop.innerHTML = "Population"
+		let minPop = htmlElement(row, 'td')
+		minPop.innerHTML = "Minority Population"
+		let minPer = htmlElement(row, 'td')
+		minPer.innerHTML = "Minority Percentage"
+		for (let d of this.geoJSON.features) {
+			let row = htmlElement(table, 'tr')
+			let name = htmlElement(row, 'td')
+			if ('NAMELSAD20' in d.properties) {
+				name.innerHTML = d.properties.NAMELSAD20
+			} else {
+				name.innerHTML = d.properties.NAMELSAD10
+			}
+			let pop = htmlElement(row, 'td')
+			pop.innerHTML = d.properties.population
+			let minPop = htmlElement(row, 'td')
+			minPop.innerHTML = d.properties.minorityPop
+			let minPer = htmlElement(row, 'td')
+			minPer.innerHTML = (100 * d.properties.minorityPop / d.properties.population).toFixed(2) + '%'
+		}
+		this.majminModal = modalDialog('majminModal' + id, 'Majority-Minority Districts', majminDiv)
+		$('body').append(this.majminModal);
+	}
+
+	getGeoJson = () => {
+		console.log('getting...')
+		retrieveDistricting(this.id).then(response => {
+			console.log('Got')
+			this.geoJSON = response;
+			
+			this.featureGroup = new L.LayerGroup();
+			this.count = 1;
+
+			L.geoJson(this.geoJSON, {
+				onEachFeature: this.processDistrict
+			});
+
+			this.checkDiv.classList = "";
+			this.infocheckDiv.classList = "";
+			this.check.style.display = '';
+			this.infoCheck.style.display = '';
+
+			this.dicTab.displayDistricting(this);
+			console.log('done');
+		});
 	}
 
 }
