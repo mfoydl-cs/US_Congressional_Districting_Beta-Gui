@@ -6,6 +6,7 @@
 class Districting {
 	constructor(id, scores, dicTab) {
 		// maybe one day dicTab won't be global...
+		this.id = id;
 		this.dicTab = dicTab;
 		this.score = scores.score
 		delete scores.score
@@ -17,6 +18,8 @@ class Districting {
 
 			this.featureGroup = new L.LayerGroup();
 			
+			this.count = 1;
+
 			L.geoJson(this.geoJSON, {
 				onEachFeature: this.processDistrict
 			});
@@ -69,7 +72,7 @@ class Districting {
 
 		var div = L.DomUtil.create('div');
 		var headerDiv = htmlElement(div, "div", 'd-flex w-100 justify-content-between');
-		createTextElement(headerDiv, "h5", id, "mb-1");
+		createTextElement(headerDiv, "h5", "Districting "+id, "mb-1");
 
 		this.checkDiv = htmlElement(headerDiv, 'div', 'spinner');
 
@@ -87,7 +90,7 @@ class Districting {
 		var infoContainer = L.DomUtil.create('div');
 		this.infoContainer = infoContainer
 		var infoHeader = htmlElement(infoContainer, 'div','d-flex w-100 justify-content-between');
-		createTextElement(infoHeader, 'h5', id, 'h5');
+		createTextElement(infoHeader, 'h5', "Districting " + id, 'h5');
 
 		this.infocheckDiv = htmlElement(infoHeader, 'div','spinner');
 
@@ -111,17 +114,17 @@ class Districting {
 		// populate stats list
 		for (let score in this.scores) {
 	    	var div = L.DomUtil.create('div', 'd-flex w-100 justify-content-between');
-			let s = this.scores[score]
-			if (score == 'majmin') {
+			let s = this.scores[score];
+			if (score == 'MAJMIN') {
 				let link = createTextElement(div, 'a', 'Maj-Min Districts', 'stat-col score modal-link')
 				link.setAttribute('data-bs-toggle', 'modal');
 				link.setAttribute('data-bs-target', '#majminModal' + id);
 			} else {
 				createTextElement(div, 'p', score, 'stat-col score')
 			}
-			createTextElement(div, 'p', s, 'stat-col')
-			createTextElement(div, 'p', this.dicTab.weights[score], 'stat-col')
-			createTextElement(div, 'p', s*this.dicTab.weights[score], 'stat-col')
+			createTextElement(div, 'p', Number(s).toFixed(3), 'stat-col')
+			createTextElement(div, 'p', Number(this.dicTab.weights[score]).toFixed(3), 'stat-col')
+			createTextElement(div, 'p', Number(s*this.dicTab.weights[score]).toFixed(3), 'stat-col')
 			let statItem = createListItem(div, true, false)
 			this.statsList.appendChild(statItem)
 		}
@@ -129,7 +132,7 @@ class Districting {
 		createTextElement(div, 'p', 'Total', 'stat-col score')
 		createTextElement(div, 'p', '', 'stat-col')
 		createTextElement(div, 'p', '', 'stat-col')
-		createTextElement(div, 'p', this.score.toFixed(2), 'stat-col')
+		createTextElement(div, 'p', this.getScore().toFixed(3), 'stat-col')
 		statItem = createListItem(div, true, false)
 		this.statsList.appendChild(statItem)
 		
@@ -174,16 +177,16 @@ class Districting {
 		var featureJson = L.geoJson(feature);
         featureJson.addTo(this.featureGroup);
 
-
-        var id = "CD" + feature.properties.CDSESSN + feature.properties["CD" + feature.properties.CDSESSN + "FP"]
+        var id = "D"+this.id + "d" + this.count;
 	    var div = L.DomUtil.create('div', 'd-flex w-100 justify-content-between');
 	    div.id = id;
 	    //var div = htmlElement(div, "div", 'd-flex w-100 justify-content-between',id);
-	    var p = createTextElement(div, 'p', "District " + feature.properties["CD" + feature.properties.CDSESSN + "FP"])
+	    var p = createTextElement(div, 'p', "District " + this.count);
 	    addDistrictHightlight(featureJson, div);
 	    var item = createListItem(div, true, false);
 
-        this.districtList.appendChild(item)
+        this.districtList.appendChild(item);
+		this.count+=1;
 	}
 
 }

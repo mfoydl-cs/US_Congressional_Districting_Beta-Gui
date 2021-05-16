@@ -77,6 +77,10 @@ body {
     border-bottom: 2px solid white;
 }
 
+.cust-nav-link:not([disabled]){
+    font-weight: bold;
+}
+
 .center{
     text-align: center;
 }
@@ -216,4 +220,24 @@ th p{
   border: 2px solid #ccc;
   border-top-color: #000;
   animation: spinner .6s linear infinite;
+}
+
+.overflow-ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.slider-flex-label{
+    min-width: 45%;
+    max-width: 45%;
+    font-weight: bold;
+}
+.slider-flex-slider{
+    flex: 1;
+}
+.slider-flex-value{
+    min-width: 10%;
+    max-width: 10%;
+    font-weight: bold;
 }

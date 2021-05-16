@@ -74,12 +74,14 @@ L.Control.Menu = L.Control.extend({
         var nav = createTabNav(div, "menuNav");
 
         this.constraintsData = constraintsDataFormat;
+        window.dicTab.setState(this.state);
 
         createTab(nav, "Jobs", jobsTab(this.state), 'jobs', true)//Jobs Tab
         createTab(nav, "Constraints", constraintsTab(this.state, this), "constraints", false, false); //Constraints Tab
         createTab(nav, "Constrain Results", constraintsSummaryTab(this.constraintsData), 'constraintsSummary', false, true)//Summary Tab
         createTab(nav, "Measures", measuresTab(this.state), "measures", false, false); //Measures Tab
         createTab(nav, "Top Districtings", window.dicTab.div, "districts", false, false); //Districtings Tab
+        
 
         $(document).ready(function () {
             $('#constraintsSummary-tab').hide(); //Hide the physical tab, content accesssed through buttons
@@ -297,10 +299,10 @@ function constraintsTab(state, menu) {
     var body = L.DomUtil.create('tbody', '', table);
 
     //Constraints Sliders
-    createSlider(body, 'compactness-constraint', 'Compactness', 0, 1, 0.1,'Comp');
-    createSlider(body, 'majmin-constraint', 'Majority-Minority Districts (>=)', 0, 10, 1,'Maj-Min');
-    createSlider(body, 'majmin-threshold', 'Majority-Minority Threshold ', 0, 1, 0.1, 'Maj-Min-Thrsh');
-    createSlider(body, 'population-constraint', 'Population Difference (<=%)', 0, 35, 0.1,"Pop-Diff");
+    createSlider(body, 'compactness-constraint', 'Compactness', 0, 1, 0.1,'Compactness');
+    createSlider(body, 'majmin-constraint', 'Majority-Minority Districts (>=)', 0, 10, 1,'Majority-Minority Districts (>=)');
+    createSlider(body, 'majmin-threshold', 'Majority-Minority Threshold', 0, 1, 0.1, 'Majority-Minority Threshold');
+    createSlider(body, 'population-constraint', 'Population Difference (<=%)', 0, 35, 0.1,"Population Difference (<=%)");
 
     //Incumbents Protection Menu
     var incumbentsDiv = htmlElement(constraints, 'div', 'container')
@@ -400,14 +402,18 @@ function measuresTab(state) {
     var measures = htmlElement(div, 'div', 'container');
 
     //Slider table
-    var table = L.DomUtil.create('table', 'table table-sm slider-table align-middle', measures);
+    var table = L.DomUtil.create('table', 'table slider-table align-middle', measures);
+    let cols = "<colgroup><col class='slider-flex-label overflow-ellipsis' span='1'><col class='slider-flex-slider' span='1'><col class='slider-flex-value' span='1'></colgroup>";
+    table.innerHTML += cols;
     var body = L.DomUtil.create('tbody', '', table);
 
-    createSlider(body, 'population-equality', 'Population Equality', 0, 1.0, 0.1,'Pop-Eq');
-    createSlider(body, 'dev-average', 'Deviation from Average Districting', 0, 1, 0.1, 'Avg-Dev');
-    createSlider(body, 'dev-enacted-geo', 'Deviation from Enacted Plan Geometry', 0, 1, 0.1, 'Enacted-Dev-Geo');
-    createSlider(body, 'dev-enacted-pop', 'Deviation from Enacted Plan Population', 0, 1, 0.1, 'Enacted-Dev-Pop');
-    createSlider(body, 'compactness', 'Compactness', 0, 1, 0.1, 'Compact');
+
+    createSlider(body, 'population-equality', 'Population Equality', 0, 1.0, 0.1,'Population Equality');
+    createSlider(body, 'avgerage-deviation', 'Deviation from Average Districting', 0, 1, 0.1, 'Deviation from Average Districting');
+    createSlider(body, 'enacted-deviation', 'Deviation from Enacted Plan', 0, 1, 0.1, 'Deviation from Enacted Plan');
+    createSlider(body, 'compactness', 'Compactness', 0, 1, 0.1, 'Compactness');
+    createSlider(body, 'political-fairness', 'Political Fairness', 0, 1, 0.1, 'Political Fairness');
+    createSlider(body, 'split-counties', 'Split Counties', 0, 1, 0.1, 'Split Counties');
 
     //Submit button
     var subDiv = htmlElement(div, 'div', 'd-grid gap-2 col-6 mx-auto submitBtn')

@@ -95,6 +95,11 @@ function retrieveDistricting(id) {
     return stuff;
 }
 
+function getEnactedDistricting(state){
+    return $.get("http://localhost:8080/rockies/api/states/enacted",
+        { state: state });
+}
+
 function submitWeights(weights) {
     return $.post(
         "http://localhost:8080/rockies/api/fjobs/weights",
