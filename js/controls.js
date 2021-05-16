@@ -82,7 +82,6 @@ L.Control.Menu = L.Control.extend({
         createTab(nav, "Measures", measuresTab(this.state), "measures", false, true); //Measures Tab
         createTab(nav, "Top Districtings", window.dicTab.div, "districts", false, true); //Districtings Tab
         
-
         $(document).ready(function () {
             $('#constraintsSummary-tab').hide(); //Hide the physical tab, content accesssed through buttons
         });
@@ -312,9 +311,16 @@ function constraintsTab(state, menu) {
     incumbents.setAttribute('data-bs-toggle', 'modal');
     incumbents.setAttribute('data-bs-target', '#incumbentsModal');
 
-    var incumbentsList = incumbentsContent(state);
-    var incumbentsModal = modalDialog('incumbentsModal', 'Protect Incumbents', incumbentsList);
-    $('body').append(incumbentsModal);
+    let incumbentsList = incumbentsContent(state);
+    console.log('incumbents')
+    if ($('#incumbentsModal').length==0){
+        
+        let incumbentsModal = modalDialog('incumbentsModal', 'Protect Incumbents', incumbentsList);
+        $('body').append(incumbentsModal);
+    }
+    else{
+        $('#incumbentsModal div div .modal-body').html(incumbentsList)
+    }
 
     //Compactness and Population Options menu
     var compactnessRadioLabels = [
@@ -432,7 +438,7 @@ function measuresTab(state) {
 
 function incumbentsContent(state) {
 
-    var div = L.DomUtil.create('div');
+    let div = L.DomUtil.create('div');
     getIncumbents(state).then(response => {
         statesObj[state].senators = response.senators
         statesObj[state].reps = response.representatives
@@ -442,8 +448,6 @@ function incumbentsContent(state) {
             let elem = createSwitch(div, senator.name, senator.name + " <em>[" + senator.party + "]</em>");
             elem.classList.add(senator.party);
             elem.classList.add('grayed');
-            //elem.setAttribute('checked', 'true');
-            elem.setAttribute('checked', 'false');
             L.DomEvent.on(elem, 'click', function (ev) {
                 if (this.getAttribute('checked') === 'true') {
                     this.setAttribute('checked', 'false');
@@ -457,8 +461,6 @@ function incumbentsContent(state) {
             let elem = createSwitch(div, rep.name, rep.name + " -<em> " + rep.district + ' District ' + " [" + rep.party + "]</em>");
             elem.classList.add(rep.party);
             elem.classList.add('grayed');
-            //elem.setAttribute('checked', 'true');
-            elem.setAttribute('checked', 'false');
             L.DomEvent.on(elem, 'click', function (ev) {
                 if (this.getAttribute('checked') === 'true') {
                     this.setAttribute('checked', 'false');
