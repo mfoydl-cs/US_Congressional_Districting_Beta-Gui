@@ -407,13 +407,11 @@ function measuresTab(state) {
     table.innerHTML += cols;
     var body = L.DomUtil.create('tbody', '', table);
 
-
-    createSlider(body, 'population-equality', 'Population Equality', 0, 1.0, 0.1,'Population Equality');
-    createSlider(body, 'avgerage-deviation', 'Deviation from Average Districting', 0, 1, 0.1, 'Deviation from Average Districting');
-    createSlider(body, 'enacted-deviation', 'Deviation from Enacted Plan', 0, 1, 0.1, 'Deviation from Enacted Plan');
-    createSlider(body, 'compactness', 'Compactness', 0, 1, 0.1, 'Compactness');
-    createSlider(body, 'political-fairness', 'Political Fairness', 0, 1, 0.1, 'Political Fairness');
-    createSlider(body, 'split-counties', 'Split Counties', 0, 1, 0.1, 'Split Counties');
+	createSlider(body, 'population-equality', 'Population Equality', 0, 1.0, 0.1,'Pop-Eq');
+	createSlider(body, 'dev-average', 'Deviation from Average Districting', 0, 1, 0.1, 'Avg-Dev');
+	createSlider(body, 'dev-enacted-geo', 'Deviation from Enacted Plan Geometry', 0, 1, 0.1, 'Enacted-Dev-Geo');
+	createSlider(body, 'dev-enacted-pop', 'Deviation from Enacted Plan Population', 0, 1, 0.1, 'Enacted-Dev-Pop');
+	createSlider(body, 'compactness', 'Compactness', 0, 1, 0.1, 'Compact');
 
     //Submit button
     var subDiv = htmlElement(div, 'div', 'd-grid gap-2 col-6 mx-auto submitBtn')
