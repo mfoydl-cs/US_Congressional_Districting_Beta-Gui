@@ -136,6 +136,8 @@ class DistrictingsTab {
 
 	setDistricts = (dics, weights) => {
 		this.sorts = dics
+		console.log("?")
+		console.log(this.sorts)
 		let plans = {}
 		this.weights = weights
 		for (let sort in this.sorts) {
@@ -156,7 +158,7 @@ class DistrictingsTab {
 	}
 
 	updateDics = () => {
-		this.dics = this.sorts[this.sorting]
+		this.dics = this.sorts[this.sorting];
 		this.updateList()
 	}
 
@@ -178,6 +180,7 @@ class DistrictingsTab {
 	updateList = () => {
 		this.clearList()
 		//this.dics.sort(sortings[this.sorting].cmp)
+		console.log(this.dics)
 		for (let dic of this.dics) {
 			this.list.append(dic.listItem);
 		}

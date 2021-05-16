@@ -77,10 +77,10 @@ L.Control.Menu = L.Control.extend({
         window.dicTab.setState(this.state);
 
         createTab(nav, "Jobs", jobsTab(this.state), 'jobs', true)//Jobs Tab
-        createTab(nav, "Constraints", constraintsTab(this.state, this), "constraints", false, false); //Constraints Tab
+        createTab(nav, "Constraints", constraintsTab(this.state, this), "constraints", false, true); //Constraints Tab
         createTab(nav, "Constrain Results", constraintsSummaryTab(this.constraintsData), 'constraintsSummary', false, true)//Summary Tab
-        createTab(nav, "Measures", measuresTab(this.state), "measures", false, false); //Measures Tab
-        createTab(nav, "Top Districtings", window.dicTab.div, "districts", false, false); //Districtings Tab
+        createTab(nav, "Measures", measuresTab(this.state), "measures", false, true); //Measures Tab
+        createTab(nav, "Top Districtings", window.dicTab.div, "districts", false, true); //Districtings Tab
         
 
         $(document).ready(function () {
@@ -305,9 +305,10 @@ function constraintsTab(state, menu) {
     createSlider(body, 'population-constraint', 'Population Difference (<=%)', 0, 35, 0.1,"Population Difference (<=%)");
 
     //Incumbents Protection Menu
-    var incumbentsDiv = htmlElement(constraints, 'div', 'container')
-    createLabel(incumbentsDiv, 'Incumbent Protection: &emsp;&emsp;', 'incumbentsLink')
-    var incumbents = createTextElement(incumbentsDiv, 'a', 'Set Protections', 'modal-link', 'incumbentsLink');
+    var incumbentsDiv = htmlElement(constraints, 'div', 'container d-grid gap-2')
+    //createLabel(incumbentsDiv, 'Incumbent Protection: &emsp;&emsp;', 'incumbentsLink')
+    //var incumbents = createTextElement(incumbentsDiv, 'a', 'Set Protections', 'modal-link', 'incumbentsLink');
+    let incumbents = createButton(incumbentsDiv,'button','Set Incumbent Protections','btn btn-primary btn-sm')
     incumbents.setAttribute('data-bs-toggle', 'modal');
     incumbents.setAttribute('data-bs-target', '#incumbentsModal');
 
@@ -493,17 +494,7 @@ function submitMeasures(state, weights) {
     dicTab.clearList()
 
     submitWeights(weights).then(response => {
-        /*
-        response['scores'] = {
-            "compactness": 0.1,
-            "popEquality": 0.8,
-            "splitCounties": 1,
-            "devFromAvg": 0.9,
-            "devFromEnactedArea": 0.4,
-            "devFromEnactedPop": 0.7,
-            "fairness": 0.3,
-            "majmin": 1
-        }*/
+        console.log(response);
         var districts = response;
         dicTab.setDistricts(districts, weights);
         dicTab.generateBoxplot();
