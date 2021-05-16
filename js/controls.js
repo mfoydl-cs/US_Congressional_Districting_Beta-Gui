@@ -500,7 +500,6 @@ function submitMeasures(state, weights) {
             "fairness": 0.3,
             "majmin": 1
         }*/
-        console.log(response);
         var districts = response;
         dicTab.setDistricts(districts, weights);
         dicTab.generateBoxplot();
@@ -532,7 +531,6 @@ function selectJob(job) {
 
 function submitConstraints(constraints, menu) {
     constrainJob(constraints).then(response => {
-        console.log(response);
         menu.setConstraintsData(response);
         switchTabContent('constraints-tab', 'constraintsSummary');
         districtLayer.clearLayers();

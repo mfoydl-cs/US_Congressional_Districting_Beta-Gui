@@ -63,7 +63,6 @@ function getJobsSummary(state){
  * @returns Summary results
  */
 function constrainJob(constraints){
-    console.log(constraints)
     return $.post(
         "http://localhost:8080/rockies/api/jobs/constraints",
         constraints
