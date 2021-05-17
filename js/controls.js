@@ -299,7 +299,7 @@ function constraintsTab(state, menu) {
     var body = L.DomUtil.create('tbody', '', table);
 
     //Constraints Sliders
-    createSlider(body, 'compactness-constraint', 'Compactness', 0, 1, 0.1,'Compactness');
+    createSlider(body, 'compactness-constraint', 'Compactness', 0, 1, 0.01,'Compactness');
     createSlider(body, 'majmin-constraint', 'Majority-Minority Districts (>=)', 0, 10, 1,'Majority-Minority Districts (>=)');
     createSlider(body, 'majmin-threshold', 'Majority-Minority Threshold', 0, 1, 0.1, 'Majority-Minority Threshold');
     createSlider(body, 'population-constraint', 'Population Difference (<=%)', 0, 35, 0.1,"Population Difference (<=%)");
@@ -394,7 +394,7 @@ function constraintsSummaryTab(data, menu) {
     var back = createButton(left, 'button', 'Back', 'btn btn-secondary btn-lg');
     var next = createButton(right, 'button', 'Next', 'btn btn-primary btn-lg');
 
-    L.DomEvent.on(back, 'click', function (ev) { switchTabContent('constraints-tab', 'constraints'); disableTab('measures'); disableTab('districts') })
+    L.DomEvent.on(back, 'click', function (ev) { switchTabContent('constraints-tab', 'constraints'); disableTab('measures'); disableTab('districts') });
     L.DomEvent.on(next, 'click', function (ev) { switchTabs('measures') });
 
     return container;
