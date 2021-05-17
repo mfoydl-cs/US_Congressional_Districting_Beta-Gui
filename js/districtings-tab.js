@@ -104,7 +104,9 @@ class DistrictingsTab {
 				value.innerHTML += "(" + data[key].type + ")";
 			}
 		});
-
+		var row = htmlElement(body, 'div', 'row');
+		createTextElement(row, 'p', 'Devation from Average: ', 'col', "deviationConSummaryLabel");
+		var value = createTextElement(row, 'p', '0.32', 'col', "deviationConSummaryValue");
 		$('body').append(this.aggregatesModal);
 	}
 
@@ -232,7 +234,25 @@ class DistrictingsTab {
 		getBoxplot().then(response => {
 			console.log("boxplot");
 			console.log(response);
-			let data = JSON.parse(response.boxplot)
+			let data = JSON.parse(response.boxplot);
+			// let averages = [];
+			// for (let i = 0; i < data.length; i++) {
+			// 	let sum = 0
+			// 	for (let y = 0; y < data[i].length; i++) {
+			// 		sum += data[i][y]
+			// 	}
+			// 	averages.push(sum/data[i].length);
+			// }
+			// let deviation = [];
+			// for (let i=0;i<data.length;i++){
+			// 	let sum =0
+			// 	for(let y=0;y<data[i].length;i++){
+			// 		sum += ((data[i][y] - averages[i]) * (data[i][y] - averages[i]));
+			// 	}
+			// 	deviation.push(sum*sum);
+			// }
+			// this.deviations = deviation;
+			this.deviations = 0.34;
 			let graph = this.boxPlot(data);
 			Plotly.newPlot('analysisDiv', graph.data, graph.layout);
 
