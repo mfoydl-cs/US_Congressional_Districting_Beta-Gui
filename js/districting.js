@@ -3,6 +3,30 @@
  * @param {Object} geoJSON geoJSON object representing the district
  * @return {Element} List Item element to add to list
  */
+
+var measureNames = {
+	"COMPACT_POLPOP": {
+		"name": "Compactness",
+		"key": "compactness"
+	},
+	"POP_EQUAL": {
+		"key": "population-equality",
+		"name": "Population Equality"
+	},
+	"DEV_AVG": {
+		"name": "Deviation from Average",
+		"key": "dev-average"
+	},
+	"DEV_ENACTED_GEO": {
+		"name": "Deviation from Enacted Geometry",
+		"key": "dev-enacted-geo"
+	},
+	"DEV_ENACTED_POP": {
+		"name": "Deviation from Enacted Population",
+		"key": "dev-enacted-pop"
+	}
+}
+
 class Districting {
 	constructor(id, scores, dicTab) {
 		// maybe one day dicTab won't be global...
@@ -79,16 +103,14 @@ class Districting {
 				let link = createTextElement(div, 'a', 'Maj-Min Districts', 'stat-col score modal-link')
 				link.setAttribute('data-bs-toggle', 'modal');
 				link.setAttribute('data-bs-target', '#majminModal' + id);
+				createTextElement(div, 'p', Number(s).toFixed(0), 'stat-col')
 			} else {
-				createTextElement(div, 'p', score, 'stat-col score')
+				createTextElement(div, 'p', measureNames[score]['name'], 'stat-col score')
+				let key = measureNames[score]['key']
+				createTextElement(div, 'p', Number(s).toFixed(3), 'stat-col')
+				createTextElement(div, 'p', Number(this.dicTab.weights[key]).toFixed(3), 'stat-col')
+				createTextElement(div, 'p', Number(s*this.dicTab.weights[key]).toFixed(3), 'stat-col')
 			}
-			console.log(s)
-			console.log(score)
-			console.log(this.dicTab.weights)
-			console.log(Number(this.dicTab.weights[score]))
-			createTextElement(div, 'p', Number(s).toFixed(3), 'stat-col')
-			createTextElement(div, 'p', Number(this.dicTab.weights[score]).toFixed(3), 'stat-col')
-			createTextElement(div, 'p', Number(s*this.dicTab.weights[score]).toFixed(3), 'stat-col')
 			let statItem = createListItem(div, true, false)
 			this.statsList.appendChild(statItem)
 		}
