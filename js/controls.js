@@ -354,7 +354,7 @@ function constraintsTab(state, menu) {
         data['popDiff'] = document.getElementById('population-constraint').value;
         data['cmpMeasure'] = document.querySelector('input[name="compactnessRadio"]:checked').value;
         data['popType'] = document.querySelector('input[name="populationRadio"]:checked').value;
-		data['minority'] = document.getElementById('minoritySelect').value
+        data['minority'] = document.getElementById('minoritySelect').value;
         var incumbentData = {};
         statesObj[state]['senators'].forEach(function (senator) {
             incumbentData[senator.name] = document.getElementById(senator.name).checked;

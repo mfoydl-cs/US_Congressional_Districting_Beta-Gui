@@ -132,6 +132,27 @@ class Districting {
 	    L.DomEvent.on(back, 'click', this.dicTab.showDistrictList.bind(this.dicTab, this))
 	}
 
+	translateScore(score) {
+		switch(score) {
+			case "compactness":
+				return "Compactness";
+			case "popEquality":
+				return "Population Equality";
+			case "splitCounties":
+				return "Split Counties";
+			case "devFromAvg":
+				return "Deviation from Average";
+			case "devFromEnactedArea":
+				return "Deviation from Enacted Area";
+			case "devFromEnactedPop":
+				return "Deviation from Enacted Population";
+			case "fairness":
+				return "Fairness";
+			default:
+				return "";
+		}
+	}
+
 	// deprecated
 	getScore = () => {
 		return this.score // incase anyone ignores the deprecated comment
@@ -222,9 +243,7 @@ class Districting {
 	}
 
 	getGeoJson = () => {
-		console.log('getting...')
 		retrieveDistricting(this.id).then(response => {
-			console.log('Got')
 			this.geoJSON = response;
 			
 			this.featureGroup = new L.LayerGroup();
@@ -240,7 +259,6 @@ class Districting {
 			this.infoCheck.style.display = '';
 
 			this.dicTab.displayDistricting(this);
-			console.log('done');
 		});
 	}
 
