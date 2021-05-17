@@ -272,9 +272,9 @@ function jobListItem(job) {
     createTextElement(headerDiv, "h5", "Job " + job.id, "mb-1 center");
 
     var content = htmlElement(container, 'div', 'container');
-    createTextElement(content, 'p', 'Rounds: ' + job.rounds);
-    createTextElement(content, 'p', 'Cooling-Period: ' + job.coolingPeriod);
-    createTextElement(content, 'p', 'Districtings: ' + job.numDistrictings);
+    createTextElement(content, 'p', 'Rounds: ' + Number(job.rounds).toLocaleString());
+    createTextElement(content, 'p', 'Cooling-Period: ' + Number(job.coolingPeriod).toLocaleString());
+    createTextElement(content, 'p', 'Districtings: ' + Number(job.numDistrictings).toLocaleString());
 
     var footer = htmlElement(container, 'div', 'd-grid gap-2');
     var selectBtn = createButton(footer, 'button', 'Select', 'btn btn-primary', 'select-' + job.name);
@@ -290,26 +290,44 @@ function jobListItem(job) {
  */
 function constraintsTab(state, menu) {
 
-    var div = L.DomUtil.create('div');  //Main Container
+    let div = L.DomUtil.create('div');  //Main Container
 
-    var headerDiv = htmlElement(div, 'div', 'center tabContentTitle mb-3');
+    let headerDiv = htmlElement(div, 'div', 'center tabContentTitle mb-3');
     createTextElement(headerDiv, 'h5', 'Job Subset Constraints', 'h5');
 
-    var constraints = htmlElement(div, 'div', 'container');
+    let constraints = htmlElement(div, 'div', 'container');
 
-    var table = L.DomUtil.create('table', 'table table-sm slider-table align-middle', constraints);
-    var body = L.DomUtil.create('tbody', '', table);
+    let compactnessRadioLabels = [
+    { 'label': 'Polsby-Popper', 'value': 'polsby', 'checked': true },
+    { 'label': 'Graph Compactness', 'value': 'graph', 'disabled': true },
+    { 'label': 'Population Fatness', 'value': 'fatness', 'disabled': true }
+    ];
+    let populationRadioLabels = [
+        { 'label': 'Total Population', 'value': 'total', 'checked': true },
+        { 'label': 'Voting Age Population (TVAP)', 'value': 'tvap', 'disabled': true },
+        { 'label': 'Citizen Voting Age Population', 'value': 'cvap', 'disabled': true }
+    ];
 
     //Constraints Sliders
-    createSlider(body, 'compactness-constraint', 'Compactness', 0, 1, 0.01,'Compactness');
-    createSlider(body, 'majmin-constraint', 'Majority-Minority Districts (>=)', 0, 10, 1,'Majority-Minority Districts (>=)');
-    createSlider(body, 'majmin-threshold', 'Majority-Minority Threshold', 0, 1, 0.1, 'Majority-Minority Threshold');
-    createSlider(body, 'population-constraint', 'Population Difference (<=%)', 0, 35, 0.1,"Population Difference (<=%)");
+    let compactDiv = htmlElement(constraints, 'div', 'constraintDiv');
+    createTextElement(compactDiv,'h6','Compactness','h6')
+    createRadioGroup(compactDiv, compactnessRadioLabels, "", "compactnessRadio");
+    createSlider(compactDiv, 'compactness-constraint', '', 0, 1, 0.01,'');
+    
+
+    let majminDiv = htmlElement(constraints, 'div', 'constraintDiv');
+    createTextElement(majminDiv, 'h6', 'Majority-Minority Districts', 'h6');
+    createSelect(majminDiv, minorities, 'minority', 'minoritySelect');
+    createSlider(majminDiv, 'majmin-constraint', 'Number of Districts (>=)', 0, 10, 1,'Number of Districts (>=)');
+    createSlider(majminDiv, 'majmin-threshold', 'Threshold (%)', 0, 1, 0.1, 'Threshold (%)');
+
+    let popDiv = htmlElement(constraints, 'div', 'constraintDiv');
+    createTextElement(popDiv, 'h6', 'Population Difference', 'h6');
+    createRadioGroup(popDiv, populationRadioLabels, "", "populationRadio");
+    createSlider(popDiv, 'population-constraint', '', 0, 35, 0.1,"");
 
     //Incumbents Protection Menu
-    var incumbentsDiv = htmlElement(constraints, 'div', 'container d-grid gap-2')
-    //createLabel(incumbentsDiv, 'Incumbent Protection: &emsp;&emsp;', 'incumbentsLink')
-    //var incumbents = createTextElement(incumbentsDiv, 'a', 'Set Protections', 'modal-link', 'incumbentsLink');
+    var incumbentsDiv = htmlElement(constraints, 'div', 'container d-grid gap-2 constraintDiv')
     let incumbents = createButton(incumbentsDiv,'button','Set Incumbent Protections','btn btn-primary btn-sm')
     incumbents.setAttribute('data-bs-toggle', 'modal');
     incumbents.setAttribute('data-bs-target', '#incumbentsModal');
@@ -326,22 +344,13 @@ function constraintsTab(state, menu) {
     }
 
     //Compactness and Population Options menu
-    var compactnessRadioLabels = [
-        { 'label': 'Polsby-Popper', 'value': 'polsby', 'checked': true},
-        { 'label': 'Graph Compactness', 'value': 'graph', 'disabled': true },
-        { 'label': 'Population Fatness', 'value': 'fatness', 'disabled': true }
-    ];
-    var populationRadioLabels = [
-        { 'label': 'Total Population', 'value': 'total', 'checked': true },
-        { 'label': 'Voting Age Population (TVAP)', 'value': 'tvap', 'disabled': true },
-        { 'label': 'Citizen Voting Age Population', 'value': 'cvap', 'disabled': true }
-    ]
+    
 
-    var optionsContainer = L.DomUtil.create('div');
-    createRadioGroup(optionsContainer, compactnessRadioLabels, "Compactness Measure", "compactnessRadio");
-    createRadioGroup(optionsContainer, populationRadioLabels, "Population Constraint-Type", "populationRadio");
-    createSelect(optionsContainer,minorities,'minority','minoritySelect');
-    createAccordian(constraints, 'compactnessAccordion', '<i>options</i>', optionsContainer);
+    //var optionsContainer = L.DomUtil.create('div');
+    
+    
+    
+    //createAccordian(constraints, 'compactnessAccordion', '<i>options</i>', optionsContainer);
 
     //Submit Buttons
     var subDiv = htmlElement(div, 'div', 'd-grid gap-2 col-6 mx-auto submitBtn')
@@ -383,7 +392,7 @@ function constraintsSummaryTab(data, menu) {
     Object.keys(data).forEach(function (key) {
         var row = htmlElement(body, 'div', 'row');
         createTextElement(row, 'p', data[key].label + data[key].value, 'col', key + "ConSummaryLabel");
-        var value = createTextElement(row, 'p', data[key].value, 'col', key + "ConSummaryValue");
+        var value = createTextElement(row, 'p', Number(Number(data[key].value).toFixed(3)).toLocaleString(), 'col', key + "ConSummaryValue");
         if (data[key].type) {
             value.innerHTML += "(" + data[key].type + ")";
         }

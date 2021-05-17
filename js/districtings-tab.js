@@ -143,6 +143,8 @@ class DistrictingsTab {
 	setDistricts = (dics, weights) => {
 		console.log(dics)
 		this.weights = weights
+		console.log('dics.enacted')
+		console.log(dics.enacted)
 		this.makeEnacted(dics.enacted);
 		delete dics.enacted
 		this.sorts = dics
@@ -251,6 +253,7 @@ class DistrictingsTab {
 
 			Plotly.addTraces('analysisDiv', scatter);
 			// Plotly.addTraces('analysisDiv',this.scatterPlot(JSON.parse(response.enacted), 'Enacted','blue'));
+			console.log(this.enacted)
 		});
 	}
 

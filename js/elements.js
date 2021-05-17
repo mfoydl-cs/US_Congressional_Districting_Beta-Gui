@@ -33,7 +33,7 @@ function modalDialog(id, headerText, bodyContent, callback) {
 }
 
 function createSelect(parent, options, label, id) {
-  let select = htmlElement(parent, 'select', 'form-select', id);
+  let select = htmlElement(parent, 'select', 'form-select form-select-sm', id);
   select.setAttribute('aria-label', label);
   options.forEach(function (opt) {
     let option = createTextElement(select, 'option', opt);
@@ -46,7 +46,10 @@ function createSelect(parent, options, label, id) {
 
 function createRadioGroup(parent, labelVals, label, name) {
   let group = htmlElement(parent, 'div', 'container');
-  createLabel(group, label);
+  if(label.length>0){
+    createLabel(group, label);
+  }
+  
   labelVals.forEach(function (val) {
     group.appendChild(createRadioButton(val.label, name, val.value, val.disabled, val.checked, name + "-" + val.value));
   });
@@ -231,18 +234,24 @@ function createSlider(parent, id, text, min, max, step, abbr) {
   let tr = L.DomUtil.create('tr', 'd-flex', parent);
 
   //let slider = Slider(tr,id,text,min,max,step);
-  let labelCol = L.DomUtil.create('div', 'slider-flex-label overflow-ellipsis', tr);
+  let labelCol;
+  if(text.length>0){
+    labelCol = L.DomUtil.create('div', 'slider-flex-label overflow-ellipsis', tr);
+  }
+  
   let rangeCol = L.DomUtil.create('div', 'slider-flex-slider', tr);
   let valueCol = L.DomUtil.create('div', 'slider-flex-value', tr);
 
   let range = htmlElement(rangeCol, 'div', 'range');
-
-  let p = L.DomUtil.create('p', 'overflow-ellipsis', labelCol)
-  let abbrEl = L.DomUtil.create('abbr', '', p);
-  abbrEl.setAttribute('title', text)
-  abbrEl.innerHTML = abbr;
-  //createLabel(labelCol, abbr, id);
-
+  if(text.length>0){
+    let p = L.DomUtil.create('p', 'overflow-ellipsis', labelCol);
+    if(abbr.length>0){
+      let abbrEl = L.DomUtil.create('abbr', '', p);
+      abbrEl.setAttribute('title', text)
+      abbrEl.innerHTML = abbr;
+    }
+  }
+  
   let slider = createInput(range, 'range', 'form-range', id);
   slider.min = min;
   slider.max = max;

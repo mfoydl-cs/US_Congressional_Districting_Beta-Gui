@@ -61,7 +61,7 @@ class Districting {
 		L.DomEvent.on(this.check, 'click', this.checkClicked);
 
 		var contentDiv = htmlElement(div, "div", 'd-flex w-100 justify-content-between');
-		createTextElement(contentDiv, "p", "Score: " + this.score.toFixed(2), "");
+		createTextElement(contentDiv, "p", "Score: " + this.score.toFixed(3), "");
 		var link = createTextElement(contentDiv,'a','<em>more info</em>','modal-link')
 		this.listItem = createListItem(div, false, false);
 

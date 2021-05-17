@@ -58,8 +58,7 @@ body {
 
 .range-value{
     width: 100%;
-    text-align: end;
-    padding-right: 5px;
+    padding: .4vh .1vw .3vh .5vw;
     font-style: italic;
 }
 
@@ -152,7 +151,8 @@ label {
 }
 
 .list-group-flush .list-group-item{
-    background: rgba(255,255,255,0);
+    background: rgba(255,255,255,0.5);
+    border-radius: .25vw;
 }
 
 .list-group-item:hover{
@@ -274,7 +274,7 @@ th p{
   border: 3px solid var(--scrollbarBG);
 }
 
-.list-group-item p {
+#districtList .list-group-item p, .enacted .list-group-item p {
     margin-bottom: 0;
 }
 
@@ -286,5 +286,15 @@ th p{
     max-width: fit-content;
 }
 
+.enacted .list-group-item p {
+    border-radius: .25vw;
+}
 
+.constraintDiv {
+    border-bottom: 2px dashed darkgray;
+    padding: 2vh 0 1vh;
+}
 
+.form-select{
+    margin: 2vh 0 2vh 0;
+}
