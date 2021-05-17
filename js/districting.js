@@ -225,7 +225,7 @@ class Districting {
 		let pop = htmlElement(row, 'td')
 		pop.innerHTML = "Population"
 		let minPop = htmlElement(row, 'td')
-		minPop.innerHTML = "Minority Population" + this.districts[0].minority
+		minPop.innerHTML = "Minority Population"
 		let minPer = htmlElement(row, 'td')
 		minPer.innerHTML = "Minority Percentage"
 		let i = 0;
@@ -246,7 +246,7 @@ class Districting {
 			let minPer = htmlElement(row, 'td')
 			minPer.innerHTML = (100 * d.minorityPop / d.population).toFixed(2) + '%'
 		}
-		this.majminModal = modalDialog('majminModal' + this.id, 'Majority-Minority Districts', majminDiv)
+		this.majminModal = modalDialog('majminModal' + this.id, 'Majority-Minority Districts (' + this.districts[0].minority + ')', majminDiv)
 		$('body').append(this.majminModal);
 	}
 
