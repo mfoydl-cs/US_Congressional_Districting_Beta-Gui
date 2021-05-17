@@ -109,7 +109,6 @@ function backToCountry() {
 
     //remove state-level geometries
     zoomLayer.forEach(function (layer) { map.removeLayer(layer); });
-
     //add state outlines back to map and set view
     stateLayer.eachLayer(function (layer) { layer.setStyle(statesStyle) });
     map.flyToBounds(countryBounds);
@@ -127,7 +126,8 @@ function zoomToState(state) {
     stateLayer.remove();
 
     countyLayer.addTo(map);
-    
+    districtLayer.clearLayers();
+    districtLayer.addTo(map);
 
     // Add state level UI controls and geometry
     layersControl.setPosition("topleft").addTo(map);

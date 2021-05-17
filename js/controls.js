@@ -75,14 +75,14 @@ L.Control.Menu = L.Control.extend({
 
         this.constraintsData = constraintsDataFormat;
         window.dicTab.setState(this.state);
+        console.log(this.state);
 
         createTab(nav, "Jobs", jobsTab(this.state), 'jobs', true)//Jobs Tab
-        createTab(nav, "Constraints", constraintsTab(this.state, this), "constraints", false, false); //Constraints Tab
+        createTab(nav, "Constraints", constraintsTab(this.state, this), "constraints", false, true); //Constraints Tab
         createTab(nav, "Constrain Results", constraintsSummaryTab(this.constraintsData), 'constraintsSummary', false, true)//Summary Tab
-        createTab(nav, "Measures", measuresTab(this.state), "measures", false, false); //Measures Tab
-        createTab(nav, "Top Districtings", window.dicTab.div, "districts", false, false); //Districtings Tab
+        createTab(nav, "Measures", measuresTab(this.state), "measures", false, true); //Measures Tab
+        createTab(nav, "Top Districtings", window.dicTab.div, "districts", false, true); //Districtings Tab
         
-
         $(document).ready(function () {
             $('#constraintsSummary-tab').hide(); //Hide the physical tab, content accesssed through buttons
         });
@@ -305,15 +305,23 @@ function constraintsTab(state, menu) {
     createSlider(body, 'population-constraint', 'Population Difference (<=%)', 0, 35, 0.1,"Population Difference (<=%)");
 
     //Incumbents Protection Menu
-    var incumbentsDiv = htmlElement(constraints, 'div', 'container')
-    createLabel(incumbentsDiv, 'Incumbent Protection: &emsp;&emsp;', 'incumbentsLink')
-    var incumbents = createTextElement(incumbentsDiv, 'a', 'Set Protections', 'modal-link', 'incumbentsLink');
+    var incumbentsDiv = htmlElement(constraints, 'div', 'container d-grid gap-2')
+    //createLabel(incumbentsDiv, 'Incumbent Protection: &emsp;&emsp;', 'incumbentsLink')
+    //var incumbents = createTextElement(incumbentsDiv, 'a', 'Set Protections', 'modal-link', 'incumbentsLink');
+    let incumbents = createButton(incumbentsDiv,'button','Set Incumbent Protections','btn btn-primary btn-sm')
     incumbents.setAttribute('data-bs-toggle', 'modal');
     incumbents.setAttribute('data-bs-target', '#incumbentsModal');
 
-    var incumbentsList = incumbentsContent(state);
-    var incumbentsModal = modalDialog('incumbentsModal', 'Protect Incumbents', incumbentsList);
-    $('body').append(incumbentsModal);
+    let incumbentsList = incumbentsContent(state);
+    console.log('incumbents')
+    if ($('#incumbentsModal').length==0){
+        
+        let incumbentsModal = modalDialog('incumbentsModal', 'Protect Incumbents', incumbentsList);
+        $('body').append(incumbentsModal);
+    }
+    else{
+        $('#incumbentsModal div div .modal-body').html(incumbentsList)
+    }
 
     //Compactness and Population Options menu
     var compactnessRadioLabels = [
@@ -345,6 +353,7 @@ function constraintsTab(state, menu) {
         data['popDiff'] = document.getElementById('population-constraint').value;
         data['cmpMeasure'] = document.querySelector('input[name="compactnessRadio"]:checked').value;
         data['popType'] = document.querySelector('input[name="populationRadio"]:checked').value;
+        data['minority'] = document.getElementById('minoritySelect').value;
         var incumbentData = {};
         statesObj[state]['senators'].forEach(function (senator) {
             incumbentData[senator.name] = document.getElementById(senator.name).checked;
@@ -431,7 +440,7 @@ function measuresTab(state) {
 
 function incumbentsContent(state) {
 
-    var div = L.DomUtil.create('div');
+    let div = L.DomUtil.create('div');
     getIncumbents(state).then(response => {
         statesObj[state].senators = response.senators
         statesObj[state].reps = response.representatives
@@ -441,8 +450,6 @@ function incumbentsContent(state) {
             let elem = createSwitch(div, senator.name, senator.name + " <em>[" + senator.party + "]</em>");
             elem.classList.add(senator.party);
             elem.classList.add('grayed');
-            //elem.setAttribute('checked', 'true');
-            elem.setAttribute('checked', 'false');
             L.DomEvent.on(elem, 'click', function (ev) {
                 if (this.getAttribute('checked') === 'true') {
                     this.setAttribute('checked', 'false');
@@ -456,8 +463,6 @@ function incumbentsContent(state) {
             let elem = createSwitch(div, rep.name, rep.name + " -<em> " + rep.district + ' District ' + " [" + rep.party + "]</em>");
             elem.classList.add(rep.party);
             elem.classList.add('grayed');
-            //elem.setAttribute('checked', 'true');
-            elem.setAttribute('checked', 'false');
             L.DomEvent.on(elem, 'click', function (ev) {
                 if (this.getAttribute('checked') === 'true') {
                     this.setAttribute('checked', 'false');
@@ -493,17 +498,7 @@ function submitMeasures(state, weights) {
     dicTab.clearList()
 
     submitWeights(weights).then(response => {
-        /*
-        response['scores'] = {
-            "compactness": 0.1,
-            "popEquality": 0.8,
-            "splitCounties": 1,
-            "devFromAvg": 0.9,
-            "devFromEnactedArea": 0.4,
-            "devFromEnactedPop": 0.7,
-            "fairness": 0.3,
-            "majmin": 1
-        }*/
+        console.log(response);
         var districts = response;
         dicTab.setDistricts(districts, weights);
         dicTab.generateBoxplot();

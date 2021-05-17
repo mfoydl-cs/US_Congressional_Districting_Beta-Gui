@@ -29,7 +29,7 @@ const plotLayout = {
 	},
 	paper_bgcolor: 'rgb(233,233,233)',
 	plot_bgcolor: 'rgb(233,233,233)',
-	showlegend: false
+	showlegend: true
 };
 
 class DistrictingsTab {
@@ -46,44 +46,49 @@ class DistrictingsTab {
 
 		//Header
 		let headerDiv = htmlElement(this.div, 'div', 'center tabContentTitle mb-3');
-		createTextElement(headerDiv, 'h5', 'Examine Districtings', 'h5');
+
+		//Sort
+		this.sortDiv = htmlElement(this.div, "div", 'd-flex w-100 justify-content-between', 'sortDiv');
+
+		//Enacted
+		this.enactedDiv = htmlElement(this.div, 'div','enacted');
+
+		//DISTRICTING LIST CONTENT
+		this.list = createListGroup(this.div);
+		this.list.id = "districtList";
+
+		//Boxplot Button
+		this.aggDiv = htmlElement(this.div, 'div', 'd-grid gap-2 col-6 mx-auto submitBtn');
 
 		
-		//Div for sorting
-		this.sortDiv = htmlElement(this.div, "div", 'd-flex w-100 justify-content-between','sortDiv');
+		// HEADER CONTENT
+		createTextElement(headerDiv, 'h5', 'Examine Districtings', 'h5');
+		
+		//SORTING CONTENT
 		createTextElement(this.sortDiv, "p", "Sorted by: " + sortNames[this.sorting], "", 'sort-label');
 		let sortBtn = createButton(this.sortDiv, 'button', 'Sort', 'btn btn-outline-primary btn-sm modal-link');
 		sortBtn.setAttribute('data-bs-toggle', 'modal');
 		sortBtn.setAttribute('data-bs-target', '#sortModal');
+
 		
-		//Create Sorting popup
-		$(document).ready(() => {
-			$('body').append(aggregatesModal);
-		});
-		$(document).ready(this.makeModal);
+		
+		
+		
+		//BOXPLOT MODAL
+		this.makeAggregatesModal() //Create boxplot aggregate Modal Window
 
-		let enactedDiv = htmlElement(this.div,'div');
-		getEnactedDistricting(this.state).then(res => {
-			//enactedDiv.append((new Districting()))
-			console.log("enacated")
-			console.log(res);
-		})
-			
+		$(document).ready(() => {$('body').append(this.aggregatesModal);}); //Add boxplot modal to DOM
+	}
 
-		//Create list
-		this.list = createListGroup(this.div);
-		this.list.id = "districtList";
-
+	makeAggregatesModal = () => {
 		//Box and Whisker Plot Model
 		//this.aggregates = createTextElement(this.div, 'a', 'Districting Data', 'modal-link',);
-		let aggDiv = htmlElement(this.div, 'div','d-grid gap-2 col-6 mx-auto submitBtn');
-		this.aggregates = createButton(aggDiv, 'button', 'Aggregate Districtings Data','btn btn-primary btn-sm')
+		this.aggregates = createButton(this.aggDiv, 'button', 'Aggregate Districtings Data', 'btn btn-primary btn-sm')
 		this.aggregates.setAttribute('data-bs-toggle', 'modal');
 		this.aggregates.setAttribute('data-bs-target', '#aggregatesModal');
 		let content = this.analysisContent();
-		let aggregatesModal = modalDialog('aggregatesModal', 'Aggregate Districting Data', content);
+		this.aggregatesModal = modalDialog('aggregatesModal', 'Aggregate Districting Data', content);
 
-		// Get Summary Info
 		const data = {
 			'count': { 'label': 'Districtings Returned: ', 'value': 1000 },
 			'avg-compactness': { 'label': 'Average Compactness: ', 'type': '', 'value': '.92 [Polsby-Popper]' },
@@ -102,10 +107,9 @@ class DistrictingsTab {
 				value.innerHTML += "(" + data[key].type + ")";
 			}
 		});
-
 	}
 
-	makeModal = () => {
+	makeSortModal = () => {
 		// create sortModal
 		let sortRadioLabels = []
 		for (let sort in sortNames) {
@@ -132,10 +136,15 @@ class DistrictingsTab {
 		while (this.list.firstChild) {
 			this.list.removeChild(this.list.firstChild)
 		}
+		this.enactedDiv.innerHTML = '';
+		this.enactedDiv.append(this.enacted);
+
 	}
 
 	setDistricts = (dics, weights) => {
 		this.sorts = dics
+		console.log("?")
+		console.log(this.sorts)
 		let plans = {}
 		this.weights = weights
 		for (let sort in this.sorts) {
@@ -156,7 +165,7 @@ class DistrictingsTab {
 	}
 
 	updateDics = () => {
-		this.dics = this.sorts[this.sorting]
+		this.dics = this.sorts[this.sorting];
 		this.updateList()
 	}
 
@@ -165,6 +174,7 @@ class DistrictingsTab {
 			this.currentDic.toggleDisplay(false)
 		}
 		this.currentDic = d
+		this.generateSelected();
 		toggleDistrict(this.currentDic.featureGroup, true);
 	}
 
@@ -178,6 +188,7 @@ class DistrictingsTab {
 	updateList = () => {
 		this.clearList()
 		//this.dics.sort(sortings[this.sorting].cmp)
+		console.log(this.dics)
 		for (let dic of this.dics) {
 			this.list.append(dic.listItem);
 		}
@@ -187,6 +198,7 @@ class DistrictingsTab {
 		this.div.append(d.infoContainer)
 		this.list.style.display = 'none';
 		this.aggregates.style.display = 'none';
+		this.enactedDiv.style.display = 'none';
 		for (let c of this.sortDiv.children) {
 			c.style.display = 'none'
 		}
@@ -197,6 +209,7 @@ class DistrictingsTab {
 		// reset to default display
 		this.list.style.display = '';
 		this.aggregates.style.display = '';
+		this.enactedDiv.style.display = '';
 		for (let c of this.sortDiv.children) {
 			c.style.display = ''
 		}
@@ -210,9 +223,39 @@ class DistrictingsTab {
 
 	generateBoxplot = () => {
 		getBoxplot().then(response => {
-			let graph = this.boxPlot(JSON.parse(response.boxplot));
+			console.log("boxplot");
+			console.log(response);
+			let data = JSON.parse(response.boxplot)
+			let graph = this.boxPlot(data);
 			Plotly.newPlot('analysisDiv', graph.data, graph.layout);
-			Plotly.addTraces('analysisDiv', this.scatterPlot(JSON.parse(response.scatterplot)));
+
+			let xtraces = []
+			let yVals = [] 
+			for (var i = 0; i < data.length; i++) {
+				xtraces.push('trace ' + i.toString());
+				yVals.push(0);
+			}
+
+			let scatter = {
+				x: xtraces,
+				y: yVals,
+				mode: 'markers',
+				showlegend: false,
+				visible: false,
+				marker: { color: 'red' }
+			}
+
+			Plotly.addTraces('analysisDiv', scatter);
+			// Plotly.addTraces('analysisDiv',this.scatterPlot(JSON.parse(response.enacted), 'Enacted','blue'));
+		});
+	}
+
+	generateSelected = () => {
+		console.log('selected')
+		getScatterPlot(this.currentDic.id).then(response => {
+			let data = JSON.parse(response.scatterplot);
+			let update = this.scatterPlot(data, 'District ' + this.currentDic.id, 'red');
+			Plotly.update('analysisDiv', { 'y': [update.y], showlegend: true, name: 'Districting ' + this.currentDic.id, visible: true }, {}, data.length);			
 		});
 	}
 
@@ -223,8 +266,9 @@ class DistrictingsTab {
 			var result = {
 				y: yValues[i],
 				type: 'box',
+				showlegend: false,
 				marker: {
-					color: 'black'
+					color: 'gray'
 				}
 			};
 			data.push(result);
@@ -232,11 +276,11 @@ class DistrictingsTab {
 
 		return {
 			data: data,
-			layout: plotLayout
+			layout: plotLayout,
 		}
 	}
 
-	scatterPlot = (data) => {
+	scatterPlot = (data, n,c) => {
 		var xtraces = []
 		for (var i = 0; i < data.length; i++) {
 			xtraces.push('trace ' + i.toString());
@@ -245,12 +289,22 @@ class DistrictingsTab {
 			x: xtraces,
 			y: data,
 			mode: 'markers',
-			marker: { color: 'red' }
+			name: n,
+			showlegend: true,
+			marker: { color: c }
 		}
 	}
 
 	setState = (state) => {
-		this.state=state;
+		//ENACTED CONTENT
+		getEnactedDistricting(state).then(res => {
+			this.makeEnacted(JSON.parse(res.enacted));
+		})
+	}
+
+	makeEnacted = (enacted) => {
+		this.enacted = new EnactedDistricting(enacted, this).listItem;
+		this.enactedDiv.append(this.enacted);
 	}
 
 }
