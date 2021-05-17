@@ -29,7 +29,7 @@ const plotLayout = {
 	},
 	paper_bgcolor: 'rgb(233,233,233)',
 	plot_bgcolor: 'rgb(233,233,233)',
-	showlegend: false
+	showlegend: true
 };
 
 class DistrictingsTab {
@@ -174,6 +174,7 @@ class DistrictingsTab {
 			this.currentDic.toggleDisplay(false)
 		}
 		this.currentDic = d
+		this.generateSelected();
 		toggleDistrict(this.currentDic.featureGroup, true);
 	}
 
@@ -222,9 +223,39 @@ class DistrictingsTab {
 
 	generateBoxplot = () => {
 		getBoxplot().then(response => {
-			let graph = this.boxPlot(JSON.parse(response.boxplot));
+			console.log("boxplot");
+			console.log(response);
+			let data = JSON.parse(response.boxplot)
+			let graph = this.boxPlot(data);
 			Plotly.newPlot('analysisDiv', graph.data, graph.layout);
-			Plotly.addTraces('analysisDiv', this.scatterPlot(JSON.parse(response.scatterplot)));
+
+			let xtraces = []
+			let yVals = [] 
+			for (var i = 0; i < data.length; i++) {
+				xtraces.push('trace ' + i.toString());
+				yVals.push(0);
+			}
+
+			let scatter = {
+				x: xtraces,
+				y: yVals,
+				mode: 'markers',
+				showlegend: false,
+				visible: false,
+				marker: { color: 'red' }
+			}
+
+			Plotly.addTraces('analysisDiv', scatter);
+			// Plotly.addTraces('analysisDiv',this.scatterPlot(JSON.parse(response.enacted), 'Enacted','blue'));
+		});
+	}
+
+	generateSelected = () => {
+		console.log('selected')
+		getScatterPlot(this.currentDic.id).then(response => {
+			let data = JSON.parse(response.scatterplot);
+			let update = this.scatterPlot(data, 'District ' + this.currentDic.id, 'red');
+			Plotly.update('analysisDiv', { 'y': [update.y], showlegend: true, name: 'Districting ' + this.currentDic.id, visible: true }, {}, data.length);			
 		});
 	}
 
@@ -235,8 +266,9 @@ class DistrictingsTab {
 			var result = {
 				y: yValues[i],
 				type: 'box',
+				showlegend: false,
 				marker: {
-					color: 'black'
+					color: 'gray'
 				}
 			};
 			data.push(result);
@@ -244,11 +276,11 @@ class DistrictingsTab {
 
 		return {
 			data: data,
-			layout: plotLayout
+			layout: plotLayout,
 		}
 	}
 
-	scatterPlot = (data) => {
+	scatterPlot = (data, n,c) => {
 		var xtraces = []
 		for (var i = 0; i < data.length; i++) {
 			xtraces.push('trace ' + i.toString());
@@ -257,7 +289,9 @@ class DistrictingsTab {
 			x: xtraces,
 			y: data,
 			mode: 'markers',
-			marker: { color: 'red' }
+			name: n,
+			showlegend: true,
+			marker: { color: c }
 		}
 	}
 

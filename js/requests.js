@@ -124,3 +124,10 @@ function getBoxplot(){
         'http://localhost:8080/rockies/api/fjobs/boxplot'
     )
 }
+
+function getScatterPlot(id){
+    return $.get(
+        'http://localhost:8080/rockies/api/fjobs/scatterplot',
+        {"id":id}
+    )
+}

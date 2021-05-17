@@ -194,9 +194,7 @@ class Districting {
 	}
 
 	getGeoJson = () => {
-		console.log('getting...')
 		retrieveDistricting(this.id).then(response => {
-			console.log('Got')
 			this.geoJSON = response;
 			
 			this.featureGroup = new L.LayerGroup();
@@ -212,7 +210,6 @@ class Districting {
 			this.infoCheck.style.display = '';
 
 			this.dicTab.displayDistricting(this);
-			console.log('done');
 		});
 	}
 
