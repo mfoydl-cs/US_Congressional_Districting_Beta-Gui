@@ -33,6 +33,8 @@ class Districting {
 		this.id = id;
 		this.dicTab = dicTab;
 		this.score = scores.score
+		this.districts = scores.districts
+		delete scores.districts
 		delete scores.score
 		delete scores.id
 		this.scores = scores;
@@ -102,7 +104,7 @@ class Districting {
 			if (score == 'MAJMIN') {
 				let link = createTextElement(div, 'a', 'Maj-Min Districts', 'stat-col score modal-link')
 				link.setAttribute('data-bs-toggle', 'modal');
-				link.setAttribute('data-bs-target', '#majminModal' + id);
+				link.setAttribute('data-bs-target', '#majminModal' + this.id);
 				createTextElement(div, 'p', Number(s).toFixed(0), 'stat-col')
 			} else {
 				createTextElement(div, 'p', measureNames[score]['name'], 'stat-col score')
@@ -238,7 +240,7 @@ class Districting {
 			let minPer = htmlElement(row, 'td')
 			minPer.innerHTML = (100 * d.properties.minorityPop / d.properties.population).toFixed(2) + '%'
 		}
-		this.majminModal = modalDialog('majminModal' + id, 'Majority-Minority Districts', majminDiv)
+		this.majminModal = modalDialog('majminModal' + this.id, 'Majority-Minority Districts', majminDiv)
 		$('body').append(this.majminModal);
 	}
 
