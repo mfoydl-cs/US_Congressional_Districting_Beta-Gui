@@ -28,12 +28,16 @@ var measureNames = {
 }
 
 class Districting {
-	constructor(id, scores, dicTab) {
+	constructor(scores, dicTab, name) {
 		// maybe one day dicTab won't be global...
-		this.id = id;
+		this.id = scores.id;
 		this.dicTab = dicTab;
 		this.score = scores.score
 		this.districts = scores.districts
+		if (name == null) {
+			name = "Districting "+this.id
+		}
+		console.log(name)
 		delete scores.districts
 		delete scores.score
 		delete scores.id
@@ -44,15 +48,15 @@ class Districting {
 
 		var div = L.DomUtil.create('div');
 		var headerDiv = htmlElement(div, "div", 'd-flex w-100 justify-content-between');
-		createTextElement(headerDiv, "h6", "Districting "+id, "mb-1");
+		createTextElement(headerDiv, "h6", name, "mb-1");
 
 		
 
 	
 		this.checkDiv = htmlElement(headerDiv, 'div', '');
-		createLabel(this.checkDiv, '<i>show</i>&nbsp', id + 'Check', 'small');
+		createLabel(this.checkDiv, '<i>show</i>&nbsp', this.id + 'Check', 'small');
 		this.check = L.DomUtil.create("input", "form-check-input custom-check", this.checkDiv);
-		this.check.id = id + "Check";
+		this.check.id = this.id + "Check";
 		this.check.type = "checkbox";
 		L.DomEvent.on(this.check, 'click', this.checkClicked);
 
@@ -70,23 +74,23 @@ class Districting {
 		var infoContainer = L.DomUtil.create('div');
 		this.infoContainer = infoContainer
 		var infoHeader = htmlElement(infoContainer, 'div','d-flex w-100 justify-content-between');
-		createTextElement(infoHeader, 'h5', "Districting " + id, 'h5');
+		createTextElement(infoHeader, 'h5', name, 'h5');
 
 		this.infocheckDiv = htmlElement(infoHeader, 'div','');
-		createLabel(this.infocheckDiv, '<i>show</i>&nbsp', id + 'InfoCheck', 'small');
+		createLabel(this.infocheckDiv, '<i>show</i>&nbsp', this.id + 'InfoCheck', 'small');
 		this.infoCheck = L.DomUtil.create("input", "form-check-input custom-check", this.infocheckDiv);
-		this.infoCheck.id = id + "InfoCheck";
+		this.infoCheck.id = this.id + "InfoCheck";
 		this.infoCheck.type = "checkbox";
 		L.DomEvent.on(this.infoCheck, 'click', this.checkClicked);
 
 		var infoBody = htmlElement(infoContainer, 'div');
 
-		createAccordian(infoBody, "Dist" + id, "Districts", listgroupContainer);
+		createAccordian(infoBody, "Dist" + this.id, "Districts", listgroupContainer);
 
 		var stats = htmlElement(infoBody,'div','container');
 		var statsListContainer = L.DomUtil.create('div')
 		this.statsList = createListGroup(statsListContainer)
-		createAccordian(infoBody, "stats" + id, "Objective Function Breakdown", statsListContainer)
+		createAccordian(infoBody, "stats" + this.id, "Objective Function Breakdown", statsListContainer)
 		div = L.DomUtil.create('div', 'd-flex w-100 justify-content-between');
 		createTextElement(div, 'p', 'Measure', 'stat-col score')
 		createTextElement(div, 'p', 'Value', 'stat-col')
@@ -97,7 +101,6 @@ class Districting {
 
 		
 		// populate stats list
-		// TODO this.scores is enum string but weights is different keys
 		for (let score in this.scores) {
 	    	var div = L.DomUtil.create('div', 'd-flex w-100 justify-content-between');
 			let s = this.scores[score];

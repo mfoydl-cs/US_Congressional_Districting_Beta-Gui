@@ -145,11 +145,12 @@ class DistrictingsTab {
 	}
 
 	setDistricts = (dics, weights) => {
-		this.sorts = dics
-		console.log("?")
-		console.log(this.sorts)
-		let plans = {}
+		console.log(dics)
 		this.weights = weights
+		this.makeEnacted(dics.enacted)
+		delete dics.enacted
+		this.sorts = dics
+		let plans = {}
 		for (let sort in this.sorts) {
 			let list = this.sorts[sort]
 			for (let i = 0; i < list.length; i++) {
@@ -158,7 +159,7 @@ class DistrictingsTab {
 				if (id in plans) {
 					list[i] = plans[id]
 				} else {
-					list[i] = new Districting(id, plan, this)
+					list[i] = new Districting(plan, this)
 					plans[id] = list[i]
 				}
 			}
@@ -302,13 +303,16 @@ class DistrictingsTab {
 
 	setState = (state) => {
 		//ENACTED CONTENT
-		getEnactedDistricting(state).then(res => {
-			this.makeEnacted(JSON.parse(res.enacted));
-		})
+		// this is now done when setDistricts is called
+	//	getEnactedDistricting(state).then(res => {
+	//		res.geography = JSON.parse(res.geography)
+	//		this.makeEnacted(res);
+	//	})
 	}
 
 	makeEnacted = (enacted) => {
-		this.enacted = new EnactedDistricting(enacted, this).listItem;
+		enacted.geography = JSON.parse(enacted.geography)
+		this.enacted = new EnactedDistricting(enacted.geography, enacted.data, this).listItem;
 		this.enactedDiv.append(this.enacted);
 	}
 
