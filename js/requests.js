@@ -131,3 +131,9 @@ function getScatterPlot(id){
         {"id":id}
     )
 }
+
+function resetSession() {
+    return $.post(
+        "http://localhost:8080/rockies/api/test/reset"
+    )
+}

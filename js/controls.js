@@ -44,7 +44,9 @@ L.Control.BackButton = L.Control.extend({
         button.innerHTML = '<h4>Back</h4>'
 
         L.DomEvent.on(button, 'click', function (ev) {
-            backToCountry();
+            resetSession().then(() => {   
+                backToCountry();
+            })
         });
         return button;
     },
