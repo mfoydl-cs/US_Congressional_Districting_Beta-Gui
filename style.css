@@ -282,5 +282,9 @@ th p{
     margin-bottom: 0;
 }
 
+#aggregatesModal .modal-dialog{
+    max-width: fit-content;
+}
+
 
 

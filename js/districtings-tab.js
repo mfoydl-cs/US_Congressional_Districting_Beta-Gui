@@ -8,12 +8,12 @@ var sortNames = {
 }
 
 const plotLayout = {
-	width: 450,
-	height: 300,
+	width: 900,
+	height: 450,
 	margin: {
-		l: 20,
-		r: 0,
-		b: 30,
+		l: 50,
+		r: 20,
+		b: 50,
 		t: 10,
 		pad: 4
 	},
@@ -77,7 +77,10 @@ class DistrictingsTab {
 		//BOXPLOT MODAL
 		this.makeAggregatesModal() //Create boxplot aggregate Modal Window
 
-		$(document).ready(() => {$('body').append(this.aggregatesModal);}); //Add boxplot modal to DOM
+		$(document).ready(() => {
+			$('body').append(this.aggregatesModal);
+			this.makeSortModal();
+		}); //Add boxplot modal to DOM
 	}
 
 	makeAggregatesModal = () => {
@@ -174,7 +177,9 @@ class DistrictingsTab {
 			this.currentDic.toggleDisplay(false)
 		}
 		this.currentDic = d
-		this.generateSelected();
+		if(d.id!='enacted'){
+			this.generateSelected();
+		}
 		toggleDistrict(this.currentDic.featureGroup, true);
 	}
 
@@ -268,7 +273,7 @@ class DistrictingsTab {
 				type: 'box',
 				showlegend: false,
 				marker: {
-					color: 'gray'
+					color: '#3388FF'
 				}
 			};
 			data.push(result);
