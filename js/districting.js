@@ -42,7 +42,7 @@ class Districting {
 		delete scores.score
 		delete scores.id
 		this.scores = scores;
-
+		this.majmin()
 		this.geoJSON = null;
 		
 
@@ -225,23 +225,26 @@ class Districting {
 		let pop = htmlElement(row, 'td')
 		pop.innerHTML = "Population"
 		let minPop = htmlElement(row, 'td')
-		minPop.innerHTML = "Minority Population"
+		minPop.innerHTML = "Minority Population" + this.districts[0].minority
 		let minPer = htmlElement(row, 'td')
 		minPer.innerHTML = "Minority Percentage"
-		for (let d of this.geoJSON.features) {
+		let i = 0;
+		for (let i = 0; i < this.districts.length; i++) {
+			this.districts[i].id = i
+		}
+		console.log(this.districts)
+		this.districts.sort((a,b) => a.minorityPop - b.minorityPop)
+		console.log(this.districts)
+		for (let d of this.districts) {
 			let row = htmlElement(table, 'tr')
 			let name = htmlElement(row, 'td')
-			if ('NAMELSAD20' in d.properties) {
-				name.innerHTML = d.properties.NAMELSAD20
-			} else {
-				name.innerHTML = d.properties.NAMELSAD10
-			}
+			name.innerHTML = "District " + d.id;
 			let pop = htmlElement(row, 'td')
-			pop.innerHTML = d.properties.population
+			pop.innerHTML = d.population
 			let minPop = htmlElement(row, 'td')
-			minPop.innerHTML = d.properties.minorityPop
+			minPop.innerHTML = d.minorityPop
 			let minPer = htmlElement(row, 'td')
-			minPer.innerHTML = (100 * d.properties.minorityPop / d.properties.population).toFixed(2) + '%'
+			minPer.innerHTML = (100 * d.minorityPop / d.population).toFixed(2) + '%'
 		}
 		this.majminModal = modalDialog('majminModal' + this.id, 'Majority-Minority Districts', majminDiv)
 		$('body').append(this.majminModal);
