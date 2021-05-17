@@ -74,11 +74,10 @@ class DistrictingsTab {
 		
 		
 		
-		//BOXPLOT MODAL
-		this.makeAggregatesModal() //Create boxplot aggregate Modal Window
+		
 
 		$(document).ready(() => {
-			$('body').append(this.aggregatesModal);
+			
 			this.makeSortModal();
 		}); //Add boxplot modal to DOM
 	}
@@ -92,12 +91,7 @@ class DistrictingsTab {
 		let content = this.analysisContent();
 		this.aggregatesModal = modalDialog('aggregatesModal', 'Aggregate Districting Data', content);
 
-		const data = {
-			'count': { 'label': 'Districtings Returned: ', 'value': 1000 },
-			'avg-compactness': { 'label': 'Average Compactness: ', 'type': '', 'value': '.92 [Polsby-Popper]' },
-			'avg-maj-min': { 'label': 'Average Majority-Minority Districts: ', 'value': 2 },
-			'population-diff': { 'label': 'Average Population Difference: ', 'type': '', 'value': '1.2% [Total Population]' },
-		}
+		let data = this.jobData;
 
 		//Generate summary info on bottom
 		htmlElement(content, 'br');
@@ -105,11 +99,13 @@ class DistrictingsTab {
 		Object.keys(data).forEach(function (key) {
 			var row = htmlElement(body, 'div', 'row');
 			createTextElement(row, 'p', data[key].label, 'col', key + "ConSummaryLabel");
-			var value = createTextElement(row, 'p', data[key].value, 'col', key + "ConSummaryValue");
+			var value = createTextElement(row, 'p', Number(Number(data[key].value).toFixed(3)).toLocaleString(), 'col', key + "ConSummaryValue");
 			if (data[key].type) {
 				value.innerHTML += "(" + data[key].type + ")";
 			}
 		});
+
+		$('body').append(this.aggregatesModal);
 	}
 
 	makeSortModal = () => {
@@ -147,7 +143,7 @@ class DistrictingsTab {
 	setDistricts = (dics, weights) => {
 		console.log(dics)
 		this.weights = weights
-		this.makeEnacted(dics.enacted)
+		this.makeEnacted(dics.enacted);
 		delete dics.enacted
 		this.sorts = dics
 		let plans = {}
@@ -228,6 +224,8 @@ class DistrictingsTab {
 	}
 
 	generateBoxplot = () => {
+		//BOXPLOT MODAL
+		this.makeAggregatesModal() //Create boxplot aggregate Modal Window
 		getBoxplot().then(response => {
 			console.log("boxplot");
 			console.log(response);
@@ -311,6 +309,7 @@ class DistrictingsTab {
 	}
 
 	makeEnacted = (enacted) => {
+		console.log(enacted);
 		enacted.geography = JSON.parse(enacted.geography)
 		this.enacted = new EnactedDistricting(enacted.geography, enacted.data, this).listItem;
 		this.enactedDiv.append(this.enacted);

@@ -388,6 +388,7 @@ function constraintsSummaryTab(data, menu) {
             value.innerHTML += "(" + data[key].type + ")";
         }
     });
+    window.dicTab.jobData = data;
 
     //Footer elements
     var footer = htmlElement(container, 'div', 'row');
@@ -501,6 +502,7 @@ function submitMeasures(state, weights) {
     dicTab.clearList()
 
     submitWeights(weights).then(response => {
+        console.log('weights')
         console.log(response);
         var districts = response;
         dicTab.setDistricts(districts, weights);

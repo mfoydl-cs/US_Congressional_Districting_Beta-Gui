@@ -92,7 +92,6 @@ function addState(state) {
         obj.precincts = L.gridLayer.precincts();
         obj.precincts.setTileIndex(tileIndex);
         obj.precincts.addTo(precinctLayer);
-        console.log('done');
     });
 
 }
