@@ -247,9 +247,10 @@ function createSlider(parent, id, text, min, max, step, abbr) {
   slider.min = min;
   slider.max = max;
   slider.step = step;
-  let value = createLabel(valueCol, Number(slider.value).toFixed(1), id, "range-value smalls", id + "Value");
+  let decimals = text === 'Compactness' ? 2 : 1;
+  let value = createLabel(valueCol, Number(slider.value).toFixed(decimals), id, "range-value smalls", id + "Value");
   slider.oninput = function () {
-    value.innerHTML = Number(this.value).toFixed(1);
+    value.innerHTML = Number(this.value).toFixed(decimals);
   }
 
   return tr;
