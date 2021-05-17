@@ -176,6 +176,7 @@ class DistrictingsTab {
 			this.currentDic.toggleDisplay(false)
 		}
 		this.currentDic = d
+		console.log('test' +d.id)
 		if(d.id!='enacted'){
 			this.generateSelected();
 		}

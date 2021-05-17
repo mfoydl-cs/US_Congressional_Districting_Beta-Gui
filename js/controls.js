@@ -312,14 +312,14 @@ function constraintsTab(state, menu) {
     let compactDiv = htmlElement(constraints, 'div', 'constraintDiv');
     createTextElement(compactDiv,'h6','Compactness','h6')
     createRadioGroup(compactDiv, compactnessRadioLabels, "", "compactnessRadio");
-    createSlider(compactDiv, 'compactness-constraint', '', 0, 1, 0.01,'');
+    createSlider(compactDiv, 'compactness-constraint', '', 0, 1, 0.01,'',2);
     
 
     let majminDiv = htmlElement(constraints, 'div', 'constraintDiv');
     createTextElement(majminDiv, 'h6', 'Majority-Minority Districts', 'h6');
     createSelect(majminDiv, minorities, 'minority', 'minoritySelect');
     createSlider(majminDiv, 'majmin-constraint', 'Number of Districts (>=)', 0, 10, 1,'Number of Districts (>=)');
-    createSlider(majminDiv, 'majmin-threshold', 'Threshold (%)', 0, 1, 0.1, 'Threshold (%)');
+    createSlider(majminDiv, 'majmin-threshold', 'Threshold (%)', 0, 1, 0.01, 'Threshold (%)',2);
 
     let popDiv = htmlElement(constraints, 'div', 'constraintDiv');
     createTextElement(popDiv, 'h6', 'Population Difference', 'h6');
@@ -434,6 +434,9 @@ function measuresTab(state) {
 	createSlider(body, 'dev-enacted-geo', 'Deviation from Enacted Plan Geometry', 0, 1, 0.1, 'Deviation from Enacted Plan Geometry');
 	createSlider(body, 'dev-enacted-pop', 'Deviation from Enacted Plan Population', 0, 1, 0.1, 'Deviation from Enacted Plan Population');
 	createSlider(body, 'compactness', 'Compactness', 0, 1, 0.1, 'Compactness');
+
+    createSlider(body, 'split', 'Split Counties', 0, 1, 0.1, 'Split Counties',1,true)
+    createSlider(body, 'polfair', 'Political Fairness', 0, 1, 0.1, 'Political Fairness',1,true)
 
     //Submit button
     var subDiv = htmlElement(div, 'div', 'd-grid gap-2 col-6 mx-auto submitBtn')

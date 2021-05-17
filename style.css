@@ -167,6 +167,9 @@ input[type='range']:hover::-webkit-slider-runnable-track{
     opacity: 0.8;
     filter: brightness(120%);
 }
+input[type='range']:not(:disabled)::-webkit-slider-runnable-track{
+    background-color: rgb(156 197 255 / 44%);
+}
 
 .custom-check{
     margin-left: 1em;
@@ -297,4 +300,8 @@ th p{
 
 .form-select{
     margin: 2vh 0 2vh 0;
+}
+
+.disabledText{
+    color: gray;
 }

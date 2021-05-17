@@ -10,6 +10,7 @@ class EnactedDistricting extends Districting {
         this.geoJSON = geoJson;
         this.featureGroup = new L.LayerGroup();
 		this.count = 1;
+		this.id = 'enacted';
 		L.geoJson(this.geoJSON, {
 			onEachFeature: this.processDistrict
 		});

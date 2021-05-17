@@ -229,7 +229,7 @@ function Slider(parent, id, text, min, max, step) {
   return div;
 }
 
-function createSlider(parent, id, text, min, max, step, abbr) {
+function createSlider(parent, id, text, min, max, step, abbr, decimals=1, disabled=false) {
 
   let tr = L.DomUtil.create('tr', 'd-flex', parent);
 
@@ -256,11 +256,22 @@ function createSlider(parent, id, text, min, max, step, abbr) {
   slider.min = min;
   slider.max = max;
   slider.step = step;
-  let decimals = text === 'Compactness' ? 2 : 1;
+  if(disabled){
+    slider.setAttribute('disabled','disabled');
+    slider.setAttribute('aria-disabled', 'true');
+    if(labelCol){
+      labelCol.classList.add('disabledText');
+    }
+    rangeCol.classList.add('disabledText');
+    slider.value = 0;
+  }
+  
+  //let decimals = text === 'Compactness' ? 2 : 1;
   let value = createLabel(valueCol, Number(slider.value).toFixed(decimals), id, "range-value smalls", id + "Value");
   slider.oninput = function () {
     value.innerHTML = Number(this.value).toFixed(decimals);
   }
+
 
   return tr;
 }
